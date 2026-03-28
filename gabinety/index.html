@@ -2458,7 +2458,7 @@ async function fetchCalendarEvents(fetchInfo, successCallback, failureCallback) 
         for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
             const dow = (d.getDay() + 6) % 7; // Convert to 0=Mon (local time)
             const dateStr = toLocalDateStr(d);
-            fixed.filter(f => f.day_of_week === dow && (!f.end_date || f.end_date > dateStr) && (!f.start_date || f.start_date <= dateStr)).forEach(f => {
+            fixed.filter(f => f.day_of_week === dow && (!f.end_date || f.end_date > dateStr) && (!f.valid_from || f.valid_from <= dateStr)).forEach(f => {
                 // Sprawdź czy jest wyjątek (odwołanie na ten dzień)
                 const exception = exceptions.find(e =>
                     e.fixed_booking_id === f.id && e.exception_date === dateStr
@@ -2881,6 +2881,7 @@ async function saveEditBooking(bookingId) {
     toast('Rezerwacja zaktualizowana', 'success');
     closeModal();
     if (calendar) calendar.refetchEvents();
+    loadMyBookings();
 }
 
 async function cancelBooking(bookingId) {
@@ -2904,6 +2905,7 @@ async function cancelBooking(bookingId) {
     toast('Rezerwacja odwołana', 'info');
     closeModal();
     if (calendar) calendar.refetchEvents();
+    loadMyBookings();
 }
 
 async function cancelSeriesFuture(seriesId, fromDate) {

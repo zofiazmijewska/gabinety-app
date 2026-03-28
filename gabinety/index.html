@@ -3422,7 +3422,7 @@ function initMyCalendar() {
                         if (d.getDay() === dow) {
                             const dateStr = toLocalDateStr(d);
                             if (fb.end_date && dateStr >= fb.end_date) { d.setDate(d.getDate() + 1); continue; }
-                            if (fb.start_date && dateStr < fb.start_date) { d.setDate(d.getDate() + 1); continue; }
+                            if (fb.valid_from && dateStr < fb.valid_from) { d.setDate(d.getDate() + 1); continue; }
                             const isExcepted = exceptions.some(e => e.fixed_booking_id === fb.id && e.exception_date === dateStr);
                             if (!isExcepted) {
                                 events.push({

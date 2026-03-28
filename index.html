@@ -1,0 +1,1722 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pracownia Psychoterapii Zofii Żmijewskiej — Psychoterapia w Warszawie</title>
+    <meta name="description" content="Psychoterapia indywidualna, rodzinna i grupowa w Warszawie (Mokotów) i online. Zofia Żmijewska — psycholożka, psychoterapeutka integracyjno-systemowa. Pomagam z lękiem, depresją, traumą, PTSD, trudnościami w relacjach i innymi wyzwaniami emocjonalnymi.">
+    <meta name="keywords" content="psychoterapia Warszawa, psychoterapeuta Mokotów, terapia indywidualna Warszawa, terapia systemowa, terapia traumy Warszawa, psycholog Warszawa, terapia online, Zofia Żmijewska">
+    <link rel="canonical" href="https://zofiazmijewska.pl/">
+
+    <!-- Open Graph (social media) -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://zofiazmijewska.pl/">
+    <meta property="og:title" content="Pracownia Psychoterapii Zofii Żmijewskiej">
+    <meta property="og:description" content="Psychoterapia indywidualna, rodzinna i grupowa w Warszawie i online. Pomagam z lękiem, depresją, traumą i trudnościami w relacjach.">
+    <meta property="og:image" content="https://zofiazmijewska.pl/images/og-image.jpg">
+    <meta property="og:locale" content="pl_PL">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Pracownia Psychoterapii Zofii Żmijewskiej">
+    <meta name="twitter:description" content="Psychoterapia indywidualna, rodzinna i grupowa w Warszawie i online.">
+    <meta name="twitter:image" content="https://zofiazmijewska.pl/images/og-image.jpg">
+
+    <!-- Structured Data (JSON-LD) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "MedicalBusiness",
+      "name": "Pracownia Psychoterapii Zofia Żmijewska",
+      "description": "Psychoterapia indywidualna, rodzinna i grupowa w Warszawie i online. Specjalizacja: lęk, depresja, trauma, PTSD, trudności w relacjach.",
+      "url": "https://zofiazmijewska.pl",
+      "image": "https://zofiazmijewska.pl/images/hero.jpg",
+      "priceRange": "160–320 zł",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "ul. Puławska 26A/7",
+        "addressLocality": "Warszawa",
+        "postalCode": "02-512",
+        "addressCountry": "PL"
+      },
+      "geo": {
+        "@type": "GeoCoordinates",
+        "latitude": 52.2083,
+        "longitude": 21.0116
+      },
+      "employee": {
+        "@type": "Person",
+        "name": "Zofia Żmijewska",
+        "jobTitle": "Psycholożka i psychoterapeutka",
+        "alumniOf": {
+          "@type": "CollegeOrUniversity",
+          "name": "Uniwersytet SWPS w Warszawie"
+        }
+      },
+      "hasOfferCatalog": {
+        "@type": "OfferCatalog",
+        "name": "Usługi psychoterapeutyczne",
+        "itemListElement": [
+          {
+            "@type": "Offer",
+            "itemOffered": { "@type": "Service", "name": "Sesja indywidualna" },
+            "price": "220",
+            "priceCurrency": "PLN"
+          },
+          {
+            "@type": "Offer",
+            "itemOffered": { "@type": "Service", "name": "Psychoterapia rodzinna" },
+            "price": "320",
+            "priceCurrency": "PLN"
+          },
+          {
+            "@type": "Offer",
+            "itemOffered": { "@type": "Service", "name": "Psychoterapia grupowa" },
+            "price": "160",
+            "priceCurrency": "PLN"
+          }
+        ]
+      }
+    }
+    </script>
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="images/favicon.svg">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            color: #2E3440;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Cormorant Garamond', serif;
+            font-weight: 500;
+        }
+
+        /* ==================== NAVIGATION ==================== */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: transparent;
+            z-index: 1000;
+            transition: background 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        nav.scrolled {
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0.7rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: none;
+        }
+
+        .home-link {
+            text-decoration: none;
+            display: none;
+            align-items: center;
+        }
+
+        nav.scrolled .home-link {
+            display: flex;
+        }
+
+        .home-circle {
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            border: 4.5px solid #B8A9C9;
+            display: block;
+            transition: border-color 0.3s ease;
+        }
+
+        .home-circle:hover {
+            border-color: #A496B8;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2.5rem;
+            align-items: center;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: white;
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: color 0.3s ease;
+            position: relative;
+        }
+
+        nav.scrolled .nav-links a {
+            color: #2E3440;
+        }
+
+        .nav-links a:hover {
+            color: #B8A9C9;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: #B8A9C9;
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .nav-links .nav-btn {
+            background: #B8A9C9;
+            color: white !important;
+            padding: 0.5rem 1.2rem;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: none;
+        }
+
+        nav.scrolled .nav-links .nav-btn {
+            display: inline-block;
+        }
+
+        .nav-links .nav-btn::after {
+            display: none;
+        }
+
+        .nav-links .nav-btn:hover {
+            background: #A496B8;
+            color: white;
+            transform: translateY(-1px);
+        }
+
+        .language-toggle {
+            display: flex;
+            gap: 0.2rem;
+            margin-left: 1rem;
+        }
+
+        .lang-btn {
+            background: none;
+            border: none;
+            padding: 0.2rem 0.4rem;
+            cursor: pointer;
+            font-weight: 400;
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.5);
+            transition: all 0.3s ease;
+        }
+
+        nav.scrolled .lang-btn {
+            color: #B8A9C9;
+        }
+
+        .lang-btn.active {
+            font-weight: 600;
+            color: white;
+        }
+
+        nav.scrolled .lang-btn.active {
+            color: #2E3440;
+        }
+
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            gap: 6px;
+            cursor: pointer;
+            background: none;
+            border: none;
+        }
+
+        .hamburger span {
+            width: 24px;
+            height: 2.5px;
+            background: #2E3440;
+            transition: all 0.3s ease;
+        }
+
+        .hamburger.active span:nth-child(1) {
+            transform: rotate(45deg) translate(10px, 10px);
+        }
+
+        .hamburger.active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .hamburger.active span:nth-child(3) {
+            transform: rotate(-45deg) translate(7px, -7px);
+        }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+                position: absolute;
+                top: 56px;
+                left: 0;
+                right: 0;
+                flex-direction: column;
+                background: white;
+                gap: 0;
+                border-top: 1px solid #E8E6EB;
+            }
+
+            .nav-links.active {
+                display: flex;
+            }
+
+            .nav-links a {
+                padding: 1rem 2rem;
+                border-bottom: 1px solid #F4F2F6;
+                color: #2E3440 !important;
+            }
+
+            .nav-links .nav-btn {
+                display: inline-block !important;
+                margin: 0.5rem 2rem 1rem;
+                text-align: center;
+            }
+
+            .hamburger {
+                display: flex;
+            }
+
+            .language-toggle {
+                margin-left: 0;
+                padding: 0.2rem;
+                gap: 0.3rem;
+            }
+
+            .lang-btn {
+                padding: 0.25rem 0.5rem;
+                font-size: 0.75rem;
+            }
+
+            .nav-container {
+                padding: 1rem 1.5rem;
+            }
+        }
+
+        /* ==================== HERO SECTION ==================== */
+        .hero {
+            min-height: 90vh;
+            background: linear-gradient(to right, rgba(42, 55, 80, 0.35) 0%, rgba(42, 55, 80, 0.15) 40%, transparent 70%), url('images/hero.jpg');
+            background-size: cover;
+            background-position: center 35%;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            text-align: left;
+            color: white;
+            margin-top: 0;
+            position: relative;
+        }
+
+        .hero-content {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            z-index: 10;
+            padding: 2rem 2rem 2rem 48px;
+        }
+
+        .hero-logo {
+            width: 30vw;
+            max-width: 460px;
+            margin-bottom: 2vw;
+            filter: brightness(0) invert(1);
+        }
+
+        .hero .btn {
+            font-size: clamp(0.7rem, 1.5vw, 1.05rem);
+            padding: clamp(0.5rem, 1.3vw, 1rem) clamp(1rem, 3vw, 2.5rem);
+        }
+
+        .hero p {
+            font-size: 1.3rem;
+            margin-bottom: 2.5rem;
+            text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.3);
+            line-height: 1.8;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 1rem 2.5rem;
+            background: #B8A9C9;
+            color: white;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: 2px solid #B8A9C9;
+            cursor: pointer;
+            font-size: 1rem;
+            font-family: 'DM Sans', sans-serif;
+        }
+
+        .btn:hover {
+            background: #A496B8;
+            border-color: #A496B8;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(184, 169, 201, 0.4);
+        }
+
+        .btn-secondary {
+            background: #B8A9C9;
+            border-color: #B8A9C9;
+        }
+
+        .btn-secondary:hover {
+            background: #A496B8;
+            border-color: #A496B8;
+            color: white;
+        }
+
+        @media (max-width: 768px) {
+            .hero {
+                min-height: 0;
+                margin-top: 0;
+                align-items: flex-end;
+                background-image: linear-gradient(to right, rgba(42, 55, 80, 0.35) 0%, rgba(42, 55, 80, 0.15) 40%, transparent 70%), url('images/hero-mobile.jpg');
+                background-size: 100% auto;
+                background-position: center top;
+                background-repeat: no-repeat;
+                aspect-ratio: 1001 / 1198;
+            }
+
+            .hero-content {
+                padding: 0 0 45% 0.4rem;
+            }
+
+            .hero-logo {
+                width: 160px;
+                margin-bottom: 8px;
+            }
+
+            .hero .btn {
+                font-size: 0.75rem;
+                padding: 0.45rem 1.1rem;
+            }
+
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .hero p {
+                font-size: 1rem;
+            }
+        }
+
+        /* ==================== ABOUT SECTION ==================== */
+        .about {
+            background: #F4F2F6;
+            color: #2E3440;
+            padding: 5rem 2rem;
+        }
+
+        .about-text-container {
+            max-width: 750px;
+            margin: 0 auto;
+        }
+
+        .about h2 {
+            font-size: 2.2rem;
+            font-weight: 500;
+            color: #2E3440;
+            margin-bottom: 1.2rem;
+        }
+
+        .about p strong {
+            font-weight: 600;
+            color: #2E3440;
+        }
+
+        .about p {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            margin-bottom: 1.5rem;
+            color: #5A6070;
+        }
+
+        @media (max-width: 768px) {
+            .about {
+                padding: 3rem 1.5rem;
+            }
+
+            .about h2 {
+                font-size: 1.8rem;
+            }
+        }
+
+        /* ==================== QUALIFICATIONS SECTION ==================== */
+        .qualifications {
+            background: #F4F2F6;
+            padding: 5rem 2rem;
+        }
+
+        .qualifications h2 {
+            font-size: 2.2rem;
+            text-align: center;
+            margin-bottom: 4rem;
+            color: #2E3440;
+        }
+
+        .qual-layout {
+            display: grid;
+            grid-template-columns: 1fr 1.2fr;
+            gap: 3rem;
+            max-width: 900px;
+            margin: 0 auto;
+            align-items: start;
+        }
+
+        .qual-photo {
+            position: sticky;
+            top: 5rem;
+        }
+
+        .qual-photo img {
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+            display: block;
+        }
+
+        .timeline {
+            position: relative;
+            padding-left: 40px;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 12px;
+            top: 8px;
+            bottom: 8px;
+            width: 2px;
+            background: #B8A9C9;
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 32px;
+            padding-left: 24px;
+        }
+
+        .timeline-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -30px;
+            top: 8px;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #B8A9C9;
+        }
+
+        .timeline-year {
+            display: none;
+        }
+
+        .timeline-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.2rem;
+            font-weight: 500;
+            color: #2E3440;
+            margin-bottom: 4px;
+        }
+
+        .timeline-desc {
+            font-size: 0.88rem;
+            color: #7A8090;
+            line-height: 1.6;
+        }
+
+        .timeline-badge {
+            display: inline-block;
+            font-size: 0.68rem;
+            font-weight: 600;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            padding: 3px 10px;
+            border-radius: 12px;
+            background: rgba(184,169,201,0.18);
+            color: #9B8BB0;
+            margin-top: 6px;
+        }
+
+        @media (max-width: 768px) {
+            .qual-layout {
+                grid-template-columns: 1fr;
+                gap: 0;
+            }
+
+            .qual-photo {
+                position: static;
+                max-width: 180px;
+                margin: 0 auto 2rem;
+            }
+
+            .qualifications .qual-photo + .timeline {
+                order: 2;
+            }
+
+            .timeline {
+                padding-left: 32px;
+            }
+
+            .timeline::before {
+                left: 8px;
+            }
+
+            .timeline-item::before {
+                left: -25px;
+            }
+
+            .qualifications h2 {
+                font-size: 1.8rem;
+            }
+
+            .qualifications {
+                padding: 3rem 1.5rem;
+            }
+        }
+
+        /* ==================== WAVE SEPARATOR ==================== */
+        .wave-separator {
+            background: #F4F2F6;
+            line-height: 0;
+        }
+
+        .wave-separator svg {
+            width: 100%;
+            height: 30px;
+            display: block;
+        }
+
+        /* ==================== SERVICES SECTION ==================== */
+        .services {
+            background: #EFEAF4;
+            color: #2E3440;
+            padding: 5rem 2rem;
+        }
+
+        .services-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .services-intro {
+            max-width: 620px;
+            margin: 0 auto 2.5rem;
+            text-align: center;
+            font-size: 1rem;
+            line-height: 1.7;
+            color: #7A8090;
+        }
+
+        .services h2 {
+            font-size: 2.2rem;
+            text-align: center;
+            margin-bottom: 3.5rem;
+            color: #2E3440;
+        }
+
+        .tags {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 0.6rem;
+            max-width: 750px;
+            margin: 0 auto;
+        }
+
+        .tag {
+            background: white;
+            padding: 0.5rem 1.1rem;
+            border-radius: 6px;
+            font-size: 0.88rem;
+            color: #5A6070;
+            border: 1px solid rgba(184, 169, 201, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .tag:hover {
+            border-color: #B8A9C9;
+            color: #2E3440;
+        }
+
+        @media (max-width: 768px) {
+            .services {
+                padding: 3rem 1.5rem;
+            }
+
+            .services-intro {
+                font-size: 1rem;
+            }
+        }
+
+        /* ==================== PRICING SECTION ==================== */
+        .pricing {
+            background: #EFEAF4;
+            color: #2E3440;
+            padding: 5rem 2rem;
+        }
+
+        .pricing-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .pricing h2 {
+            font-size: 2.2rem;
+            text-align: center;
+            margin-bottom: 3.5rem;
+            color: #2E3440;
+        }
+
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.2rem;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .pricing-card {
+            background: white;
+            padding: 1.8rem 1.5rem;
+            border-radius: 8px;
+            border: 1px solid rgba(184, 169, 201, 0.2);
+            text-align: center;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+        }
+
+        .pricing-card h3 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.15rem;
+            margin-bottom: 1rem;
+            font-weight: 500;
+            color: #2E3440;
+        }
+
+        .pricing-price {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 0.3rem;
+            font-family: 'DM Sans', sans-serif;
+            color: #2E3440;
+        }
+
+        .pricing-duration {
+            font-size: 0.85rem;
+            color: #8A849A;
+            margin-bottom: 1rem;
+        }
+
+        .pricing-card p {
+            font-size: 0.82rem;
+            line-height: 1.6;
+            color: #7A8090;
+        }
+
+        .pricing-notes {
+            max-width: 800px;
+            margin: 2.5rem auto 0;
+            text-align: center;
+        }
+
+        .pricing-notes p {
+            font-size: 0.88rem;
+            color: #7A8090;
+            line-height: 1.6;
+            margin-bottom: 0.4rem;
+        }
+
+        .en-only {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .pricing {
+                padding: 3rem 1.5rem;
+            }
+
+            .pricing h2 {
+                font-size: 1.8rem;
+            }
+
+            .pricing-grid {
+                grid-template-columns: 1fr;
+                max-width: 100%;
+            }
+        }
+
+        /* ==================== OFFICE & CONTACT SECTION ==================== */
+        .office-contact {
+            background: #F4F2F6;
+            padding: 5rem 2rem;
+        }
+
+        .office-contact-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .office-contact h2 {
+            font-size: 2.2rem;
+            text-align: center;
+            margin-bottom: 3.5rem;
+            color: #2E3440;
+        }
+
+        .contact-inline {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            margin: 0 auto 2rem;
+        }
+
+        .contact-inline-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.92rem;
+            color: #5A6070;
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+
+        a.contact-inline-item:hover {
+            color: #B8A9C9;
+        }
+
+        .contact-inline-item svg {
+            width: 16px;
+            height: 16px;
+            color: #B8A9C9;
+            flex-shrink: 0;
+        }
+
+        .contact-inline-sep {
+            color: rgba(184, 169, 201, 0.45);
+            font-size: 1.1rem;
+            line-height: 1;
+        }
+
+        @media (max-width: 768px) {
+            .contact-inline-sep {
+                display: none;
+            }
+
+            .contact-inline {
+                flex-direction: column;
+                gap: 0.8rem;
+            }
+        }
+
+        .contact-details {
+            max-width: 700px;
+            margin: 0 auto 3rem;
+            text-align: center;
+        }
+
+        .contact-details p {
+            font-size: 0.88rem;
+            color: #7A8090;
+            line-height: 1.8;
+            margin-bottom: 0.3rem;
+        }
+
+        .office-gallery {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            max-width: 800px;
+            margin: 0 auto 4rem;
+        }
+
+        .office-gallery img {
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+            display: block;
+            cursor: pointer;
+            transition: opacity 0.3s ease;
+        }
+
+        .office-gallery img:hover {
+            opacity: 0.85;
+        }
+
+        /* Lightbox */
+        .lightbox {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.95);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .lightbox.active {
+            display: flex;
+        }
+
+        .lightbox-img {
+            max-width: 85vw;
+            max-height: 85vh;
+            object-fit: contain;
+            border-radius: 4px;
+        }
+
+        .lightbox-close {
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            background: none;
+            border: none;
+            color: #2E3440;
+            font-size: 2.5rem;
+            cursor: pointer;
+            line-height: 1;
+            opacity: 0.7;
+            transition: opacity 0.3s;
+        }
+
+        .lightbox-close:hover {
+            opacity: 1;
+        }
+
+        .lightbox-prev,
+        .lightbox-next {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #2E3440;
+            font-size: 3rem;
+            cursor: pointer;
+            padding: 1rem;
+            opacity: 0.6;
+            transition: opacity 0.3s;
+        }
+
+        .lightbox-prev:hover,
+        .lightbox-next:hover {
+            opacity: 1;
+        }
+
+        .lightbox-prev {
+            left: 1rem;
+        }
+
+        .lightbox-next {
+            right: 1rem;
+        }
+
+        .maps-container {
+            background: #F4F2F6;
+            padding: 0;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+
+        .maps-container iframe {
+            width: 100%;
+            height: 400px;
+            border: none;
+        }
+
+
+        @media (max-width: 768px) {
+            .office-contact {
+                padding: 3rem 1.5rem;
+            }
+
+            .office-contact h2 {
+                font-size: 1.8rem;
+            }
+
+            .maps-container iframe {
+                height: 300px;
+            }
+
+        }
+
+        /* ==================== FOOTER ==================== */
+        footer {
+            background: #2E3440;
+            color: white;
+            padding: 1.2rem 2rem;
+            text-align: center;
+        }
+
+        .footer-bottom {
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .footer-nip {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.5);
+            margin-top: 0.5rem;
+        }
+
+        /* ==================== ANIMATIONS ==================== */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in {
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        /* ==================== UTILITY CLASSES ==================== */
+        .hidden {
+            display: none !important;
+        }
+
+        /* ==================== FAQ SECTION ==================== */
+        .faq {
+            background: #F4F2F6;
+            color: #2E3440;
+            padding: 5rem 2rem;
+        }
+
+        .faq-container {
+            max-width: 750px;
+            margin: 0 auto;
+        }
+
+        .faq h2 {
+            font-size: 2.2rem;
+            text-align: center;
+            margin-bottom: 3.5rem;
+            color: #2E3440;
+        }
+
+        .faq-item {
+            border-bottom: 1px solid rgba(184, 169, 201, 0.3);
+        }
+
+        .faq-item:first-of-type {
+            border-top: 1px solid rgba(184, 169, 201, 0.3);
+        }
+
+        .faq-question {
+            width: 100%;
+            background: none;
+            border: none;
+            text-align: left;
+            padding: 1.3rem 0;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 1rem;
+            font-weight: 500;
+            color: #2E3440;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            transition: color 0.2s ease;
+        }
+
+        .faq-question:hover {
+            color: #9B8BB0;
+        }
+
+        .faq-question.open {
+            color: #9B8BB0;
+        }
+
+        .faq-icon {
+            flex-shrink: 0;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            border: 1.5px solid #B8A9C9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            color: #B8A9C9;
+            transition: transform 0.3s ease;
+            line-height: 1;
+        }
+
+        .faq-question.open .faq-icon {
+            transform: rotate(45deg);
+        }
+
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.35s ease, padding 0.35s ease;
+        }
+
+        .faq-answer.open {
+            max-height: 400px;
+        }
+
+        .faq-answer-inner {
+            padding-bottom: 1.3rem;
+            font-size: 0.95rem;
+            line-height: 1.8;
+            color: #5A6070;
+        }
+
+        @media (max-width: 768px) {
+            .faq {
+                padding: 3rem 1.5rem;
+            }
+
+            .faq h2 {
+                font-size: 1.8rem;
+            }
+        }
+
+        /* ==================== LAZY MAP ==================== */
+        .map-placeholder {
+            width: 100%;
+            height: 400px;
+            background: #E8E4EF;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background 0.2s ease;
+            margin-bottom: 2rem;
+        }
+
+        .map-placeholder:hover {
+            background: #DDD8E8;
+        }
+
+        .map-placeholder-inner {
+            text-align: center;
+            color: #7A8090;
+        }
+
+        .map-placeholder-inner svg {
+            width: 36px;
+            height: 36px;
+            margin-bottom: 0.8rem;
+            color: #B8A9C9;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .map-placeholder-inner p {
+            font-size: 0.95rem;
+            margin-bottom: 0.4rem;
+            color: #5A6070;
+        }
+
+        .map-placeholder-inner span {
+            font-size: 0.8rem;
+            color: #B8A9C9;
+            font-weight: 500;
+        }
+
+        @media (max-width: 768px) {
+            .map-placeholder {
+                height: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- ==================== NAVIGATION ==================== -->
+    <nav>
+        <div class="nav-container">
+            <a href="#home" class="home-link" aria-label="Strona główna">
+                <span class="home-circle"></span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="#about" data-pl="O mnie" data-en="About">O mnie</a></li>
+                <li><a href="#services" data-pl="Oferta" data-en="Services">Oferta</a></li>
+                <li><a href="#qualifications" data-pl="Wykształcenie" data-en="Qualifications">Wykształcenie</a></li>
+                <li><a href="#pricing" data-pl="Cennik" data-en="Pricing">Cennik</a></li>
+                <li><a href="#faq" data-pl="FAQ" data-en="FAQ">FAQ</a></li>
+                <li><a href="#contact" data-pl="Kontakt" data-en="Contact">Kontakt</a></li>
+                <li><a href="#" class="nav-btn" data-cal-link="pracownia-psychoterapii-zofii-zmijewskiej" data-cal-namespace="booking" data-cal-config='{"layout":"month_view"}' data-pl="Umów wizytę" data-en="Book a session" onclick="event.preventDefault()">Umów wizytę</a></li>
+            </ul>
+            <div class="language-toggle">
+                <button class="lang-btn active" data-lang="pl" aria-label="Polski">PL</button>
+                <button class="lang-btn" data-lang="en" aria-label="English">EN</button>
+            </div>
+            <button class="hamburger" aria-label="Menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- ==================== HERO SECTION ==================== -->
+    <section class="hero" id="home">
+        <div class="hero-content">
+            <img src="images/logo.svg" alt="Pracownia Psychoterapii Zofia Żmijewska" class="hero-logo" id="hero-logo" data-logo-pl="images/logo.svg" data-logo-en="images/logo-en.svg">
+            <a href="#" class="btn" data-cal-link="pracownia-psychoterapii-zofii-zmijewskiej" data-cal-namespace="booking" data-cal-config='{"layout":"month_view"}' data-pl="Umów wizytę" data-en="Book a session" onclick="event.preventDefault()">Umów wizytę</a>
+        </div>
+    </section>
+
+    <!-- ==================== ABOUT SECTION ==================== -->
+    <section class="about" id="about">
+        <div class="about-text-container">
+            <h2 data-pl="O mnie" data-en="About me">O mnie</h2>
+            <p data-pl="Nazywam się Zofia Żmijewska i jestem psycholożką oraz psychoterapeutką. Pracuję integracyjnie, co oznacza, że łączę różne narzędzia i metody pracy, dopasowując je do Twoich potrzeb. Bazuję jednak na podejściu systemowym — to znaczy, że interesuje mnie nie tylko Twoja indywidualna historia, ale też kontekst, w którym żyjesz: Twoje relacje, rodzina, środowisko. Często to, co przeżywamy jako osobisty problem — lęk, poczucie utknięcia, powtarzające się konflikty, trudności emocjonalne — okazuje się ściśle związane z tym, jak funkcjonujemy z innymi ludźmi i jakie wzorce się w nas zapisały." data-en="My name is Zofia Żmijewska and I am a psychologist and psychotherapist. I work integratively, combining different tools and methods and tailoring them to your needs. My foundation is systemic thinking — I'm interested not only in your individual story, but also the context you live in: your relationships, family, and environment. What we experience as a personal problem — anxiety, feeling stuck, recurring conflicts, emotional difficulties — often turns out to be closely connected to how we function with others and the patterns ingrained within us.">Nazywam się Zofia Żmijewska i jestem psycholożką oraz psychoterapeutką. Pracuję integracyjnie, co oznacza, że łączę różne narzędzia i metody pracy, dopasowując je do Twoich potrzeb. Bazuję jednak na podejściu systemowym — to znaczy, że interesuje mnie nie tylko Twoja indywidualna historia, ale też kontekst, w którym żyjesz: Twoje relacje, rodzina, środowisko. Często to, co przeżywamy jako osobisty problem — lęk, poczucie utknięcia, powtarzające się konflikty, trudności emocjonalne — okazuje się ściśle związane z tym, jak funkcjonujemy z innymi ludźmi i jakie wzorce się w nas zapisały.</p>
+            <p data-pl="Jestem członkinią Polskiego Towarzystwa Psychiatrycznego, Sekcji Naukowej Terapii Rodzin. A swoją pracę poddaję regularnej superwizji." data-en="I am a member of the Polish Psychiatric Association, Scientific Section of Family Therapy. I submit my work to regular supervision.">Jestem członkinią Polskiego Towarzystwa Psychiatrycznego, Sekcji Naukowej Terapii Rodzin. A swoją pracę poddaję regularnej superwizji.</p>
+        </div>
+    </section>
+
+    <!-- Wave separator -->
+    <div class="wave-separator">
+        <svg viewBox="0 0 1200 30" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M0,0 C300,30 900,30 1200,0 L1200,30 L0,30 Z" fill="#EFEAF4"/>
+        </svg>
+    </div>
+
+    <!-- ==================== SERVICES SECTION ==================== -->
+    <section class="services" id="services">
+        <div class="services-container">
+            <p class="services-intro" data-pl="Powody, dla których ludzie szukają pomocy, bywają bardzo różne — w swoim gabinecie staram się tworzyć bezpieczną przestrzeń, w której możemy wspólnie przyglądać się temu, co za nimi stoi." data-en="The reasons people seek help vary greatly — in my practice, I strive to create a safe space where we can look together at what lies behind them.">Powody, dla których ludzie szukają pomocy, bywają bardzo różne — w swoim gabinecie staram się tworzyć bezpieczną przestrzeń, w której możemy wspólnie przyglądać się temu, co za nimi stoi.</p>
+            <div class="tags">
+                <span class="tag" data-pl="lęk" data-en="anxiety">lęk</span>
+                <span class="tag" data-pl="depresja" data-en="depression">depresja</span>
+                <span class="tag" data-pl="trauma" data-en="trauma">trauma</span>
+                <span class="tag" data-pl="konflikty w relacjach" data-en="relationship conflicts">konflikty w relacjach</span>
+                <span class="tag" data-pl="ADHD" data-en="ADHD">ADHD</span>
+                <span class="tag" data-pl="ataki paniki" data-en="panic attacks">ataki paniki</span>
+                <span class="tag" data-pl="problemy rodzinne" data-en="family issues">problemy rodzinne</span>
+                <span class="tag" data-pl="wypalenie" data-en="burnout">wypalenie</span>
+                <span class="tag" data-pl="PTSD" data-en="PTSD">PTSD</span>
+                <span class="tag" data-pl="trudność z bliskością" data-en="difficulty with closeness">trudność z bliskością</span>
+                <span class="tag" data-pl="poczucie utknięcia" data-en="feeling stuck">poczucie utknięcia</span>
+                <span class="tag" data-pl="autyzm" data-en="autism">autyzm</span>
+                <span class="tag" data-pl="żałoba i strata" data-en="grief & loss">żałoba i strata</span>
+                <span class="tag" data-pl="wybuchowość" data-en="emotional outbursts">wybuchowość</span>
+                <span class="tag" data-pl="trudności ze snem" data-en="sleep difficulties">trudności ze snem</span>
+                <span class="tag" data-pl="kryzysy życiowe" data-en="life crises">kryzysy życiowe</span>
+                <span class="tag" data-pl="problemy z zaufaniem" data-en="trust issues">problemy z zaufaniem</span>
+                <span class="tag" data-pl="wycofanie emocjonalne" data-en="emotional withdrawal">wycofanie emocjonalne</span>
+                <span class="tag" data-pl="przytłoczenie" data-en="feeling overwhelmed">przytłoczenie</span>
+                <span class="tag" data-pl="samotność" data-en="loneliness">samotność</span>
+                <span class="tag" data-pl="stres" data-en="stress">stres</span>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ==================== QUALIFICATIONS SECTION ==================== -->
+    <section class="qualifications" id="qualifications">
+        <h2 data-pl="Wykształcenie i certyfikacja" data-en="Education & Certification">Wykształcenie i certyfikacja</h2>
+        <div class="qual-layout">
+            <div class="qual-photo">
+                <img src="images/about.jpg" alt="Zofia Żmijewska">
+            </div>
+            <div class="timeline">
+            <!-- Item 1: PTP Certification (in progress) -->
+            <div class="timeline-item">
+                <div class="timeline-year" data-pl="Certyfikacja" data-en="Certification">Certyfikacja</div>
+                <div class="timeline-title" data-pl="Certyfikacja psychoterapeutyczna" data-en="Psychotherapy Certification">Certyfikacja psychoterapeutyczna</div>
+                <div class="timeline-desc" data-pl="Certyfikacja w Polskim Towarzystwie Psychologicznym<br>jako psychoterapeutka integracyjno-systemowa." data-en="Certification with the Polish Psychological Association<br>as an integrative-systemic psychotherapist.">Certyfikacja w Polskim Towarzystwie Psychologicznym<br>jako psychoterapeutka integracyjno-systemowa.</div>
+                <div class="timeline-badge" data-pl="W trakcie" data-en="In progress">W trakcie</div>
+            </div>
+
+            <!-- Item 2: ESTD Trauma Certification (in progress) -->
+            <div class="timeline-item">
+                <div class="timeline-year" data-pl="Certyfikacja" data-en="Certification">Certyfikacja</div>
+                <div class="timeline-title" data-pl="Certyfikacja w diagnostyce zaburzeń potraumatycznych" data-en="Post-Traumatic Disorder Diagnostics Certification">Certyfikacja w diagnostyce zaburzeń potraumatycznych</div>
+                <div class="timeline-desc" data-pl="ESTD (European Society for Trauma and Dissociation).<br>Centrum Badań nad Traumą i Dysocjacją w Katowicach." data-en="ESTD (European Society for Trauma and Dissociation).<br>Centre for Research on Trauma and Dissociation in Katowice.">ESTD (European Society for Trauma and Dissociation).<br>Centrum Badań nad Traumą i Dysocjacją w Katowicach.</div>
+                <div class="timeline-badge" data-pl="W trakcie" data-en="In progress">W trakcie</div>
+            </div>
+
+
+            <!-- Item 4: Psychotherapy Training (completed) -->
+            <div class="timeline-item">
+                <div class="timeline-year" data-pl="Szkolenie" data-en="Training">Szkolenie</div>
+                <div class="timeline-title" data-pl="Psychoterapeutka integracyjno-systemowa" data-en="Integrative-Systemic Psychotherapist">Psychoterapeutka integracyjno-systemowa</div>
+                <div class="timeline-desc" data-pl="Szkoła Psychoterapii Mabor/Dialog. Pełne 4-letnie szkolenie akredytowane przez Polskie Towarzystwo Psychologiczne oraz Polskie Towarzystwo Psychiatryczne." data-en="Mabor/Dialog School of Psychotherapy. Full 4-year training programme accredited by the Polish Psychological Association and the Polish Psychiatric Association.">Szkoła Psychoterapii Mabor/Dialog. Pełne 4-letnie szkolenie akredytowane przez Polskie Towarzystwo Psychologiczne oraz Polskie Towarzystwo Psychiatryczne.</div>
+            </div>
+
+            <!-- Item 5: University (completed) -->
+            <div class="timeline-item">
+                <div class="timeline-year" data-pl="Studia" data-en="Studies">Studia</div>
+                <div class="timeline-title" data-pl="Magister psychologii klinicznej" data-en="Master's in Clinical Psychology">Magister psychologii klinicznej</div>
+                <div class="timeline-desc" data-pl="Uniwersytet SWPS w Warszawie." data-en="SWPS University in Warsaw.">Uniwersytet SWPS w Warszawie.</div>
+            </div>
+        </div>
+        </div>
+    </section>
+
+    <!-- ==================== PRICING SECTION ==================== -->
+    <section class="pricing" id="pricing">
+        <div class="pricing-container">
+            <h2 data-pl="Cennik" data-en="Pricing">Cennik</h2>
+            <div class="pricing-grid">
+                <!-- Individual Session -->
+                <div class="pricing-card">
+                    <h3 data-pl="Sesja indywidualna" data-en="Individual Session">Sesja indywidualna</h3>
+                    <div class="pricing-price">220 zł</div>
+                    <div class="pricing-duration" data-pl="50 minut" data-en="50 minutes">50 minut</div>
+                    <p data-pl="Sesja psychoterapeutyczna dostosowana do Twoich indywidualnych potrzeb." data-en="A psychotherapy session tailored to your individual needs.">Sesja psychoterapeutyczna dostosowana do Twoich indywidualnych potrzeb.</p>
+                </div>
+
+                <!-- Family Therapy -->
+                <div class="pricing-card">
+                    <h3 data-pl="Psychoterapia rodzinna" data-en="Family Psychotherapy">Psychoterapia rodzinna</h3>
+                    <div class="pricing-price">320 zł</div>
+                    <div class="pricing-duration" data-pl="80 minut" data-en="80 minutes">80 minut</div>
+                    <p data-pl="Spotkanie z rodziną — uczestniczą wszyscy członkowie wspólnie zamieszkujący." data-en="A session with the family — all members living together take part.">Spotkanie z rodziną — uczestniczą wszyscy członkowie wspólnie zamieszkujący.</p>
+                </div>
+
+                <!-- Group Therapy -->
+                <div class="pricing-card">
+                    <h3 data-pl="Psychoterapia grupowa" data-en="Group Psychotherapy">Psychoterapia grupowa</h3>
+                    <div class="pricing-price">160 zł</div>
+                    <div class="pricing-duration" data-pl="90 minut" data-en="90 minutes">90 minut</div>
+                    <p data-pl="Sesja grupowa terapeutyczna z innymi uczestnikami w bezpiecznym środowisku." data-en="A group therapy session with other participants in a safe environment.">Sesja grupowa terapeutyczna z innymi uczestnikami w bezpiecznym środowisku.</p>
+                </div>
+            </div>
+            <div class="pricing-notes">
+                <p data-pl="Pracuję z dorosłymi i młodzieżą od 15. roku życia." data-en="I work with adults and adolescents from the age of 15.">Pracuję z dorosłymi i młodzieżą od 15. roku życia.</p>
+                <p data-pl="Przed rozpoczęciem psychoterapii zapraszam na konsultację (50 min / 220 zł)." data-en="Before starting psychotherapy, I invite you for a consultation (50 min / 220 zł).">Przed rozpoczęciem psychoterapii zapraszam na konsultację (50 min / 220 zł).</p>
+                <p data-pl="Sesje prowadzę również online." data-en="I also offer online sessions.">Sesje prowadzę również online.</p>
+                <p class="en-only" data-pl="" data-en="Prices in PLN (Polish zloty)."></p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== FAQ SECTION ==================== -->
+    <section class="faq" id="faq">
+        <div class="faq-container">
+            <h2 data-pl="Najczęstsze pytania" data-en="Frequently Asked Questions">Najczęstsze pytania</h2>
+
+            <div class="faq-item">
+                <button class="faq-question" aria-expanded="false">
+                    <span data-pl="Jak wygląda pierwsza wizyta?" data-en="What does the first session look like?">Jak wygląda pierwsza wizyta?</span>
+                    <span class="faq-icon">+</span>
+                </button>
+                <div class="faq-answer" role="region">
+                    <div class="faq-answer-inner" data-pl="Pierwsza wizyta to konsultacja (50 minut), podczas której możemy poznać się nawzajem i porozmawiać o tym, co Cię sprowadza. Nie musisz mieć gotowej „historii" ani wiedzieć, czego dokładnie szukasz. Wspólnie przyglądamy się temu, co jest dla Ciebie ważne, a na końcu omawiamy, czy i jak możemy ze sobą pracować." data-en="The first session is a consultation (50 minutes) during which we can get to know each other and talk about what brings you here. You don't need to have a ready 'story' or know exactly what you're looking for. Together we look at what matters to you, and at the end we discuss whether and how we can work together.">Pierwsza wizyta to konsultacja (50 minut), podczas której możemy poznać się nawzajem i porozmawiać o tym, co Cię sprowadza. Nie musisz mieć gotowej „historii" ani wiedzieć, czego dokładnie szukasz. Wspólnie przyglądamy się temu, co jest dla Ciebie ważne, a na końcu omawiamy, czy i jak możemy ze sobą pracować.</div>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <button class="faq-question" aria-expanded="false">
+                    <span data-pl="Ile czasu trwa psychoterapia?" data-en="How long does psychotherapy last?">Ile czasu trwa psychoterapia?</span>
+                    <span class="faq-icon">+</span>
+                </button>
+                <div class="faq-answer" role="region">
+                    <div class="faq-answer-inner" data-pl="Czas trwania terapii jest bardzo indywidualny — zależy od Twoich celów, tempa pracy i tego, nad czym pracujemy. Niektóre osoby potrzebują kilku miesięcy, inne — kilku lat. Sesje odbywają się zwykle raz w tygodniu. To, jak długo będzie trwać nasza współpraca, omawiamy na bieżąco i dostosowujemy do Twoich potrzeb." data-en="The duration of therapy is very individual — it depends on your goals, pace of work, and what we are working on. Some people need a few months, others a few years. Sessions usually take place once a week. How long our collaboration will last is something we discuss as we go and adapt to your needs.">Czas trwania terapii jest bardzo indywidualny — zależy od Twoich celów, tempa pracy i tego, nad czym pracujemy. Niektóre osoby potrzebują kilku miesięcy, inne — kilku lat. Sesje odbywają się zwykle raz w tygodniu. To, jak długo będzie trwać nasza współpraca, omawiamy na bieżąco i dostosowujemy do Twoich potrzeb.</div>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <button class="faq-question" aria-expanded="false">
+                    <span data-pl="Czym różni się konsultacja od sesji terapeutycznej?" data-en="What is the difference between a consultation and a therapy session?">Czym różni się konsultacja od sesji terapeutycznej?</span>
+                    <span class="faq-icon">+</span>
+                </button>
+                <div class="faq-answer" role="region">
+                    <div class="faq-answer-inner" data-pl="Konsultacja (zwykle 1–3 spotkania) to czas na wzajemne poznanie się, omówienie tego, z czym przychodzisz, i zdecydowanie, czy psychoterapia jest dla Ciebie odpowiednia i czy chcemy pracować razem. Sesja terapeutyczna to regularne spotkanie w ramach już prowadzonej terapii — nakierowane na konkretną pracę nad wybranym obszarem." data-en="A consultation (usually 1–3 sessions) is time to get to know each other, discuss what brings you here, and decide whether psychotherapy is right for you and whether we want to work together. A therapy session is a regular meeting within ongoing therapy — focused on concrete work in a specific area.">Konsultacja (zwykle 1–3 spotkania) to czas na wzajemne poznanie się, omówienie tego, z czym przychodzisz, i zdecydowanie, czy psychoterapia jest dla Ciebie odpowiednia i czy chcemy pracować razem. Sesja terapeutyczna to regularne spotkanie w ramach już prowadzonej terapii — nakierowane na konkretną pracę nad wybranym obszarem.</div>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <button class="faq-question" aria-expanded="false">
+                    <span data-pl="Czy prowadzisz sesje online?" data-en="Do you offer online sessions?">Czy prowadzisz sesje online?</span>
+                    <span class="faq-icon">+</span>
+                </button>
+                <div class="faq-answer" role="region">
+                    <div class="faq-answer-inner" data-pl="Tak. Prowadzę sesje zarówno stacjonarnie (ul. Puławska 26A/7, Warszawa), jak i online — przez wideo. Forma online sprawdza się dobrze dla osób, które mieszkają poza Warszawą, mają trudności z dojazdem lub po prostu czują się swobodniej we własnym domu." data-en="Yes. I offer sessions both in-person (ul. Puławska 26A/7, Warsaw) and online via video. Online sessions work well for people living outside Warsaw, those who have difficulty commuting, or those who simply feel more comfortable at home.">Tak. Prowadzę sesje zarówno stacjonarnie (ul. Puławska 26A/7, Warszawa), jak i online — przez wideo. Forma online sprawdza się dobrze dla osób, które mieszkają poza Warszawą, mają trudności z dojazdem lub po prostu czują się swobodniej we własnym domu.</div>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <button class="faq-question" aria-expanded="false">
+                    <span data-pl="Dla kogo jest psychoterapia?" data-en="Who is psychotherapy for?">Dla kogo jest psychoterapia?</span>
+                    <span class="faq-icon">+</span>
+                </button>
+                <div class="faq-answer" role="region">
+                    <div class="faq-answer-inner" data-pl="Psychoterapia jest dla każdego, kto czuje, że coś go blokuje, nurtuje albo sprawia mu ból — niezależnie od tego, czy ma zdiagnozowane zaburzenie, czy po prostu czuje, że chciałby żyć inaczej. Pracuję z dorosłymi i młodzieżą od 15. roku życia, indywidualnie i rodzinnie." data-en="Psychotherapy is for anyone who feels stuck, troubled, or in pain — regardless of whether they have a diagnosed disorder or simply feel they would like to live differently. I work with adults and adolescents from the age of 15, individually and in family settings.">Psychoterapia jest dla każdego, kto czuje, że coś go blokuje, nurtuje albo sprawia mu ból — niezależnie od tego, czy ma zdiagnozowane zaburzenie, czy po prostu czuje, że chciałby żyć inaczej. Pracuję z dorosłymi i młodzieżą od 15. roku życia, indywidualnie i rodzinnie.</div>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <button class="faq-question" aria-expanded="false">
+                    <span data-pl="Skąd mam wiedzieć, czy potrzebuję psychoterapii?" data-en="How do I know if I need psychotherapy?">Skąd mam wiedzieć, czy potrzebuję psychoterapii?</span>
+                    <span class="faq-icon">+</span>
+                </button>
+                <div class="faq-answer" role="region">
+                    <div class="faq-answer-inner" data-pl="Jeśli zadajesz sobie to pytanie — to już dobry sygnał, że warto porozmawiać. Nie musisz być w kryzysie, żeby skorzystać z psychoterapii. Często przychodzą do mnie osoby, które „zewnętrznie" radzą sobie dobrze, ale czują wewnętrzne zmęczenie, poczucie utknięcia lub brak satysfakcji z życia. Zapraszam na konsultację — razem to sprawdzimy." data-en="If you are asking yourself this question, it is already a good sign that it is worth talking. You don't have to be in crisis to benefit from psychotherapy. People often come to me who are managing well on the outside, but feel inner exhaustion, a sense of being stuck, or a lack of life satisfaction. I invite you for a consultation — we will find out together.">Jeśli zadajesz sobie to pytanie — to już dobry sygnał, że warto porozmawiać. Nie musisz być w kryzysie, żeby skorzystać z psychoterapii. Często przychodzą do mnie osoby, które „zewnętrznie" radzą sobie dobrze, ale czują wewnętrzne zmęczenie, poczucie utknięcia lub brak satysfakcji z życia. Zapraszam na konsultację — razem to sprawdzimy.</div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- ==================== OFFICE & CONTACT SECTION ==================== -->
+    <section class="office-contact" id="contact">
+        <div class="office-contact-container">
+            <h2 data-pl="Kontakt" data-en="Contact">Kontakt</h2>
+            <div class="contact-inline">
+                <a href="mailto:kontakt@zofiazmijewska.pl" class="contact-inline-item">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" /></svg>
+                    <span>kontakt@zofiazmijewska.pl</span>
+                </a>
+                <span class="contact-inline-sep">|</span>
+                <a href="tel:+48514622225" class="contact-inline-item">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 0 0 2.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 0 1-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 0 0-1.091-.852H4.5A2.25 2.25 0 0 0 2.25 4.5v2.25Z" /></svg>
+                    <span>514 622 225</span>
+                </a>
+                <span class="contact-inline-sep">|</span>
+                <div class="contact-inline-item">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z"/></svg>
+                    <span data-pl="ul. Puławska 26A/7, Warszawa" data-en="ul. Puławska 26A/7, Warsaw">ul. Puławska 26A/7, Warszawa</span>
+                </div>
+            </div>
+            <div class="contact-details">
+                <p data-pl="Klatka po lewej, drugie piętro." data-en="Left staircase, second floor.">Klatka po lewej, drugie piętro.</p>
+                <p data-pl="Proszę przyjść nie wcześniej niż 10 minut przed rozpoczęciem spotkania." data-en="Please arrive no earlier than 10 minutes before your appointment.">Proszę przyjść nie wcześniej niż 10 minut przed rozpoczęciem spotkania.</p>
+                <p data-pl="Płatność możliwa gotówką, kartą lub przelewem." data-en="Payment accepted in cash, by card, or bank transfer.">Płatność możliwa gotówką, kartą lub przelewem.</p>
+            </div>
+
+            <!-- Gallery Section -->
+            <div class="office-gallery">
+                <img src="images/gabinet4.jpg" alt="Gabinet - widok 1" onclick="openLightbox(0)">
+                <img src="images/gabinet1.jpg" alt="Gabinet - widok 2" onclick="openLightbox(1)">
+                <img src="images/gabinet3.jpg" alt="Gabinet - widok 3" onclick="openLightbox(2)">
+                <img src="images/gabinet2.jpg" alt="Gabinet - widok 4" onclick="openLightbox(3)">
+            </div>
+
+            <!-- Lightbox -->
+            <div class="lightbox" id="lightbox" onclick="closeLightbox(event)">
+                <button class="lightbox-close" onclick="closeLightbox(event)">&times;</button>
+                <button class="lightbox-prev" onclick="lightboxPrev(event)">&#8249;</button>
+                <img class="lightbox-img" id="lightbox-img" src="" alt="Gabinet">
+                <button class="lightbox-next" onclick="lightboxNext(event)">&#8250;</button>
+            </div>
+
+            <!-- Maps (lazy load) -->
+            <div class="maps-container" id="mapsContainer">
+                <div class="map-placeholder" id="mapPlaceholder" onclick="loadMap()" role="button" tabindex="0" aria-label="Kliknij, aby załadować mapę Google">
+                    <div class="map-placeholder-inner">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z"/>
+                        </svg>
+                        <p>ul. Puławska 26A/7, Warszawa</p>
+                        <span>Kliknij, aby załadować mapę</span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- ==================== FOOTER ==================== -->
+    <footer>
+        <div class="footer-bottom">
+            <p>© <span class="current-year"></span> <span data-pl="Pracownia Psychoterapii Zofia Żmijewska. Wszystkie prawa zastrzeżone." data-en="Psychotherapy Office Zofia Żmijewska. All rights reserved.">Pracownia Psychoterapii Zofia Żmijewska. Wszystkie prawa zastrzeżone.</span></p>
+            <p class="footer-nip">ul. Puławska 26A/7, 02-512 Warszawa · NIP: 1133097341</p>
+        </div>
+    </footer>
+
+    <script>
+        // ==================== LANGUAGE SWITCHING ====================
+        const langBtns = document.querySelectorAll('.lang-btn');
+        const translatableElements = document.querySelectorAll('[data-pl][data-en]');
+        let currentLang = 'pl';
+
+        langBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                currentLang = btn.getAttribute('data-lang');
+                updateLanguage();
+                updateActiveButton();
+            });
+        });
+
+        function updateLanguage() {
+            translatableElements.forEach(el => {
+                if (el.hasAttribute('data-pl') && el.hasAttribute('data-en')) {
+                    const text = currentLang === 'pl' ? el.getAttribute('data-pl') : el.getAttribute('data-en');
+                    el.innerHTML = text;
+                }
+            });
+
+            // Update HTML lang attribute
+            document.documentElement.lang = currentLang;
+
+            // Show/hide English-only elements
+            document.querySelectorAll('.en-only').forEach(el => {
+                el.style.display = currentLang === 'en' ? '' : 'none';
+            });
+
+            // Switch logo
+            const heroLogo = document.getElementById('hero-logo');
+            if (heroLogo) {
+                heroLogo.src = currentLang === 'pl' ? heroLogo.getAttribute('data-logo-pl') : heroLogo.getAttribute('data-logo-en');
+            }
+        }
+
+        function updateActiveButton() {
+            langBtns.forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelector(`[data-lang="${currentLang}"]`).classList.add('active');
+        }
+
+        // ==================== MOBILE MENU TOGGLE ====================
+        const hamburger = document.querySelector('.hamburger');
+        const navLinks = document.querySelector('.nav-links');
+
+        hamburger.addEventListener('click', () => {
+            hamburger.classList.toggle('active');
+            navLinks.classList.toggle('active');
+        });
+
+        // Close menu when a link is clicked
+        document.querySelectorAll('.nav-links a').forEach(link => {
+            link.addEventListener('click', () => {
+                hamburger.classList.remove('active');
+                navLinks.classList.remove('active');
+            });
+        });
+
+        // ==================== INTERSECTION OBSERVER FOR ANIMATIONS ====================
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('fade-in');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.service-card').forEach(card => {
+            observer.observe(card);
+        });
+
+        // ==================== NAV SCROLL EFFECT ====================
+        const nav = document.querySelector('nav');
+        const heroSection = document.querySelector('.hero');
+
+        function updateNav() {
+            const heroBottom = heroSection.offsetTop + heroSection.offsetHeight;
+            if (window.scrollY >= heroBottom - 60) {
+                nav.classList.add('scrolled');
+            } else {
+                nav.classList.remove('scrolled');
+            }
+        }
+
+        // Set correct state on page load
+        updateNav();
+        window.addEventListener('scroll', updateNav);
+
+        // ==================== LIGHTBOX ====================
+        const lightboxImages = [
+            'images/gabinet4.jpg',
+            'images/gabinet1.jpg',
+            'images/gabinet3.jpg',
+            'images/gabinet2.jpg'
+        ];
+        let lightboxIndex = 0;
+        const lightbox = document.getElementById('lightbox');
+        const lightboxImg = document.getElementById('lightbox-img');
+
+        function openLightbox(index) {
+            lightboxIndex = index;
+            lightboxImg.src = lightboxImages[lightboxIndex];
+            lightbox.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeLightbox(e) {
+            if (e.target === lightbox || e.target.classList.contains('lightbox-close')) {
+                lightbox.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        }
+
+        function lightboxPrev(e) {
+            e.stopPropagation();
+            lightboxIndex = (lightboxIndex - 1 + lightboxImages.length) % lightboxImages.length;
+            lightboxImg.src = lightboxImages[lightboxIndex];
+        }
+
+        function lightboxNext(e) {
+            e.stopPropagation();
+            lightboxIndex = (lightboxIndex + 1) % lightboxImages.length;
+            lightboxImg.src = lightboxImages[lightboxIndex];
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (!lightbox.classList.contains('active')) return;
+            if (e.key === 'Escape') {
+                lightbox.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+            if (e.key === 'ArrowLeft') lightboxPrev(e);
+            if (e.key === 'ArrowRight') lightboxNext(e);
+        });
+
+        // ==================== DYNAMIC YEAR ====================
+        document.querySelectorAll('.current-year').forEach(el => {
+            el.textContent = new Date().getFullYear();
+        });
+
+        // ==================== FAQ ACCORDION ====================
+        document.querySelectorAll('.faq-question').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const answer = btn.nextElementSibling;
+                const isOpen = btn.classList.contains('open');
+
+                // Close all open items
+                document.querySelectorAll('.faq-question.open').forEach(openBtn => {
+                    openBtn.classList.remove('open');
+                    openBtn.setAttribute('aria-expanded', 'false');
+                    openBtn.nextElementSibling.classList.remove('open');
+                });
+
+                // Open clicked item (if it wasn't open)
+                if (!isOpen) {
+                    btn.classList.add('open');
+                    btn.setAttribute('aria-expanded', 'true');
+                    answer.classList.add('open');
+                }
+            });
+        });
+
+        // ==================== LAZY MAP ====================
+        function loadMap() {
+            const container = document.getElementById('mapsContainer');
+            const iframe = document.createElement('iframe');
+            iframe.src = 'https://www.google.com/maps/embed/v1/place?key=AIzaSyBFw0Qbyq9zTFTd-tUY6dZWTgaQzuU17R8&q=Puławska+26A,+02-512+Warszawa,+Poland&zoom=15';
+            iframe.style.width = '100%';
+            iframe.style.height = '400px';
+            iframe.style.border = 'none';
+            iframe.style.borderRadius = '8px';
+            iframe.style.marginBottom = '2rem';
+            iframe.setAttribute('allowfullscreen', '');
+            iframe.setAttribute('referrerpolicy', 'no-referrer-when-downgrade');
+            iframe.setAttribute('aria-label', 'Google Maps - Puławska 26A/7, 02-512 Warszawa');
+            container.innerHTML = '';
+            container.appendChild(iframe);
+        }
+
+        // Also allow keyboard activation of map placeholder
+        document.addEventListener('keydown', (e) => {
+            const placeholder = document.getElementById('mapPlaceholder');
+            if (placeholder && document.activeElement === placeholder && (e.key === 'Enter' || e.key === ' ')) {
+                loadMap();
+            }
+        });
+    </script>
+
+    <!-- Cal.com Embed Script -->
+    <script type="text/javascript">
+    (function (C, A, L) {
+        let p = function (a, ar) { a.q.push(ar); };
+        let d = C.document;
+        C.Cal = C.Cal || function () {
+            let cal = C.Cal;
+            let ar = arguments;
+            if (!cal.loaded) {
+                cal.ns = {};
+                cal.q = cal.q || [];
+                d.head.appendChild(d.createElement("script")).src = A;
+                cal.loaded = true;
+            }
+            if (ar[0] === L) {
+                const api = function () { p(api, arguments); };
+                const namespace = ar[1];
+                api.q = api.q || [];
+                if (typeof namespace === "string") {
+                    cal.ns[namespace] = cal.ns[namespace] || api;
+                    p(cal.ns[namespace], ar);
+                    p(cal, ["initNamespace", namespace]);
+                } else p(cal, ar);
+                return;
+            }
+            p(cal, ar);
+        };
+    })(window, "https://app.cal.eu/embed/embed.js", "init");
+
+    Cal("init", "booking", { origin: "https://cal.eu" });
+    Cal.ns.booking("ui", {
+        styles: { branding: { brandColor: "#B8A9C9" } },
+        hideEventTypeDetails: false,
+        layout: "month_view"
+    });
+    </script>
+</body>
+</html>

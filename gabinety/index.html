@@ -1728,6 +1728,32 @@
             </div>
         </div>
 
+        <!-- ==================== ADMIN: HISTORIA ==================== -->
+        <div id="view-adminHistory" class="view">
+            <div class="flex-between mb-2">
+                <h2 class="card-title" style="margin:0;">Historia zmian</h2>
+                <button class="btn btn-secondary" onclick="loadAuditLog()">Odśwież</button>
+            </div>
+            <div class="card">
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Kiedy</th>
+                                <th>Opis</th>
+                                <th>Akcja</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody id="auditLogTable"></tbody>
+                    </table>
+                </div>
+                <div id="auditLogEmpty" class="text-center text-gray" style="padding:2rem;display:none;">
+                    Brak zapisanych zmian
+                </div>
+            </div>
+        </div>
+
     </div>
 </div>
 
@@ -2160,7 +2186,8 @@ function setupNavTabs() {
         const adminTabs = [
             { view: 'adminTenants', label: 'Najemcy' },
             { view: 'adminFixed', label: 'Stałe bloki' },
-            { view: 'adminInvoices', label: 'Faktury' }
+            { view: 'adminInvoices', label: 'Faktury' },
+            { view: 'adminHistory', label: 'Historia' }
         ];
         adminTabs.forEach(t => {
             const btn = document.createElement('button');
@@ -2196,6 +2223,7 @@ function switchView(viewName) {
         case 'adminTenants': loadTenants(); break;
         case 'adminFixed': loadFixedBookings(); break;
         case 'adminInvoices': initInvoiceMonths(); loadInvoices(); break;
+        case 'adminHistory': loadAuditLog(); break;
     }
 }
 
@@ -2842,6 +2870,8 @@ async function saveEditBooking(bookingId) {
         return;
     }
 
+    const { data: oldBooking } = await sb.from('single_bookings').select('*').eq('id', bookingId).single();
+
     // Sprawdź konflikty (pomijając edytowaną rezerwację)
     const { data: conflicts } = await sb
         .from('single_bookings')
@@ -2860,16 +2890,15 @@ async function saveEditBooking(bookingId) {
         return;
     }
 
-    const { error } = await sb
-        .from('single_bookings')
-        .update({
-            room_id: newRoomId,
-            booking_date: newDate,
-            start_time: String(newStartH).padStart(2,'0') + ':00:00',
-            end_time: String(newEndH).padStart(2,'0') + ':00:00',
-            tenant_id: newTenantId
-        })
-        .eq('id', bookingId);
+    const newData = {
+        room_id: newRoomId,
+        booking_date: newDate,
+        start_time: String(newStartH).padStart(2,'0') + ':00:00',
+        end_time: String(newEndH).padStart(2,'0') + ':00:00',
+        tenant_id: newTenantId
+    };
+
+    const { error } = await sb.from('single_bookings').update(newData).eq('id', bookingId);
 
     if (error) {
         toast('Błąd zapisu: ' + error.message, 'error');
@@ -2878,6 +2907,11 @@ async function saveEditBooking(bookingId) {
         return;
     }
 
+    const tenantName = (await sb.from('tenants').select('name').eq('id', newTenantId).single()).data?.name || '';
+    const roomName = rooms.find(r => r.id === newRoomId)?.name || '';
+    await logAudit('single_bookings', bookingId, 'update', oldBooking, newData,
+        `Edycja rezerwacji: ${tenantName} — ${newDate} ${String(newStartH).padStart(2,'0')}:00–${String(newEndH).padStart(2,'0')}:00 ${roomName}`);
+
     toast('Rezerwacja zaktualizowana', 'success');
     closeModal();
     if (calendar) calendar.refetchEvents();
@@ -2885,6 +2919,8 @@ async function saveEditBooking(bookingId) {
 }
 
 async function cancelBooking(bookingId) {
+    const { data: oldBooking } = await sb.from('single_bookings').select('*, tenants(name), rooms(name)').eq('id', bookingId).single();
+
     let query = sb
         .from('single_bookings')
         .update({ status: 'cancelled', cancelled_at: new Date().toISOString(), cancelled_by: currentTenant.id })
@@ -2900,6 +2936,13 @@ async function cancelBooking(bookingId) {
     if (error) {
         toast('Błąd odwołania: ' + error.message, 'error');
         return;
+    }
+
+    if (oldBooking) {
+        const tenantName = oldBooking.tenants?.name || '';
+        const roomName = oldBooking.rooms?.name || '';
+        await logAudit('single_bookings', bookingId, 'cancel', oldBooking, null,
+            `Odwołano rezerwację: ${tenantName} — ${oldBooking.booking_date} ${oldBooking.start_time.substring(0,5)}–${oldBooking.end_time.substring(0,5)} ${roomName}`);
     }
 
     toast('Rezerwacja odwołana', 'info');
@@ -4151,13 +4194,19 @@ async function saveFixed() {
         is_active: true
     };
 
-    const { error } = await sb.from('fixed_bookings').insert(data);
+    const { data: inserted, error } = await sb.from('fixed_bookings').insert(data).select().single();
     if (error) {
         toast('Błąd: ' + error.message, 'error');
         btn.disabled = false;
         btn.textContent = 'Dodaj';
         return;
     }
+
+    const tenantName = (await sb.from('tenants').select('name').eq('id', data.tenant_id).single()).data?.name || '';
+    const roomName = rooms.find(r => r.id === data.room_id)?.name || '';
+    const dayName = DAYS_PL[data.day_of_week] || '';
+    await logAudit('fixed_bookings', inserted?.id, 'insert', null, inserted,
+        `Stały blok: ${tenantName} — ${dayName} ${data.start_time.substring(0,5)}–${data.end_time.substring(0,5)} ${roomName}`);
 
     toast('Stały blok dodany', 'success');
     await autoRecalcMonthly(data.tenant_id);
@@ -4237,6 +4286,8 @@ async function updateFixed() {
         return;
     }
 
+    const { data: oldFb } = await sb.from('fixed_bookings').select('*').eq('id', id).single();
+
     const updates = {
         tenant_id: document.getElementById('editFixedTenant').value,
         room_id: document.getElementById('editFixedRoom').value,
@@ -4253,6 +4304,12 @@ async function updateFixed() {
         btn.textContent = 'Zapisz';
         return;
     }
+
+    const tenantName = (await sb.from('tenants').select('name').eq('id', updates.tenant_id).single()).data?.name || '';
+    const roomName = rooms.find(r => r.id === updates.room_id)?.name || '';
+    const dayName = DAYS_PL[updates.day_of_week] || '';
+    await logAudit('fixed_bookings', id, 'update', oldFb, updates,
+        `Edycja bloku: ${tenantName} — ${dayName} ${startTime.substring(0,5)}–${endTime.substring(0,5)} ${roomName}`);
 
     toast('Stały blok zaktualizowany', 'success');
     await autoRecalcMonthly(updates.tenant_id);
@@ -4271,11 +4328,19 @@ async function toggleFixed(id, active) {
 
 async function deleteFixed(id) {
     if (!confirm('Na pewno usunąć ten stały blok?')) return;
-    const { data: fb } = await sb.from('fixed_bookings').select('tenant_id').eq('id', id).single();
+    const { data: fb } = await sb.from('fixed_bookings').select('*, tenants(name), rooms(name)').eq('id', id).single();
     const { error } = await sb.from('fixed_bookings').delete().eq('id', id);
     if (error) { toast('Błąd usuwania: ' + error.message, 'error'); return; }
+
+    if (fb) {
+        const dayName = DAYS_PL[fb.day_of_week] || '';
+        const tenantName = fb.tenants?.name || '';
+        const roomName = fb.rooms?.name || '';
+        await logAudit('fixed_bookings', id, 'delete', fb, null,
+            `Usunięto blok: ${tenantName} — ${dayName} ${fb.start_time.substring(0,5)}–${fb.end_time.substring(0,5)} ${roomName}`);
+        await autoRecalcMonthly(fb.tenant_id);
+    }
     toast('Blok usunięty', 'info');
-    if (fb) await autoRecalcMonthly(fb.tenant_id);
     loadFixedBookings();
 }
 
@@ -4522,6 +4587,107 @@ function toast(msg, type = 'info') {
 document.getElementById('loginEmail').addEventListener('keydown', e => {
     if (e.key === 'Enter') handleLogin();
 });
+
+// ================================================================
+// AUDIT LOG
+// ================================================================
+async function logAudit(tableName, recordId, action, oldData, newData, description) {
+    try {
+        await sb.from('audit_log').insert({
+            table_name: tableName,
+            record_id: recordId || null,
+            action,
+            old_data: oldData || null,
+            new_data: newData || null,
+            description,
+            performed_by: currentTenant ? currentTenant.id : null
+        });
+    } catch (e) {
+        console.warn('logAudit error:', e);
+    }
+}
+
+async function loadAuditLog() {
+    const { data, error } = await sb
+        .from('audit_log')
+        .select('*, performer:tenants!performed_by(name)')
+        .order('performed_at', { ascending: false })
+        .limit(200);
+
+    const tbody = document.getElementById('auditLogTable');
+    const empty = document.getElementById('auditLogEmpty');
+    if (!tbody) return;
+
+    if (error || !data || data.length === 0) {
+        tbody.innerHTML = '';
+        if (empty) empty.style.display = '';
+        return;
+    }
+    if (empty) empty.style.display = 'none';
+
+    const now = Date.now();
+    const UNDO_WINDOW_MS = 24 * 60 * 60 * 1000;
+
+    const actionLabels = {
+        insert: { label: 'Dodano', cls: 'badge-confirmed' },
+        update: { label: 'Edytowano', cls: 'badge-single' },
+        delete: { label: 'Usunięto', cls: 'badge-cancelled' },
+        cancel: { label: 'Odwołano', cls: 'badge-cancelled' },
+        activate: { label: 'Aktywowano', cls: 'badge-confirmed' },
+        deactivate: { label: 'Dezakt.', cls: 'badge-single' }
+    };
+
+    tbody.innerHTML = data.map(entry => {
+        const dt = new Date(entry.performed_at);
+        const timeStr = dt.toLocaleDateString('pl-PL', { day: 'numeric', month: 'short' })
+            + ' ' + dt.toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' });
+        const performer = entry.performer ? entry.performer.name : '—';
+        const al = actionLabels[entry.action] || { label: entry.action, cls: 'badge-single' };
+        const canUndo = (now - dt.getTime()) < UNDO_WINDOW_MS
+            && ['insert', 'update', 'delete'].includes(entry.action);
+        const undoBtn = canUndo
+            ? `<button class="btn btn-sm btn-secondary" onclick="undoAuditLog('${entry.id}', '${entry.table_name}', '${entry.action}', '${entry.record_id}')">Cofnij</button>`
+            : '';
+        return `<tr>
+            <td class="text-xs text-gray" style="white-space:nowrap;">${timeStr}<br><span style="font-size:0.75rem;color:#aaa;">${performer}</span></td>
+            <td>${entry.description}</td>
+            <td><span class="badge ${al.cls}">${al.label}</span></td>
+            <td>${undoBtn}</td>
+        </tr>`;
+    }).join('');
+}
+
+async function undoAuditLog(logId, tableName, action, recordId) {
+    if (!confirm('Na pewno cofnąć tę zmianę?')) return;
+
+    const { data: entry } = await sb.from('audit_log').select('*').eq('id', logId).single();
+    if (!entry) { toast('Nie znaleziono wpisu', 'error'); return; }
+
+    let error;
+    if (action === 'insert') {
+        // Cofnij insert = usuń rekord
+        ({ error } = await sb.from(tableName).delete().eq('id', recordId));
+    } else if (action === 'update' || action === 'cancel') {
+        // Cofnij update = przywróć old_data
+        if (!entry.old_data) { toast('Brak danych do przywrócenia', 'error'); return; }
+        ({ error } = await sb.from(tableName).update(entry.old_data).eq('id', recordId));
+    } else if (action === 'delete') {
+        // Cofnij delete = przywróć rekord
+        if (!entry.old_data) { toast('Brak danych do przywrócenia', 'error'); return; }
+        ({ error } = await sb.from(tableName).insert({ ...entry.old_data, id: recordId }));
+    }
+
+    if (error) { toast('Błąd cofania: ' + error.message, 'error'); return; }
+
+    // Usuń wpis z audit_log (i wpis który go cofa, żeby nie tworzyć pętli)
+    await sb.from('audit_log').delete().eq('id', logId);
+
+    toast('Zmiana cofnięta', 'success');
+    loadAuditLog();
+    if (calendar) calendar.refetchEvents();
+    loadFixedBookings();
+    loadMyBookings();
+}
 
 // ================================================================
 // BOOT

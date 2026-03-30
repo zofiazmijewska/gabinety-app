@@ -1501,21 +1501,6 @@
                     Brak stałych rezerwacji w kalendarzu
                 </div>
             </div>
-            <!-- Historia zmian -->
-            <div class="card" style="margin-top:1.5rem;" id="myFixedHistoryCard">
-                <h3 class="card-title">Historia zmian</h3>
-                <div class="table-wrap">
-                    <table>
-                        <thead>
-                            <tr><th>Od kiedy</th><th>Godz./tydz.</th><th>Kwota mies.</th><th>Uwagi</th></tr>
-                        </thead>
-                        <tbody id="myFixedHistoryTable"></tbody>
-                    </table>
-                </div>
-                <div id="myFixedHistoryEmpty" class="text-center text-gray" style="padding:2rem;display:none;">
-                    Brak historii zmian
-                </div>
-            </div>
         </div>
 
         <!-- ==================== SUMMARY VIEW ==================== -->
@@ -2606,7 +2591,7 @@ async function showBookingModal(start, end, resourceId) {
     if (currentTenant && currentTenant.is_admin) {
         const { data: tenants } = await sb.from('tenants').select('id, name').eq('is_active', true).order('name');
         const tenantOptions = (tenants || []).map(t =>
-            `<option value="${t.id}" ${t.id === currentTenant.id ? 'selected' : ''}>${t.name}</option>`
+            `<option value="${t.id}" ${t.id === currentTenant.id ? 'selected' : ''}>${escHtml(t.name)}</option>`
         ).join('');
         tenantSelectHtml = `
             <div class="form-group">
@@ -3580,41 +3565,6 @@ async function loadMyFixed() {
     const hasAnyData = (bookings && bookings.length > 0) || monthlyAmount > 0;
     document.getElementById('myFixedStats').style.display = hasAnyData ? '' : 'none';
 
-    // 4. Load history
-    loadMyFixedHistory();
-}
-
-async function loadMyFixedHistory() {
-    const historyCard = document.getElementById('myFixedHistoryCard');
-    const tbody = document.getElementById('myFixedHistoryTable');
-    const empty = document.getElementById('myFixedHistoryEmpty');
-
-    const { data, error } = await sb
-        .from('rental_history')
-        .select('*')
-        .eq('tenant_id', currentTenant.id)
-        .order('valid_from', { ascending: false });
-
-    if (error || !data || data.length === 0) {
-        // No history table or no records — hide section
-        historyCard.style.display = 'none';
-        return;
-    }
-
-    historyCard.style.display = '';
-    empty.style.display = 'none';
-    tbody.innerHTML = data.map(h => {
-        const date = new Date(h.valid_from).toLocaleDateString('pl-PL', { day: 'numeric', month: 'short', year: 'numeric' });
-        const calculated = (h.weekly_hours * PRICE_PER_HOUR * 4.26).toFixed(2);
-        const actual = h.monthly_amount ? parseFloat(h.monthly_amount).toFixed(2) : calculated;
-        const isCustom = h.monthly_amount && Math.abs(parseFloat(h.monthly_amount) - parseFloat(calculated)) > 0.01;
-        return `<tr>
-            <td>${date}</td>
-            <td>${h.weekly_hours}h</td>
-            <td>${actual} zł${isCustom ? ' <span class="badge badge-single">indywidualna</span>' : ''}</td>
-            <td>${h.notes || ''}</td>
-        </tr>`;
-    }).join('');
 }
 
 // ================================================================
@@ -3622,7 +3572,7 @@ async function loadMyFixedHistory() {
 // ================================================================
 function initSummaryMonths() {
     const select = document.getElementById('summaryMonth');
-    if (select.options.length > 0) return;
+    if (!select || select.options.length > 0) return;
 
     const now = new Date();
     for (let i = 0; i < 6; i++) {
@@ -4038,11 +3988,6 @@ async function saveTenant(existingId) {
             return;
         }
 
-        // Log history if amount changed
-        if (existingId && oldAmount !== null && Math.abs(oldAmount - data.monthly_fixed_amount) > 0.01) {
-            await logRentalHistory(existingId, data.monthly_fixed_amount);
-        }
-
         toast(existingId ? 'Najemca zaktualizowany' : 'Najemca dodany', 'success');
         closeModal();
         loadTenants();
@@ -4071,29 +4016,6 @@ function useCalcAmount() {
 }
 
 
-async function logRentalHistory(tenantId, newAmount) {
-    // Count weekly hours from fixed_bookings
-    const { data: bookings } = await sb
-        .from('fixed_bookings')
-        .select('start_time, end_time')
-        .eq('tenant_id', tenantId)
-        .eq('is_active', true);
-
-    let weeklyHours = 0;
-    if (bookings) {
-        bookings.forEach(f => {
-            weeklyHours += parseInt(f.end_time.split(':')[0]) - parseInt(f.start_time.split(':')[0]);
-        });
-    }
-
-    if (weeklyHours === 0 && newAmount === 0) return;
-
-    await sb.from('rental_history').insert({
-        tenant_id: tenantId,
-        weekly_hours: weeklyHours,
-        monthly_amount: newAmount
-    });
-}
 
 // ================================================================
 // ADMIN: FIXED BOOKINGS

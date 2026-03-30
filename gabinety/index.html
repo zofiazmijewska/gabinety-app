@@ -2667,10 +2667,11 @@ async function confirmBooking(dateStr, startH, endH) {
     const dow = (bookingStart.getDay() + 6) % 7; // 0=Pon
     const { data: fixedConflicts } = await sb
         .from('fixed_bookings')
-        .select('start_time, end_time, tenants(name)')
+        .select('start_time, end_time, tenant_id, tenants(name)')
         .eq('room_id', roomId)
         .eq('day_of_week', dow)
-        .eq('is_active', true);
+        .eq('is_active', true)
+        .or(`valid_from.is.null,valid_from.lte.${dateStr}`);
 
     if (fixedConflicts) {
         for (let h = startH; h < endH; h++) {

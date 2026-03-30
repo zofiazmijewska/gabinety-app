@@ -2327,6 +2327,7 @@ function initCalendar() {
         allDaySlot: false,
         expandRows: true,
         height: 'auto',
+        weekends: false,
         resources: resources,
         headerToolbar: isMobile
             ? { left: 'prev,next today', center: 'title', right: 'resourceTimeGridDay,timeGridWeek' }
@@ -2380,7 +2381,19 @@ function initCalendar() {
             if (calEl) calEl.style.opacity = isLoading ? '0.5' : '1';
         },
         eventDidMount: function(info) {
-            info.el.title = `${info.event.title}`;
+            if (info.view.type === 'timeGridWeek') {
+                const roomId = info.event.extendedProps.roomId;
+                const roomIndex = rooms.findIndex(r => r.id === roomId);
+                if (roomIndex >= 0 && rooms.length > 0) {
+                    const w = 100 / rooms.length;
+                    const l = roomIndex * w;
+                    info.el.style.setProperty('left', l + '%', 'important');
+                    info.el.style.setProperty('width', `calc(${w}% - 2px)`, 'important');
+                    info.el.style.setProperty('right', 'auto', 'important');
+                    info.el.style.setProperty('margin-left', '0', 'important');
+                }
+            }
+            info.el.title = info.event.title;
         }
     });
     calendar.render();

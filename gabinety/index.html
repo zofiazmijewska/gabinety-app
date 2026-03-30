@@ -2760,6 +2760,13 @@ async function confirmBooking(dateStr, startH, endH) {
         return;
     }
 
+    const tenantName = (await sb.from('tenants').select('name').eq('id', bookingTenantId).single()).data?.name || '';
+    const roomName = rooms.find(r => r.id === bookings[0]?.room_id)?.name || '';
+    const desc = repeatWeeks > 1
+        ? `Rezerwacja (${repeatWeeks} tygodni): ${tenantName} — ${dateStr} ${String(startH).padStart(2,'0')}:00–${String(endH).padStart(2,'0')}:00 ${roomName}`
+        : `Nowa rezerwacja: ${tenantName} — ${dateStr} ${String(startH).padStart(2,'0')}:00–${String(endH).padStart(2,'0')}:00 ${roomName}`;
+    await logAudit('single_bookings', null, 'insert', null, { tenant_id: bookingTenantId, booking_date: dateStr, start_time: bookings[0]?.start_time, room_id: bookings[0]?.room_id }, desc);
+
     toast(repeatWeeks > 1 ? `Zarezerwowano ${repeatWeeks} tygodni!` : 'Rezerwacja potwierdzona!', 'success');
     closeModal();
     if (calendar) calendar.refetchEvents();
@@ -4275,11 +4282,18 @@ async function updateFixed() {
 }
 
 async function toggleFixed(id, active) {
-    const { data: fb } = await sb.from('fixed_bookings').select('tenant_id').eq('id', id).single();
+    const { data: fb } = await sb.from('fixed_bookings').select('*, tenants(name), rooms(name)').eq('id', id).single();
     const { error } = await sb.from('fixed_bookings').update({ is_active: active }).eq('id', id);
     if (error) { toast('Błąd: ' + error.message, 'error'); return; }
+    if (fb) {
+        const dayName = DAYS_PL[fb.day_of_week] || '';
+        const tenantName = fb.tenants?.name || '';
+        const roomName = fb.rooms?.name || '';
+        await logAudit('fixed_bookings', id, active ? 'activate' : 'deactivate', { is_active: !active }, { is_active: active },
+            `${active ? 'Aktywowano' : 'Dezaktywowano'} blok: ${tenantName} — ${dayName} ${fb.start_time.substring(0,5)}–${fb.end_time.substring(0,5)} ${roomName}`);
+        await autoRecalcMonthly(fb.tenant_id);
+    }
     toast(active ? 'Blok aktywowany' : 'Blok dezaktywowany', 'success');
-    if (fb) await autoRecalcMonthly(fb.tenant_id);
     loadFixedBookings();
 }
 

@@ -2434,15 +2434,15 @@ async function fetchCalendarEvents(fetchInfo, successCallback, failureCallback) 
                 start: b.booking_date + 'T' + b.start_time,
                 end: b.booking_date + 'T' + b.end_time,
                 resourceId: b.room_id,
-                backgroundColor: b.rooms.color,
-                borderColor: b.rooms.color,
+                backgroundColor: b.rooms?.color || '#8B6AAE',
+                borderColor: b.rooms?.color || '#8B6AAE',
                 extendedProps: {
                     bookingType: 'single',
                     bookingId: b.id,
                     tenantId: b.tenant_id,
-                    tenantName: b.tenants.name,
+                    tenantName: b.tenants?.name || '',
                     roomId: b.room_id,
-                    roomName: b.rooms.name,
+                    roomName: b.rooms?.name || '—',
                     bookingDate: b.booking_date,
                     startTime: b.start_time,
                     endTime: b.end_time,
@@ -2508,9 +2508,9 @@ async function fetchCalendarEvents(fetchInfo, successCallback, failureCallback) 
                                 fixedBookingId: f.id,
                                 exceptionId: exception.id,
                                 tenantId: f.tenant_id,
-                                tenantName: f.tenants.name,
+                                tenantName: f.tenants?.name || '',
                                 roomId: f.room_id,
-                                roomName: f.rooms.name,
+                                roomName: f.rooms?.name || '—',
                                 startTime: f.start_time,
                                 endTime: f.end_time
                             }
@@ -2526,20 +2526,20 @@ async function fetchCalendarEvents(fetchInfo, successCallback, failureCallback) 
                 );
                 if (!hasOverride) {
                     events.push({
-                        title: displayName(f.tenants.name, f.tenant_id) + ' (stały)',
+                        title: displayName(f.tenants?.name || '', f.tenant_id) + ' (stały)',
                         start: dateStr + 'T' + f.start_time,
                         end: dateStr + 'T' + f.end_time,
                         resourceId: f.room_id,
-                        backgroundColor: f.rooms.color,
-                        borderColor: f.rooms.color,
+                        backgroundColor: f.rooms?.color || '#5B9E7A',
+                        borderColor: f.rooms?.color || '#5B9E7A',
                         display: 'block',
                         extendedProps: {
                             bookingType: 'fixed',
                             fixedBookingId: f.id,
                             tenantId: f.tenant_id,
-                            tenantName: f.tenants.name,
+                            tenantName: f.tenants?.name || '',
                             roomId: f.room_id,
-                            roomName: f.rooms.name,
+                            roomName: f.rooms?.name || '—',
                             startTime: f.start_time,
                             endTime: f.end_time
                         }
@@ -3309,7 +3309,7 @@ async function loadMyBookings() {
         return `<tr>
             <td>${datePretty}</td>
             <td>${b.start_time.substring(0,5)} – ${b.end_time.substring(0,5)}</td>
-            <td>${b.rooms.name}</td>
+            <td>${b.rooms?.name || '—'}</td>
             <td><span class="badge badge-single">Pojedyncza</span></td>
             <td><span class="badge badge-${b.status}">${b.status === 'confirmed' ? 'Potwierdzona' : 'Odwołana'}</span></td>
             <td class="text-xs text-gray">${annotation}</td>
@@ -3382,7 +3382,7 @@ function initMyCalendar() {
             if (singles) {
                 singles.forEach(b => {
                     events.push({
-                        title: b.rooms.name,
+                        title: b.rooms?.name || '—',
                         start: b.booking_date + 'T' + b.start_time,
                         end: b.booking_date + 'T' + b.end_time,
                         backgroundColor: '#8B6AAE',
@@ -3427,7 +3427,7 @@ function initMyCalendar() {
                             const isExcepted = exceptions.some(e => e.fixed_booking_id === fb.id && e.exception_date === dateStr);
                             if (!isExcepted) {
                                 events.push({
-                                    title: fb.rooms.name + ' (stała)',
+                                    title: (fb.rooms?.name || '—') + ' (stała)',
                                     start: dateStr + 'T' + fb.start_time,
                                     end: dateStr + 'T' + fb.end_time,
                                     backgroundColor: '#5B9E7A',
@@ -3486,7 +3486,7 @@ async function loadMyFixed() {
             return `<tr>
                 <td>${DAYS_PL[f.day_of_week]}</td>
                 <td>${f.start_time.substring(0,5)} – ${f.end_time.substring(0,5)} (${hours}h)</td>
-                <td>${f.rooms.name}</td>
+                <td>${f.rooms?.name || '—'}</td>
                 <td>${(hours * hourlyRate).toFixed(0)} zł</td>
             </tr>`;
         }).join('');
@@ -3536,7 +3536,7 @@ async function loadMyFixed() {
             return `<tr>
                 <td>${DAYS_PL[f.day_of_week]}</td>
                 <td>${f.start_time.substring(0,5)} – ${f.end_time.substring(0,5)}</td>
-                <td>${f.rooms.name}</td>
+                <td>${f.rooms?.name || '—'}</td>
                 <td>${hours}h</td>
             </tr>`;
         }).join('');
@@ -3740,7 +3740,7 @@ async function loadSummarySingle(tenantId, startDate, endDate) {
         return `<tr>
             <td>${datePretty}</td>
             <td>${b.start_time.substring(0,5)} – ${b.end_time.substring(0,5)}</td>
-            <td>${b.rooms.name}</td>
+            <td>${b.rooms?.name || '—'}</td>
             <td>${tenantRate} zł</td>
         </tr>`;
     }).join('');

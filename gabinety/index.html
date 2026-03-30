@@ -1400,6 +1400,7 @@
         <button class="nav-tab" data-view="myFixed">Wynajem stały</button>
         <button class="nav-tab" data-view="summary">Podsumowanie</button>
         <button class="nav-tab" data-view="documents">Regulamin i RODO</button>
+        <button class="nav-tab" data-view="myHistory">Historia</button>
         <!-- Admin tabs - shown dynamically -->
     </div>
 
@@ -1499,6 +1500,27 @@
                 </div>
                 <div id="myFixedEmpty" class="text-center text-gray" style="padding:2rem;display:none;">
                     Brak stałych rezerwacji w kalendarzu
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== MY HISTORY VIEW ==================== -->
+        <div id="view-myHistory" class="view">
+            <div class="flex-between mb-2">
+                <h2 class="card-title" style="margin:0;">Historia</h2>
+                <button class="btn btn-secondary" onclick="loadMyHistory()">Odśwież</button>
+            </div>
+            <div class="card">
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr><th>Kiedy</th><th>Opis</th><th>Akcja</th></tr>
+                        </thead>
+                        <tbody id="myHistoryTable"></tbody>
+                    </table>
+                </div>
+                <div id="myHistoryEmpty" class="text-center text-gray" style="padding:2rem;display:none;">
+                    Brak historii
                 </div>
             </div>
         </div>
@@ -1717,7 +1739,12 @@
         <div id="view-adminHistory" class="view">
             <div class="flex-between mb-2">
                 <h2 class="card-title" style="margin:0;">Historia zmian</h2>
-                <button class="btn btn-secondary" onclick="loadAuditLog()">Odśwież</button>
+                <div style="display:flex;gap:0.5rem;align-items:center;">
+                    <select class="form-select" id="auditFilterTenant" style="width:auto;" onchange="loadAuditLog()">
+                        <option value="">Wszyscy</option>
+                    </select>
+                    <button class="btn btn-secondary" onclick="loadAuditLog()">Odśwież</button>
+                </div>
             </div>
             <div class="card">
                 <div class="table-wrap">
@@ -2234,7 +2261,8 @@ function switchView(viewName) {
         case 'adminTenants': loadTenants(); break;
         case 'adminFixed': loadFixedBookings(); break;
         case 'adminInvoices': initInvoiceMonths(); loadInvoices(); break;
-        case 'adminHistory': loadAuditLog(); break;
+        case 'myHistory': loadMyHistory(); break;
+        case 'adminHistory': initAuditFilter(); loadAuditLog(); break;
     }
 }
 
@@ -4582,16 +4610,70 @@ async function logAudit(tableName, recordId, action, oldData, newData, descripti
     }
 }
 
-async function loadAuditLog() {
-    const { data, error } = await sb
-        .from('audit_log')
-        .select('*, performer:tenants!performed_by(name)')
-        .order('performed_at', { ascending: false })
-        .limit(200);
+const ACTION_LABELS = {
+    insert:     { label: 'Dodano',      cls: 'badge-confirmed' },
+    update:     { label: 'Edytowano',   cls: 'badge-single' },
+    delete:     { label: 'Usunięto',    cls: 'badge-cancelled' },
+    cancel:     { label: 'Odwołano',    cls: 'badge-cancelled' },
+    activate:   { label: 'Aktywowano',  cls: 'badge-confirmed' },
+    deactivate: { label: 'Dezakt.',     cls: 'badge-single' }
+};
 
+function renderAuditRows(data, showUndo, showPerformer) {
+    const now = Date.now();
+    const UNDO_WINDOW_MS = 24 * 60 * 60 * 1000;
+    return data.map(entry => {
+        const dt = new Date(entry.performed_at);
+        const timeStr = dt.toLocaleDateString('pl-PL', { day: 'numeric', month: 'short' })
+            + ' ' + dt.toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' });
+        const al = ACTION_LABELS[entry.action] || { label: entry.action, cls: 'badge-single' };
+        const performerCell = showPerformer
+            ? `<br><span style="font-size:0.75rem;color:#aaa;">${entry.performer?.name || '—'}</span>` : '';
+        const canUndo = showUndo && (now - dt.getTime()) < UNDO_WINDOW_MS
+            && ['insert', 'update', 'delete'].includes(entry.action);
+        const undoBtn = canUndo
+            ? `<button class="btn btn-sm btn-secondary" onclick="undoAuditLog('${entry.id}', '${entry.table_name}', '${entry.action}', '${entry.record_id}')">Cofnij</button>`
+            : '';
+        return `<tr>
+            <td class="text-xs text-gray" style="white-space:nowrap;">${timeStr}${performerCell}</td>
+            <td>${escHtml(entry.description)}</td>
+            <td><span class="badge ${al.cls}">${al.label}</span></td>
+            ${showUndo ? `<td>${undoBtn}</td>` : ''}
+        </tr>`;
+    }).join('');
+}
+
+async function initAuditFilter() {
+    const sel = document.getElementById('auditFilterTenant');
+    if (!sel || sel.options.length > 1) return;
+    const { data: tenants } = await sb.from('tenants').select('id, name').eq('is_active', true).order('name');
+    if (tenants) tenants.forEach(t => {
+        sel.innerHTML += `<option value="${t.id}">${escHtml(t.name)}</option>`;
+    });
+    sel.innerHTML += `<option value="__admin">Tylko admin</option>`;
+}
+
+async function loadAuditLog() {
     const tbody = document.getElementById('auditLogTable');
     const empty = document.getElementById('auditLogEmpty');
     if (!tbody) return;
+
+    const filterTenant = document.getElementById('auditFilterTenant')?.value || '';
+
+    let query = sb.from('audit_log')
+        .select('*, performer:tenants!performed_by(name)')
+        .order('performed_at', { ascending: false })
+        .limit(300);
+
+    if (filterTenant === '__admin') {
+        // Admin's own actions = performed_by is admin tenant
+        const { data: adminTenant } = await sb.from('tenants').select('id').eq('is_admin', true).single();
+        if (adminTenant) query = query.eq('performed_by', adminTenant.id);
+    } else if (filterTenant) {
+        query = query.eq('performed_by', filterTenant);
+    }
+
+    const { data, error } = await query;
 
     if (error || !data || data.length === 0) {
         tbody.innerHTML = '';
@@ -4599,37 +4681,28 @@ async function loadAuditLog() {
         return;
     }
     if (empty) empty.style.display = 'none';
+    tbody.innerHTML = renderAuditRows(data, true, true);
+}
 
-    const now = Date.now();
-    const UNDO_WINDOW_MS = 24 * 60 * 60 * 1000;
+async function loadMyHistory() {
+    const tbody = document.getElementById('myHistoryTable');
+    const empty = document.getElementById('myHistoryEmpty');
+    if (!tbody) return;
 
-    const actionLabels = {
-        insert: { label: 'Dodano', cls: 'badge-confirmed' },
-        update: { label: 'Edytowano', cls: 'badge-single' },
-        delete: { label: 'Usunięto', cls: 'badge-cancelled' },
-        cancel: { label: 'Odwołano', cls: 'badge-cancelled' },
-        activate: { label: 'Aktywowano', cls: 'badge-confirmed' },
-        deactivate: { label: 'Dezakt.', cls: 'badge-single' }
-    };
+    const { data, error } = await sb
+        .from('audit_log')
+        .select('*, performer:tenants!performed_by(name)')
+        .eq('performed_by', currentTenant.id)
+        .order('performed_at', { ascending: false })
+        .limit(100);
 
-    tbody.innerHTML = data.map(entry => {
-        const dt = new Date(entry.performed_at);
-        const timeStr = dt.toLocaleDateString('pl-PL', { day: 'numeric', month: 'short' })
-            + ' ' + dt.toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' });
-        const performer = entry.performer ? entry.performer.name : '—';
-        const al = actionLabels[entry.action] || { label: entry.action, cls: 'badge-single' };
-        const canUndo = (now - dt.getTime()) < UNDO_WINDOW_MS
-            && ['insert', 'update', 'delete'].includes(entry.action);
-        const undoBtn = canUndo
-            ? `<button class="btn btn-sm btn-secondary" onclick="undoAuditLog('${entry.id}', '${entry.table_name}', '${entry.action}', '${entry.record_id}')">Cofnij</button>`
-            : '';
-        return `<tr>
-            <td class="text-xs text-gray" style="white-space:nowrap;">${timeStr}<br><span style="font-size:0.75rem;color:#aaa;">${performer}</span></td>
-            <td>${entry.description}</td>
-            <td><span class="badge ${al.cls}">${al.label}</span></td>
-            <td>${undoBtn}</td>
-        </tr>`;
-    }).join('');
+    if (error || !data || data.length === 0) {
+        tbody.innerHTML = '';
+        if (empty) empty.style.display = '';
+        return;
+    }
+    if (empty) empty.style.display = 'none';
+    tbody.innerHTML = renderAuditRows(data, false, false);
 }
 
 async function undoAuditLog(logId, tableName, action, recordId) {

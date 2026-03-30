@@ -239,8 +239,8 @@
             font-size: 0.75rem;
             font-weight: 500;
         }
-        .badge-fixed { background: var(--primary-light); color: #6B5B7B; }
-        .badge-single { background: #E0F0E8; color: #4B7B5B; }
+        .badge-fixed { background: var(--room1); color: #ffffff; }
+        .badge-single { background: var(--room2); color: #3a3f4a; }
         .badge-cancelled { background: #F0E0E0; color: #7B4B4B; }
         .badge-confirmed { background: #E0F0E8; color: #4B7B5B; }
 
@@ -2797,7 +2797,7 @@ async function confirmBooking(dateStr, startH, endH) {
     const desc = repeatWeeks > 1
         ? `Rezerwacja (${repeatWeeks} tygodni): ${tenantName} — ${dateStr} ${String(startH).padStart(2,'0')}:00–${String(endH).padStart(2,'0')}:00 ${roomName}`
         : `Nowa rezerwacja: ${tenantName} — ${dateStr} ${String(startH).padStart(2,'0')}:00–${String(endH).padStart(2,'0')}:00 ${roomName}`;
-    await logAudit('single_bookings', null, 'insert', null, { tenant_id: bookingTenantId, booking_date: dateStr, start_time: bookings[0]?.start_time, room_id: bookings[0]?.room_id }, desc);
+    await logAudit('single_bookings', null, 'insert', null, { tenant_id: bookingTenantId, booking_date: dateStr, start_time: bookings[0]?.start_time, room_id: bookings[0]?.room_id }, desc, bookingTenantId);
 
     toast(repeatWeeks > 1 ? `Zarezerwowano ${repeatWeeks} tygodni!` : 'Rezerwacja potwierdzona!', 'success');
     closeModal();
@@ -2969,7 +2969,7 @@ async function saveEditBooking(bookingId) {
     const tenantName = (await sb.from('tenants').select('name').eq('id', newTenantId).single()).data?.name || '';
     const roomName = rooms.find(r => r.id === newRoomId)?.name || '';
     await logAudit('single_bookings', bookingId, 'update', oldBooking, newData,
-        `Edycja rezerwacji: ${tenantName} — ${newDate} ${String(newStartH).padStart(2,'0')}:00–${String(newEndH).padStart(2,'0')}:00 ${roomName}`);
+        `Edycja rezerwacji: ${tenantName} — ${newDate} ${String(newStartH).padStart(2,'0')}:00–${String(newEndH).padStart(2,'0')}:00 ${roomName}`, newTenantId);
 
     toast('Rezerwacja zaktualizowana', 'success');
     closeModal();
@@ -3001,7 +3001,7 @@ async function cancelBooking(bookingId) {
         const tenantName = oldBooking.tenants?.name || '';
         const roomName = oldBooking.rooms?.name || '';
         await logAudit('single_bookings', bookingId, 'cancel', oldBooking, null,
-            `Odwołano rezerwację: ${tenantName} — ${oldBooking.booking_date} ${oldBooking.start_time.substring(0,5)}–${oldBooking.end_time.substring(0,5)} ${roomName}`);
+            `Odwołano rezerwację: ${tenantName} — ${oldBooking.booking_date} ${oldBooking.start_time.substring(0,5)}–${oldBooking.end_time.substring(0,5)} ${roomName}`, oldBooking.tenant_id);
     }
 
     toast('Rezerwacja odwołana', 'info');
@@ -3413,12 +3413,14 @@ function initMyCalendar() {
             myCalendar.changeView('listDay', date);
         },
         eventDidMount: function(info) {
-            // Force dark text in list view (FullCalendar sets inline white color)
+            // In list view force appropriate text color based on event type
             const el = info.el;
             if (el.tagName === 'TR' || el.closest('.fc-list')) {
-                el.style.color = '#3a3f4a';
+                const isFixed = info.event.extendedProps.type === 'fixed';
+                const color = isFixed ? '#ffffff' : '#3a3f4a';
+                el.style.color = color;
                 el.querySelectorAll('td, a').forEach(function(child) {
-                    child.style.setProperty('color', '#3a3f4a', 'important');
+                    child.style.setProperty('color', color, 'important');
                 });
             }
         },
@@ -3443,8 +3445,8 @@ function initMyCalendar() {
                         title: b.rooms?.name || '—',
                         start: b.booking_date + 'T' + b.start_time,
                         end: b.booking_date + 'T' + b.end_time,
-                        backgroundColor: '#8B6AAE',
-                        borderColor: '#8B6AAE',
+                        backgroundColor: '#A4AECC',
+                        borderColor: '#A4AECC',
                         textColor: '#3a3f4a',
                         extendedProps: { type: 'single' }
                     });
@@ -3488,9 +3490,9 @@ function initMyCalendar() {
                                     title: (fb.rooms?.name || '—') + ' (stała)',
                                     start: dateStr + 'T' + fb.start_time,
                                     end: dateStr + 'T' + fb.end_time,
-                                    backgroundColor: '#5B9E7A',
-                                    borderColor: '#5B9E7A',
-                                    textColor: '#3a3f4a',
+                                    backgroundColor: '#596B84',
+                                    borderColor: '#596B84',
+                                    textColor: '#ffffff',
                                     extendedProps: { type: 'fixed' }
                                 });
                             }
@@ -4202,7 +4204,7 @@ async function saveFixed() {
     const roomName = rooms.find(r => r.id === data.room_id)?.name || '';
     const dayName = DAYS_PL[data.day_of_week] || '';
     await logAudit('fixed_bookings', inserted?.id, 'insert', null, inserted,
-        `Stały blok: ${tenantName} — ${dayName} ${data.start_time.substring(0,5)}–${data.end_time.substring(0,5)} ${roomName}`);
+        `Stały blok: ${tenantName} — ${dayName} ${data.start_time.substring(0,5)}–${data.end_time.substring(0,5)} ${roomName}`, data.tenant_id);
 
     toast('Stały blok dodany', 'success');
     await autoRecalcMonthly(data.tenant_id);
@@ -4305,7 +4307,7 @@ async function updateFixed() {
     const roomName = rooms.find(r => r.id === updates.room_id)?.name || '';
     const dayName = DAYS_PL[updates.day_of_week] || '';
     await logAudit('fixed_bookings', id, 'update', oldFb, updates,
-        `Edycja bloku: ${tenantName} — ${dayName} ${startTime.substring(0,5)}–${endTime.substring(0,5)} ${roomName}`);
+        `Edycja bloku: ${tenantName} — ${dayName} ${startTime.substring(0,5)}–${endTime.substring(0,5)} ${roomName}`, updates.tenant_id);
 
     toast('Stały blok zaktualizowany', 'success');
     await autoRecalcMonthly(updates.tenant_id);
@@ -4322,7 +4324,7 @@ async function toggleFixed(id, active) {
         const tenantName = fb.tenants?.name || '';
         const roomName = fb.rooms?.name || '';
         await logAudit('fixed_bookings', id, active ? 'activate' : 'deactivate', { is_active: !active }, { is_active: active },
-            `${active ? 'Aktywowano' : 'Dezaktywowano'} blok: ${tenantName} — ${dayName} ${fb.start_time.substring(0,5)}–${fb.end_time.substring(0,5)} ${roomName}`);
+            `${active ? 'Aktywowano' : 'Dezaktywowano'} blok: ${tenantName} — ${dayName} ${fb.start_time.substring(0,5)}–${fb.end_time.substring(0,5)} ${roomName}`, fb.tenant_id);
         await autoRecalcMonthly(fb.tenant_id);
     }
     toast(active ? 'Blok aktywowany' : 'Blok dezaktywowany', 'success');
@@ -4340,7 +4342,7 @@ async function deleteFixed(id) {
         const tenantName = fb.tenants?.name || '';
         const roomName = fb.rooms?.name || '';
         await logAudit('fixed_bookings', id, 'delete', fb, null,
-            `Usunięto blok: ${tenantName} — ${dayName} ${fb.start_time.substring(0,5)}–${fb.end_time.substring(0,5)} ${roomName}`);
+            `Usunięto blok: ${tenantName} — ${dayName} ${fb.start_time.substring(0,5)}–${fb.end_time.substring(0,5)} ${roomName}`, fb.tenant_id);
         await autoRecalcMonthly(fb.tenant_id);
     }
     toast('Blok usunięty', 'info');
@@ -4594,7 +4596,7 @@ document.getElementById('loginEmail').addEventListener('keydown', e => {
 // ================================================================
 // AUDIT LOG
 // ================================================================
-async function logAudit(tableName, recordId, action, oldData, newData, description) {
+async function logAudit(tableName, recordId, action, oldData, newData, description, subjectTenantId) {
     try {
         await sb.from('audit_log').insert({
             table_name: tableName,
@@ -4603,7 +4605,8 @@ async function logAudit(tableName, recordId, action, oldData, newData, descripti
             old_data: oldData || null,
             new_data: newData || null,
             description,
-            performed_by: currentTenant ? currentTenant.id : null
+            performed_by: currentTenant ? currentTenant.id : null,
+            subject_tenant_id: subjectTenantId || null
         });
     } catch (e) {
         console.warn('logAudit error:', e);

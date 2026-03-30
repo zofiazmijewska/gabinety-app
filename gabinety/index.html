@@ -1832,13 +1832,35 @@ async function init() {
     sb.auth.onAuthStateChange(async (event, session) => {
         if (event === 'SIGNED_IN' && session) {
             currentUser = session.user;
-            const ok = await loadTenantProfile();
-            if (ok) showApp(); else showLogin();
+            if (!currentTenant) {
+                // Only re-init if not already loaded (e.g. magic link callback)
+                const ok = await loadTenantProfile();
+                if (ok) showApp(); else showLogin();
+            }
+        } else if (event === 'TOKEN_REFRESHED' && session) {
+            // Token refreshed silently — just update user, don't re-render
+            currentUser = session.user;
         } else if (event === 'SIGNED_OUT') {
-            currentUser = null;
-            currentTenant = null;
-            isAdmin = false;
-            showLanding();
+            // Only show landing if we truly have no session
+            const { data: { session: check } } = await sb.auth.getSession();
+            if (!check) {
+                currentUser = null;
+                currentTenant = null;
+                isAdmin = false;
+                showLanding();
+            }
+        }
+    });
+
+    // When tab becomes visible again, check session is still valid
+    document.addEventListener('visibilitychange', async () => {
+        if (document.visibilityState !== 'visible') return;
+        if (currentTenant) return; // Already logged in and showing app
+        const { data: { session } } = await sb.auth.getSession();
+        if (session && !currentTenant) {
+            currentUser = session.user;
+            const ok = await loadTenantProfile();
+            if (ok) showApp(); else showLanding();
         }
     });
 }

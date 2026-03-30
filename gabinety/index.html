@@ -2329,17 +2329,10 @@ function initCalendar() {
         height: 'auto',
         resources: resources,
         headerToolbar: isMobile
-            ? { left: 'prev,next today', center: 'title', right: 'resourceTimeGridDay,resourceTimeGridWeek' }
-            : { left: 'prev,next today', center: 'title', right: 'resourceTimeGridDay,resourceTimeGridWeek' },
+            ? { left: 'prev,next today', center: 'title', right: 'resourceTimeGridDay,timeGridWeek' }
+            : { left: 'prev,next today', center: 'title', right: 'resourceTimeGridDay,timeGridWeek' },
         titleFormat: { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' },
         buttonText: { today: 'Dziś', week: 'Tydzień', day: 'Dzień' },
-        views: {
-            resourceTimeGridWeek: {
-                titleFormat: { year: 'numeric', month: 'long', week: 'numeric' },
-                resourceLabelText: '',
-                dayHeaderFormat: { weekday: 'short', day: 'numeric' }
-            }
-        },
         nowIndicator: true,
         selectable: true,
         selectMirror: true,

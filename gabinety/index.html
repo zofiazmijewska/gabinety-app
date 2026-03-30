@@ -1941,8 +1941,12 @@ async function changePassword() {
     closeModal();
 }
 
-function handleLogout() {
-    sb.auth.signOut();
+async function handleLogout() {
+    await sb.auth.signOut();
+    currentUser = null;
+    currentTenant = null;
+    isAdmin = false;
+    showLanding();
 }
 
 async function loadTenantProfile() {

@@ -2685,22 +2685,34 @@ async function confirmBooking(dateStr, startH, endH) {
         return;
     }
 
-    // Sprawdź kolizje ze stałymi blokami
+    // Sprawdź kolizje ze stałymi blokami (pomijaj wyjątki na ten dzień)
     const dow = (bookingStart.getDay() + 6) % 7; // 0=Pon
     const { data: fixedConflicts } = await sb
         .from('fixed_bookings')
-        .select('start_time, end_time, tenant_id, tenants(name)')
+        .select('id, start_time, end_time, tenant_id, tenants(name)')
         .eq('room_id', roomId)
         .eq('day_of_week', dow)
         .eq('is_active', true)
         .or(`valid_from.is.null,valid_from.lte.${dateStr}`);
 
-    if (fixedConflicts) {
+    if (fixedConflicts && fixedConflicts.length > 0) {
+        // Pobierz wyjątki dla tych bloków na ten konkretny dzień
+        const fixedIds = fixedConflicts.map(f => f.id);
+        const { data: exceptions } = await sb
+            .from('fixed_booking_exceptions')
+            .select('fixed_booking_id')
+            .in('fixed_booking_id', fixedIds)
+            .eq('exception_date', dateStr);
+        const cancelledIds = new Set((exceptions || []).map(e => e.fixed_booking_id));
+
         for (let h = startH; h < endH; h++) {
             const timeStr = String(h).padStart(2, '0') + ':00:00';
-            const conflict = fixedConflicts.find(f => f.start_time <= timeStr && f.end_time > timeStr);
+            const conflict = fixedConflicts.find(f =>
+                !cancelledIds.has(f.id) &&
+                f.start_time <= timeStr && f.end_time > timeStr
+            );
             if (conflict) {
-                toast(`Termin ${String(h).padStart(2,'0')}:00 jest zajęty stałym blokiem (${displayName(conflict.tenants.name, conflict.tenant_id)})`, 'error');
+                toast(`Termin ${String(h).padStart(2,'0')}:00 jest zajęty stałym blokiem (${displayName(conflict.tenants?.name || '', conflict.tenant_id)})`, 'error');
                 btn.disabled = false;
                 btn.textContent = 'Rezerwuję';
                 return;

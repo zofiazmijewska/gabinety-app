@@ -2303,6 +2303,23 @@ function displayName(fullName, tenantId) {
 // ================================================================
 // CALENDAR
 // ================================================================
+
+function repositionWeekEvents() {
+    if (!calendar || calendar.view.type !== 'timeGridWeek') return;
+    const n = rooms.length;
+    if (n === 0) return;
+    document.querySelectorAll('.fc-timegrid-event-harness[data-room-index]').forEach(harness => {
+        const idx = parseInt(harness.dataset.roomIndex);
+        const leftPct = (idx / n * 100);
+        const rightPct = ((n - 1 - idx) / n * 100);
+        const style = harness.getAttribute('style') || '';
+        const match = style.match(/inset:\s*(\S+)\s+\S+\s+(\S+)/);
+        if (match) {
+            harness.style.setProperty('inset', `${match[1]} ${rightPct}% ${match[2]} ${leftPct}%`, 'important');
+        }
+    });
+}
+
 function initCalendar() {
     const calEl = document.getElementById('calendar');
     if (calendar) { calendar.destroy(); }
@@ -2379,18 +2396,21 @@ function initCalendar() {
         loading: function(isLoading) {
             const calEl = document.getElementById('calendar');
             if (calEl) calEl.style.opacity = isLoading ? '0.5' : '1';
+            if (!isLoading) {
+                setTimeout(repositionWeekEvents, 100);
+            }
+        },
+        datesSet: function() {
+            setTimeout(repositionWeekEvents, 100);
         },
         eventDidMount: function(info) {
+            // Tag harness with room index for repositioning
             if (info.view.type === 'timeGridWeek') {
                 const roomId = info.event.extendedProps.roomId;
                 const roomIndex = rooms.findIndex(r => r.id === roomId);
-                if (roomIndex >= 0 && rooms.length > 0) {
-                    const w = 100 / rooms.length;
-                    const l = roomIndex * w;
-                    info.el.style.setProperty('left', l + '%', 'important');
-                    info.el.style.setProperty('width', `calc(${w}% - 2px)`, 'important');
-                    info.el.style.setProperty('right', 'auto', 'important');
-                    info.el.style.setProperty('margin-left', '0', 'important');
+                if (roomIndex >= 0) {
+                    const harness = info.el.closest('.fc-timegrid-event-harness');
+                    if (harness) harness.dataset.roomIndex = roomIndex;
                 }
             }
             info.el.title = info.event.title;
@@ -4561,7 +4581,18 @@ async function generateInvoices() {
                     }
                 }
             }
-            toast(`Faktury wysłane do Fakturownia: ${result.created || 0}`, 'success');
+            const errors = (result.results || []).filter(r => r.error);
+            if (result.created > 0 && errors.length === 0) {
+                toast(`Faktury wysłane do Fakturownia: ${result.created}`, 'success');
+            } else if (result.created > 0 && errors.length > 0) {
+                toast(`Wysłano ${result.created} faktur, ${errors.length} błędów — sprawdź szczegóły w konsoli`, 'warning');
+                console.warn('Fakturownia errors:', errors);
+            } else if (errors.length > 0) {
+                toast(`Błąd Fakturownia dla ${errors.length} faktur — sprawdź konsolę`, 'error');
+                console.error('Fakturownia errors:', errors);
+            } else {
+                toast(`Dane faktur zapisane (${generated}). Brak faktur do wysłania do Fakturowni (sprawdź ID klientów).`, 'info');
+            }
         } else {
             const err = await resp.text();
             toast(`Dane zapisane (${generated}), błąd Fakturownia: ${err}`, 'error');

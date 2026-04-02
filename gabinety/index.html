@@ -326,6 +326,36 @@
             font-weight: 500 !important;
             padding: 0.5rem !important;
         }
+        /* W widoku tygodnia: ukryj wiersz nagłówków gabinetów (zostaw tylko dni) */
+        .fc-resourceTimeGridWeek-view .fc-col-header tr:last-child .fc-resource-header {
+            display: none;
+        }
+        .fc-resourceTimeGridWeek-view .fc-col-header tr:last-child {
+            display: none;
+        }
+        /* Tydzień: odstępy między eventami + subtelne bordery między gabinetami */
+        .fc-resourceTimeGridWeek-view .fc-timegrid-event {
+            margin: 0 1px !important;
+        }
+        .fc-resourceTimeGridWeek-view .fc-event {
+            font-size: 0.8rem !important;
+            padding: 1px 3px !important;
+        }
+        /* Linia pionowa między dniami — pseudo-element rysowany nad wszystkim */
+        .fc-resourceTimeGridWeek-view .day-separator {
+            position: relative;
+        }
+        .fc-resourceTimeGridWeek-view .day-separator::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: #bbb;
+            z-index: 5;
+            pointer-events: none;
+        }
 
         /* ==================== ROOM LEGEND ==================== */
         .room-legend {
@@ -2304,20 +2334,22 @@ function displayName(fullName, tenantId) {
 // CALENDAR
 // ================================================================
 
-function repositionWeekEvents() {
-    if (!calendar || calendar.view.type !== 'timeGridWeek') return;
-    const n = rooms.length;
-    if (n === 0) return;
-    document.querySelectorAll('.fc-timegrid-event-harness[data-room-index]').forEach(harness => {
-        const idx = parseInt(harness.dataset.roomIndex);
-        const leftPct = (idx / n * 100);
-        const rightPct = ((n - 1 - idx) / n * 100);
-        const style = harness.getAttribute('style') || '';
-        const match = style.match(/inset:\s*(\S+)\s+\S+\s+(\S+)/);
-        if (match) {
-            harness.style.setProperty('inset', `${match[1]} ${rightPct}% ${match[2]} ${leftPct}%`, 'important');
+function addDaySeparators() {
+    if (!calendar || calendar.view.type !== 'resourceTimeGridWeek') return;
+    // Oznacz pierwszą kolumnę resource każdego dnia grubszym borderem
+    const cols = document.querySelectorAll('.fc-timegrid-col.fc-resource');
+    let lastDate = '';
+    cols.forEach(col => {
+        const date = col.dataset.date;
+        col.classList.remove('day-separator');
+        if (date && date !== lastDate) {
+            col.classList.add('day-separator');
+            lastDate = date;
         }
     });
+    // To samo dla nagłówków
+    const headerCells = document.querySelectorAll('.fc-col-header-cell[colspan]');
+    headerCells.forEach(cell => cell.classList.add('day-separator'));
 }
 
 function initCalendar() {
@@ -2344,11 +2376,16 @@ function initCalendar() {
         allDaySlot: false,
         expandRows: true,
         height: 'auto',
-        weekends: false,
+        weekends: true,
+        views: {
+            resourceTimeGridWeek: { weekends: false },
+            resourceTimeGridDay: { weekends: true }
+        },
         resources: resources,
+        datesAboveResources: true,
         headerToolbar: isMobile
-            ? { left: 'prev,next today', center: 'title', right: 'resourceTimeGridDay,timeGridWeek' }
-            : { left: 'prev,next today', center: 'title', right: 'resourceTimeGridDay,timeGridWeek' },
+            ? { left: 'prev,next today', center: 'title', right: 'resourceTimeGridDay,resourceTimeGridWeek' }
+            : { left: 'prev,next today', center: 'title', right: 'resourceTimeGridDay,resourceTimeGridWeek' },
         titleFormat: { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' },
         buttonText: { today: 'Dziś', week: 'Tydzień', day: 'Dzień' },
         nowIndicator: true,
@@ -2396,23 +2433,35 @@ function initCalendar() {
         loading: function(isLoading) {
             const calEl = document.getElementById('calendar');
             if (calEl) calEl.style.opacity = isLoading ? '0.5' : '1';
-            if (!isLoading) {
-                setTimeout(repositionWeekEvents, 100);
-            }
+            if (!isLoading) setTimeout(addDaySeparators, 50);
         },
         datesSet: function() {
-            setTimeout(repositionWeekEvents, 100);
+            setTimeout(addDaySeparators, 50);
+        },
+        eventContent: function(arg) {
+            if (arg.view.type === 'resourceTimeGridWeek') {
+                const title = arg.event.title || '';
+                const type = arg.event.extendedProps.bookingType;
+                const isCancelled = type === 'fixed_cancelled';
+                const isFixed = type === 'fixed';
+
+                // Rozdziel imię i nazwisko
+                const nameOnly = title.replace(' (stały)', '').replace(' (odwołana)', '').replace('✕ ', '');
+                const parts = nameOnly.split(' ');
+
+                let html = '<div style="line-height:1.2;overflow:hidden;">';
+                if (isCancelled) html += '<div>✕</div>';
+                parts.forEach(p => { html += '<div>' + p + '</div>'; });
+                if (isFixed) html += '<div style="opacity:0.7">(stały)</div>';
+                if (isCancelled) html += '<div style="opacity:0.7">(odw.)</div>';
+                html += '</div>';
+
+                return { html: html };
+            }
+            // Widok dnia — standardowy render
+            return null;
         },
         eventDidMount: function(info) {
-            // Tag harness with room index for repositioning
-            if (info.view.type === 'timeGridWeek') {
-                const roomId = info.event.extendedProps.roomId;
-                const roomIndex = rooms.findIndex(r => r.id === roomId);
-                if (roomIndex >= 0) {
-                    const harness = info.el.closest('.fc-timegrid-event-harness');
-                    if (harness) harness.dataset.roomIndex = roomIndex;
-                }
-            }
             info.el.title = info.event.title;
         }
     });

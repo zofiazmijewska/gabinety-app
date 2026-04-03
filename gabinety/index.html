@@ -2458,8 +2458,10 @@ function initCalendar() {
 
                 return { html: html };
             }
-            // Widok dnia — standardowy render
-            return null;
+            // Widok dnia — zwróć domyślny format z tytułem i godziną
+            const t = arg.event.title || '';
+            const timeText = arg.timeText || '';
+            return { html: '<div class="fc-event-main-frame"><div class="fc-event-time">' + timeText + '</div><div class="fc-event-title-container"><div class="fc-event-title fc-sticky">' + t + '</div></div></div>' };
         },
         eventDidMount: function(info) {
             info.el.title = info.event.title;

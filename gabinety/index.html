@@ -230,6 +230,7 @@
             border-bottom: 1px solid #F0EDF3;
         }
         tr:hover td { background: var(--bg-light); }
+        tr[style*="cursor:pointer"]:hover td { background: var(--primary-lighter); }
 
         /* ==================== BADGE ==================== */
         .badge {
@@ -1472,7 +1473,6 @@
                                 <th>Typ</th>
                                 <th>Status</th>
                                 <th>Kto / kiedy</th>
-                                <th></th>
                             </tr>
                         </thead>
                         <tbody id="myBookingsTable"></tbody>
@@ -2942,6 +2942,34 @@ function showBookingDetailModal(props) {
     document.getElementById('modalContainer').innerHTML = modal;
 }
 
+function openBookingDetail(bookingId) {
+    const b = window._bookingsCache && window._bookingsCache[bookingId];
+    if (!b) { toast('Nie znaleziono rezerwacji', 'error'); return; }
+
+    const roomName = b.rooms?.name || '—';
+    const datePretty = new Date(b.booking_date).toLocaleDateString('pl-PL', { weekday: 'long', day: 'numeric', month: 'long' });
+    const time = b.start_time.substring(0,5) + ' – ' + b.end_time.substring(0,5);
+    const admin = currentTenant && currentTenant.is_admin;
+
+    const modal = `
+        <div class="modal-overlay" onclick="if(event.target===this)closeModal()">
+            <div class="modal">
+                <h2>Szczegóły rezerwacji</h2>
+                <p><strong>${roomName}</strong></p>
+                <p>${datePretty}</p>
+                <p>${time}</p>
+                <hr style="margin:0.75rem 0;border-color:var(--border)">
+                <div class="modal-actions" style="flex-wrap:wrap;gap:0.5rem;">
+                    <button class="btn btn-secondary" onclick="closeModal()">Zamknij</button>
+                    ${admin ? `<button class="btn btn-primary" onclick="showEditBookingModal('${b.id}', '${b.room_id}', '${b.booking_date}', '${b.start_time}', '${b.end_time}', '${b.tenant_id}')">Zmień termin</button>` : ''}
+                    <button class="btn btn-danger" onclick="cancelBooking('${b.id}')">Odwołaj tę sesję</button>
+                    ${b.series_id ? `<button class="btn btn-danger" style="background:#9B3030;" onclick="cancelSeriesFuture('${b.series_id}', '${b.booking_date}')">Odwołaj tę i przyszłe</button>` : ''}
+                </div>
+            </div>
+        </div>`;
+    document.getElementById('modalContainer').innerHTML = modal;
+}
+
 async function showEditBookingModal(bookingId, currentRoomId, currentDate, currentStart, currentEnd, tenantId) {
     const roomOptions = rooms.map(r =>
         `<option value="${r.id}" ${r.id === currentRoomId ? 'selected' : ''}>${r.name}</option>`
@@ -3427,12 +3455,14 @@ async function loadMyBookings() {
     }
 
     empty.style.display = 'none';
+    // Zapisz dane rezerwacji do szybkiego dostępu z onclick
+    window._bookingsCache = {};
+    data.forEach(b => { window._bookingsCache[b.id] = b; });
+
     tbody.innerHTML = data.map(b => {
         const datePretty = new Date(b.booking_date).toLocaleDateString('pl-PL', { weekday: 'short', day: 'numeric', month: 'short' });
         const bookingDate = new Date(b.booking_date);
         const daysUntil = Math.floor((bookingDate - new Date()) / (1000 * 60 * 60 * 24));
-        const isAdmin = currentTenant && currentTenant.is_admin;
-        const canCancel = b.status === 'confirmed' && (isAdmin || daysUntil >= CANCEL_DAYS);
 
         // Adnotacja: kto i kiedy utworzył / odwołał
         let annotation = '';
@@ -3448,17 +3478,15 @@ async function loadMyBookings() {
             annotation = `utw. ${createStr}${creatorName ? '<br>' + creatorName : ''}`;
         }
 
-        return `<tr>
+        const clickable = b.status === 'confirmed' ? `style="cursor:pointer;" onclick="openBookingDetail('${b.id}')"` : '';
+
+        return `<tr ${clickable}>
             <td>${datePretty}</td>
             <td>${b.start_time.substring(0,5)} – ${b.end_time.substring(0,5)}</td>
             <td>${b.rooms?.name || '—'}</td>
             <td><span class="badge badge-single">Pojedyncza</span></td>
             <td><span class="badge badge-${b.status}">${b.status === 'confirmed' ? 'Potwierdzona' : 'Odwołana'}</span></td>
             <td class="text-xs text-gray">${annotation}</td>
-            <td style="white-space:nowrap;">
-                ${isAdmin ? `<button class="btn btn-sm btn-secondary" onclick="showEditBookingModal('${b.id}', '${b.room_id}', '${b.booking_date}', '${b.start_time}', '${b.end_time}', '${b.tenant_id}')">Edytuj</button> ` : ''}
-                ${canCancel ? `<button class="btn btn-sm btn-danger" onclick="cancelBooking('${b.id}')">Odwołaj</button>` : ''}
-            </td>
         </tr>`;
     }).join('');
 }
@@ -3497,14 +3525,12 @@ function initMyCalendar() {
             myCalendar.changeView('listDay', date);
         },
         eventDidMount: function(info) {
-            // In list view force appropriate text color based on event type
+            // In list view ALL events need dark text (background is white, color is only the dot)
             const el = info.el;
             if (el.tagName === 'TR' || el.closest('.fc-list')) {
-                const isFixed = info.event.extendedProps.type === 'fixed';
-                const color = isFixed ? '#ffffff' : '#3a3f4a';
-                el.style.color = color;
+                el.style.color = '#3a3f4a';
                 el.querySelectorAll('td, a').forEach(function(child) {
-                    child.style.setProperty('color', color, 'important');
+                    child.style.setProperty('color', '#3a3f4a', 'important');
                 });
             }
         },
@@ -3524,7 +3550,10 @@ function initMyCalendar() {
                 .lte('booking_date', end);
 
             if (singles) {
+                // Cache dla kliknięć w kalendarz
+                if (!window._bookingsCache) window._bookingsCache = {};
                 singles.forEach(b => {
+                    window._bookingsCache[b.id] = b;
                     events.push({
                         title: b.rooms?.name || '—',
                         start: b.booking_date + 'T' + b.start_time,
@@ -3532,7 +3561,7 @@ function initMyCalendar() {
                         backgroundColor: '#A4AECC',
                         borderColor: '#A4AECC',
                         textColor: '#3a3f4a',
-                        extendedProps: { type: 'single' }
+                        extendedProps: { type: 'single', bookingId: b.id }
                     });
                 });
             }
@@ -3590,7 +3619,13 @@ function initMyCalendar() {
         },
         eventDisplay: 'block',
         displayEventTime: true,
-        eventTimeFormat: { hour: '2-digit', minute: '2-digit', hour12: false }
+        eventTimeFormat: { hour: '2-digit', minute: '2-digit', hour12: false },
+        eventClick: function(info) {
+            const props = info.event.extendedProps;
+            if (props.type === 'single' && props.bookingId) {
+                openBookingDetail(props.bookingId);
+            }
+        }
     });
     myCalendar.render();
 }

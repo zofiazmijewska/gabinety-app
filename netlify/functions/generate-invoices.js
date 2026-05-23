@@ -93,7 +93,8 @@ exports.handler = async (event) => {
           buyer_name: inv.buyer_name,
           buyer_tax_no: inv.nip || '',
           buyer_email: inv.buyer_email || '',
-          positions: inv.positions
+          positions: inv.positions,
+          gov_save_and_send: false  // nie wysyłaj do KSeF automatycznie
         }
       };
 

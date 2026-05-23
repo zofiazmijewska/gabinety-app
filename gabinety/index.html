@@ -2788,13 +2788,18 @@ async function confirmBooking(dateStr, startH, endH) {
 
     // Sprawdź kolizje ze stałymi blokami (pomijaj wyjątki na ten dzień)
     const dow = (bookingStart.getDay() + 6) % 7; // 0=Pon
-    const { data: fixedConflicts } = await sb
+    const { data: fixedAll } = await sb
         .from('fixed_bookings')
-        .select('id, start_time, end_time, tenant_id, tenants(name)')
+        .select('id, start_time, end_time, end_date, tenant_id, tenants(name)')
         .eq('room_id', roomId)
         .eq('day_of_week', dow)
-        .eq('is_active', true)
-        .or(`valid_from.is.null,valid_from.lte.${dateStr}`);
+        .eq('is_active', true);
+
+    // Filtruj tak jak kalendarz: blok musi być już aktywny i jeszcze nieswygasły
+    const fixedConflicts = (fixedAll || []).filter(f =>
+        (!f.valid_from || f.valid_from <= dateStr) &&
+        (!f.end_date || f.end_date > dateStr)
+    );
 
     if (fixedConflicts && fixedConflicts.length > 0) {
         // Pobierz wyjątki dla tych bloków na ten konkretny dzień

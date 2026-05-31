@@ -1733,6 +1733,40 @@
             </div>
         </div>
 
+        <!-- ==================== ADMIN: BOOKING SERIES VIEW ==================== -->
+        <div id="view-adminSeries" class="view">
+            <div class="flex-between mb-2">
+                <h2 class="card-title" style="margin:0;">Serie cykliczne</h2>
+                <div style="display:flex;gap:0.5rem;align-items:center;">
+                    <label style="display:flex;align-items:center;gap:0.4rem;cursor:pointer;font-size:0.9rem;">
+                        <input type="checkbox" id="seriesShowInactive">
+                        <span>pokaż nieaktywne</span>
+                    </label>
+                </div>
+            </div>
+            <p class="text-sm text-gray mb-2">Lista wzorców rezerwacji cyklicznych. Serie z <strong>auto-przedłużaniem</strong> są co tydzień rozszerzane przez system o brakujące tygodnie do 12 tygodni do przodu.</p>
+            <div class="card">
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Najemca</th>
+                                <th>Gabinet</th>
+                                <th>Dzień</th>
+                                <th>Godziny</th>
+                                <th>Auto-przedłużanie</th>
+                                <th>Aktywna</th>
+                                <th>Ostatnio przedłużona</th>
+                                <th>Najdalsza data</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody id="bookingSeriesTable"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
         <!-- ==================== ADMIN: INVOICES VIEW ==================== -->
         <div id="view-adminInvoices" class="view">
             <div class="flex-between mb-2">
@@ -2254,6 +2288,7 @@ function setupNavTabs() {
         const adminTabs = [
             { view: 'adminTenants', label: 'Najemcy' },
             { view: 'adminFixed', label: 'Stałe bloki' },
+            { view: 'adminSeries', label: 'Serie cykliczne' },
             { view: 'adminInvoices', label: 'Faktury' },
             { view: 'adminHistory', label: 'Historia' }
         ];
@@ -2290,6 +2325,7 @@ function switchView(viewName) {
         case 'summary': initSummaryMonths(); loadSummary(); break;
         case 'adminTenants': loadTenants(); break;
         case 'adminFixed': loadFixedBookings(); break;
+        case 'adminSeries': loadBookingSeries(); break;
         case 'adminInvoices': initInvoiceMonths(); loadInvoices(); break;
         case 'myHistory': loadMyHistory(); break;
         case 'adminHistory': initAuditFilter(); loadAuditLog(); break;
@@ -2746,6 +2782,13 @@ async function showBookingModal(start, end, resourceId) {
                             ${[2,3,4,5,6,7,8,10,12].map(n => `<option value="${n}">${n} tygodni</option>`).join('')}
                         </select>
                     </div>
+                    <div class="form-group" style="margin-top:0.25rem;">
+                        <label style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;">
+                            <input type="checkbox" id="bookAutoRenew">
+                            <span class="text-sm">Przedłużaj automatycznie (bezterminowo)</span>
+                        </label>
+                        <p class="text-sm text-gray" style="margin-top:0.25rem;padding-left:1.5rem;">Po wyczerpaniu wybranej liczby tygodni system będzie sam dostawiał kolejne. W każdej chwili możesz zatrzymać serię.</p>
+                    </div>
                     <p class="text-sm text-gray" id="bookRepeatInfo"></p>
                 </div>
                 <div class="modal-actions">
@@ -2835,7 +2878,32 @@ async function confirmBooking(dateStr, startH, endH) {
     // Repeat settings
     const repeatCheck = document.getElementById('bookRepeatCheck');
     const repeatWeeks = repeatCheck && repeatCheck.checked ? parseInt(document.getElementById('bookRepeatWeeks').value) : 1;
-    const seriesId = repeatWeeks > 1 ? crypto.randomUUID() : null;
+    const autoRenewCheck = document.getElementById('bookAutoRenew');
+    const autoRenew = !!(autoRenewCheck && autoRenewCheck.checked);
+
+    // Jeśli rezerwacja cykliczna — zapisz wzorzec do booking_series (Etap 1 auto-przedłużania)
+    // series_id w single_bookings będzie wskazywać na to id (kompatybilne wstecz: stare serie miały losowy UUID)
+    let seriesId = null;
+    if (repeatWeeks > 1) {
+        const { data: seriesRow, error: seriesErr } = await sb.from('booking_series').insert({
+            tenant_id: bookingTenantId,
+            room_id: roomId,
+            day_of_week: dow,
+            start_time: String(startH).padStart(2, '0') + ':00:00',
+            end_time: String(endH).padStart(2, '0') + ':00:00',
+            auto_renew: autoRenew,
+            is_active: true,
+            created_by: currentTenant.id
+        }).select('id').single();
+
+        if (seriesErr || !seriesRow) {
+            // Fallback — jakby tabela jeszcze nie istniała, używamy losowego UUID jak wcześniej
+            console.warn('booking_series insert failed, fallback to random UUID', seriesErr);
+            seriesId = crypto.randomUUID();
+        } else {
+            seriesId = seriesRow.id;
+        }
+    }
 
     // Book each hour separately, for each week
     const bookings = [];
@@ -2883,12 +2951,16 @@ async function confirmBooking(dateStr, startH, endH) {
 
     const tenantName = (await sb.from('tenants').select('name').eq('id', bookingTenantId).single()).data?.name || '';
     const roomName = rooms.find(r => r.id === bookings[0]?.room_id)?.name || '';
+    const renewLabel = autoRenew ? ', auto-przedłużanie' : '';
     const desc = repeatWeeks > 1
-        ? `Rezerwacja (${repeatWeeks} tygodni): ${tenantName} — ${dateStr} ${String(startH).padStart(2,'0')}:00–${String(endH).padStart(2,'0')}:00 ${roomName}`
+        ? `Rezerwacja (${repeatWeeks} tygodni${renewLabel}): ${tenantName} — ${dateStr} ${String(startH).padStart(2,'0')}:00–${String(endH).padStart(2,'0')}:00 ${roomName}`
         : `Nowa rezerwacja: ${tenantName} — ${dateStr} ${String(startH).padStart(2,'0')}:00–${String(endH).padStart(2,'0')}:00 ${roomName}`;
     await logAudit('single_bookings', null, 'insert', null, { tenant_id: bookingTenantId, booking_date: dateStr, start_time: bookings[0]?.start_time, room_id: bookings[0]?.room_id }, desc, bookingTenantId);
 
-    toast(repeatWeeks > 1 ? `Zarezerwowano ${repeatWeeks} tygodni!` : 'Rezerwacja potwierdzona!', 'success');
+    const toastMsg = repeatWeeks > 1
+        ? (autoRenew ? `Zarezerwowano ${repeatWeeks} tygodni — będzie przedłużane automatycznie` : `Zarezerwowano ${repeatWeeks} tygodni!`)
+        : 'Rezerwacja potwierdzona!';
+    toast(toastMsg, 'success');
     closeModal();
     if (calendar) calendar.refetchEvents();
 }
@@ -3147,6 +3219,13 @@ async function cancelSeriesFuture(seriesId, fromDate) {
         toast('Błąd odwołania: ' + error.message, 'error');
         return;
     }
+
+    // Wyłącz też auto-przedłużanie tej serii (jeśli istnieje w booking_series)
+    // — kompatybilne wstecz: dla starych serii bez rekordu w booking_series
+    // operacja nic nie zaktualizuje i to OK
+    await sb.from('booking_series')
+        .update({ is_active: false })
+        .eq('id', seriesId);
 
     toast('Seria rezerwacji odwołana', 'info');
     closeModal();
@@ -4471,6 +4550,141 @@ async function deleteFixed(id) {
     }
     toast('Blok usunięty', 'info');
     loadFixedBookings();
+}
+
+// ================================================================
+// ADMIN: BOOKING SERIES (serie cykliczne — wzorce auto-przedłużania)
+// ================================================================
+const DOW_NAMES_PL = ['poniedziałek','wtorek','środa','czwartek','piątek','sobota','niedziela'];
+
+async function loadBookingSeries() {
+    const showInactive = document.getElementById('seriesShowInactive')?.checked;
+    let query = sb
+        .from('booking_series')
+        .select('*, tenants(name), rooms(name)')
+        .order('created_at', { ascending: false });
+    if (!showInactive) query = query.eq('is_active', true);
+
+    const { data: series, error } = await query;
+    if (error) {
+        document.getElementById('bookingSeriesTable').innerHTML =
+            `<tr><td colspan="9" class="text-gray text-center">Błąd: ${escHtml(error.message)}</td></tr>`;
+        return;
+    }
+    if (!series || series.length === 0) {
+        document.getElementById('bookingSeriesTable').innerHTML =
+            '<tr><td colspan="9" class="text-gray text-center">Brak serii cyklicznych</td></tr>';
+        return;
+    }
+
+    // Dla każdej serii pobierz najdalszą datę rezerwacji w niej
+    const ids = series.map(s => s.id);
+    const { data: maxes } = await sb
+        .from('single_bookings')
+        .select('series_id, booking_date')
+        .in('series_id', ids)
+        .eq('status', 'confirmed')
+        .order('booking_date', { ascending: false });
+    const farthestBySeries = {};
+    (maxes || []).forEach(b => {
+        if (!farthestBySeries[b.series_id]) farthestBySeries[b.series_id] = b.booking_date;
+    });
+
+    const tbody = document.getElementById('bookingSeriesTable');
+    tbody.innerHTML = series.map(s => {
+        const tenant = s.tenants?.name || '—';
+        const room   = s.rooms?.name || '—';
+        const day    = DOW_NAMES_PL[s.day_of_week] || '?';
+        const hours  = `${s.start_time.substring(0,5)}–${s.end_time.substring(0,5)}`;
+        const lastExt = s.last_extended_at
+            ? new Date(s.last_extended_at).toLocaleDateString('pl-PL')
+            : '—';
+        const farthest = farthestBySeries[s.id]
+            ? new Date(farthestBySeries[s.id]).toLocaleDateString('pl-PL')
+            : '—';
+        const autoBadge = s.auto_renew
+            ? '<span style="color:#2d7a2d;font-weight:600;">tak</span>'
+            : '<span style="color:#888;">nie</span>';
+        const activeBadge = s.is_active
+            ? '<span style="color:#2d7a2d;">aktywna</span>'
+            : '<span style="color:#9B3030;">zatrzymana</span>';
+
+        const actions = [];
+        if (s.is_active) {
+            if (s.auto_renew) {
+                actions.push(`<button class="btn btn-sm btn-secondary" onclick="toggleSeriesAutoRenew('${s.id}', false)">Wyłącz auto</button>`);
+            } else {
+                actions.push(`<button class="btn btn-sm btn-primary" onclick="toggleSeriesAutoRenew('${s.id}', true)">Włącz auto</button>`);
+            }
+            actions.push(`<button class="btn btn-sm btn-danger" style="background:#9B3030;" onclick="stopBookingSeries('${s.id}')">Zatrzymaj</button>`);
+        } else {
+            actions.push(`<button class="btn btn-sm btn-secondary" onclick="resumeBookingSeries('${s.id}')">Wznów</button>`);
+        }
+
+        return `<tr>
+            <td>${escHtml(tenant)}</td>
+            <td>${escHtml(room)}</td>
+            <td>${day}</td>
+            <td>${hours}</td>
+            <td>${autoBadge}</td>
+            <td>${activeBadge}</td>
+            <td>${lastExt}</td>
+            <td>${farthest}</td>
+            <td style="white-space:nowrap;">${actions.join(' ')}</td>
+        </tr>`;
+    }).join('');
+
+    // Bind checkbox once
+    const cb = document.getElementById('seriesShowInactive');
+    if (cb && !cb._bound) {
+        cb._bound = true;
+        cb.addEventListener('change', loadBookingSeries);
+    }
+}
+
+async function toggleSeriesAutoRenew(seriesId, newValue) {
+    const verb = newValue ? 'włączyć' : 'wyłączyć';
+    if (!confirm(`Czy ${verb} automatyczne przedłużanie tej serii?`)) return;
+
+    const { error } = await sb.from('booking_series')
+        .update({ auto_renew: newValue })
+        .eq('id', seriesId);
+
+    if (error) { toast('Błąd: ' + error.message, 'error'); return; }
+    toast(newValue ? 'Auto-przedłużanie włączone' : 'Auto-przedłużanie wyłączone', 'success');
+    await logAudit('booking_series', seriesId, 'update', null,
+        { auto_renew: newValue }, `Auto-przedłużanie: ${newValue ? 'włączone' : 'wyłączone'}`, null);
+    loadBookingSeries();
+}
+
+async function stopBookingSeries(seriesId) {
+    if (!confirm('Zatrzymać serię? Istniejące rezerwacje pozostaną, ale system przestanie dostawiać nowe tygodnie. Możesz później wznowić.')) return;
+
+    const { error } = await sb.from('booking_series')
+        .update({ is_active: false, auto_renew: false })
+        .eq('id', seriesId);
+
+    if (error) { toast('Błąd: ' + error.message, 'error'); return; }
+    toast('Seria zatrzymana', 'info');
+    await logAudit('booking_series', seriesId, 'update', null,
+        { is_active: false }, 'Seria cykliczna zatrzymana', null);
+    loadBookingSeries();
+}
+
+async function resumeBookingSeries(seriesId) {
+    if (!confirm('Wznowić serię? Czy włączyć też automatyczne przedłużanie?')) return;
+
+    const enableAuto = confirm('Włączyć automatyczne przedłużanie (12 tygodni do przodu)?\n\nOK = tak, włącz auto\nAnuluj = nie, tylko aktywuj bez auto');
+
+    const { error } = await sb.from('booking_series')
+        .update({ is_active: true, auto_renew: enableAuto })
+        .eq('id', seriesId);
+
+    if (error) { toast('Błąd: ' + error.message, 'error'); return; }
+    toast('Seria wznowiona', 'success');
+    await logAudit('booking_series', seriesId, 'update', null,
+        { is_active: true, auto_renew: enableAuto }, `Seria wznowiona${enableAuto ? ' (z auto)' : ''}`, null);
+    loadBookingSeries();
 }
 
 // ================================================================

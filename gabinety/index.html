@@ -4561,7 +4561,7 @@ async function loadBookingSeries() {
     const showInactive = document.getElementById('seriesShowInactive')?.checked;
     let query = sb
         .from('booking_series')
-        .select('*, tenants(name), rooms(name)')
+        .select('*, tenants!booking_series_tenant_id_fkey(name), rooms(name)')
         .order('created_at', { ascending: false });
     if (!showInactive) query = query.eq('is_active', true);
 

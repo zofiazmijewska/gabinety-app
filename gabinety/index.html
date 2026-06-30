@@ -3364,6 +3364,8 @@ async function saveEditFixedBooking(fixedBookingId) {
     }
 
     // 2. Utwórz nową stałą rezerwację od podanej daty
+    // UWAGA: kalendarz filtruje po `valid_from`, NIE po `start_date`
+    // (w schemie istnieją oba pola, ale tylko valid_from jest używane do renderowania)
     const { error } = await sb
         .from('fixed_bookings')
         .insert({
@@ -3373,7 +3375,7 @@ async function saveEditFixedBooking(fixedBookingId) {
             start_time: String(newStartH).padStart(2,'0') + ':00:00',
             end_time: String(newEndH).padStart(2,'0') + ':00:00',
             is_active: true,
-            start_date: fromDate
+            valid_from: fromDate
         });
 
     if (error) {

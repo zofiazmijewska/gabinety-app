@@ -4308,7 +4308,8 @@ async function loadFixedBookings() {
         <td>${validFrom}</td>
         <td><span class="badge badge-${f.is_active ? 'confirmed' : 'cancelled'}">${f.is_active ? 'Tak' : 'Nie'}</span></td>
         <td>
-            <button class="btn btn-sm btn-primary" onclick="showEditFixedModal('${f.id}', '${f.tenant_id}', '${f.room_id}', ${f.day_of_week}, '${f.start_time}', '${f.end_time}', '${f.valid_from || ''}')">Edytuj</button>
+            <button class="btn btn-sm btn-primary" onclick="showSplitFixedModal('${f.id}', '${f.tenant_id}', '${f.room_id}', ${f.day_of_week}, '${f.start_time}', '${f.end_time}')">Wprowadź zmianę od…</button>
+            <button class="btn btn-sm btn-secondary" onclick="showEditFixedModal('${f.id}', '${f.tenant_id}', '${f.room_id}', ${f.day_of_week}, '${f.start_time}', '${f.end_time}', '${f.valid_from || ''}')">Edytuj</button>
             <button class="btn btn-sm btn-secondary" onclick="toggleFixed('${f.id}', ${!f.is_active})">${f.is_active ? 'Wyłącz' : 'Włącz'}</button>
             <button class="btn btn-sm btn-danger" onclick="deleteFixed('${f.id}')">Usuń</button>
         </td>
@@ -4574,6 +4575,147 @@ async function updateFixed() {
         toast('Stały blok zaktualizowany', 'success');
     }
 
+    await autoRecalcMonthly(newTenantId);
+    _fixedCache = null;
+    closeModal();
+    loadFixedBookings();
+}
+
+// ================================================================
+// SPLIT FIXED BLOCK — "Wprowadź zmianę od…"
+// Dzieli istniejący blok na dwa: stary zostaje z end_date,
+// nowy z nową wersją zaczyna od podanej daty.
+// Czytelniejszy UX niż Edytuj — wymusza datę i jasno mówi co robi.
+// ================================================================
+async function showSplitFixedModal(id, tenantId, roomId, dayOfWeek, startTime, endTime) {
+    const { data: tenants, error } = await sb.from('tenants').select('id, name').eq('is_active', true).order('name');
+    if (error) { toast('Błąd ładowania najemców: ' + error.message, 'error'); return; }
+
+    const tenantName = (tenants || []).find(t => t.id === tenantId)?.name || '';
+    const roomName = rooms.find(r => r.id === roomId)?.name || '';
+    const dayName = DAYS_PL[dayOfWeek] || '';
+    const todayStr = toLocalDateStr(new Date());
+
+    const modal = `
+        <div class="modal-overlay" onclick="if(event.target===this)closeModal()">
+            <div class="modal">
+                <h2>Wprowadź zmianę od…</h2>
+                <input type="hidden" id="splitFixedId" value="${id}">
+                <div style="background:#f5f3f8;padding:0.75rem;border-radius:6px;margin-bottom:1rem;">
+                    <p class="text-sm" style="margin:0;"><strong>Obecny blok:</strong></p>
+                    <p class="text-sm" style="margin:0.25rem 0 0 0;">${escHtml(tenantName)} — ${dayName} ${startTime.substring(0,5)}–${endTime.substring(0,5)} ${escHtml(roomName)}</p>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Zmiana obowiązuje od dnia</label>
+                    <input class="form-input" id="splitFixedDate" type="date" value="${todayStr}" min="${todayStr}">
+                    <p class="text-xs text-gray mt-1">Obecny blok zakończy się tego dnia (przeszłe rezerwacje pozostaną nietknięte). Nowa wersja zacznie od tego dnia.</p>
+                </div>
+                <p class="text-sm" style="margin-top:1rem;margin-bottom:0.5rem;"><strong>Nowa wersja:</strong></p>
+                <div class="form-group">
+                    <label class="form-label">Najemca</label>
+                    <select class="form-select" id="splitFixedTenant">
+                        ${(tenants || []).map(t => `<option value="${t.id}" ${t.id === tenantId ? 'selected' : ''}>${t.name}</option>`).join('')}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Gabinet</label>
+                    <select class="form-select" id="splitFixedRoom">
+                        ${rooms.map(r => `<option value="${r.id}" ${r.id === roomId ? 'selected' : ''}>${r.name}</option>`).join('')}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Dzień tygodnia</label>
+                    <select class="form-select" id="splitFixedDay">
+                        ${DAYS_PL.map((d, i) => `<option value="${i}" ${i === dayOfWeek ? 'selected' : ''}>${d}</option>`).join('')}
+                    </select>
+                </div>
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label class="form-label">Od</label>
+                        <select class="form-select" id="splitFixedStart">
+                            ${Array.from({length: HOURS_END - HOURS_START}, (_, i) => i + HOURS_START)
+                                .map(h => `<option value="${String(h).padStart(2,'0')}:00:00" ${startTime === String(h).padStart(2,'0')+':00:00' ? 'selected' : ''}>${String(h).padStart(2,'0')}:00</option>`).join('')}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Do</label>
+                        <select class="form-select" id="splitFixedEnd">
+                            ${Array.from({length: HOURS_END - HOURS_START}, (_, i) => i + HOURS_START + 1)
+                                .map(h => `<option value="${String(h).padStart(2,'0')}:00:00" ${endTime === String(h).padStart(2,'0')+':00:00' ? 'selected' : ''}>${String(h).padStart(2,'0')}:00</option>`).join('')}
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-actions">
+                    <button class="btn btn-secondary" onclick="closeModal()">Anuluj</button>
+                    <button class="btn btn-primary" id="splitFixedBtn" onclick="splitFixed()">Wprowadź zmianę</button>
+                </div>
+            </div>
+        </div>`;
+    document.getElementById('modalContainer').innerHTML = modal;
+}
+
+async function splitFixed() {
+    const btn = document.getElementById('splitFixedBtn');
+    btn.disabled = true;
+    btn.textContent = 'Zapisuję...';
+
+    const id          = document.getElementById('splitFixedId').value;
+    const fromDate    = document.getElementById('splitFixedDate').value;
+    const newTenantId = document.getElementById('splitFixedTenant').value;
+    const newRoomId   = document.getElementById('splitFixedRoom').value;
+    const newDay      = parseInt(document.getElementById('splitFixedDay').value);
+    const newStart    = document.getElementById('splitFixedStart').value;
+    const newEnd      = document.getElementById('splitFixedEnd').value;
+
+    if (!fromDate) {
+        toast('Wybierz datę od kiedy zmiana ma obowiązywać', 'error');
+        btn.disabled = false; btn.textContent = 'Wprowadź zmianę'; return;
+    }
+    if (newStart >= newEnd) {
+        toast('Godzina rozpoczęcia musi być przed godziną zakończenia', 'error');
+        btn.disabled = false; btn.textContent = 'Wprowadź zmianę'; return;
+    }
+
+    const { data: oldFb } = await sb.from('fixed_bookings').select('*').eq('id', id).single();
+
+    // 1. Zakończ stary blok na fromDate
+    const { error: endError } = await sb.from('fixed_bookings')
+        .update({ end_date: fromDate })
+        .eq('id', id);
+    if (endError) {
+        toast('Błąd kończenia starego bloku: ' + endError.message, 'error');
+        btn.disabled = false; btn.textContent = 'Wprowadź zmianę'; return;
+    }
+
+    // 2. Wstaw nowy blok od fromDate
+    const { data: newRow, error: insError } = await sb.from('fixed_bookings').insert({
+        tenant_id: newTenantId,
+        room_id: newRoomId,
+        day_of_week: newDay,
+        start_time: newStart,
+        end_time: newEnd,
+        is_active: true,
+        valid_from: fromDate
+    }).select('id').single();
+
+    if (insError) {
+        // Rollback end_date
+        await sb.from('fixed_bookings').update({ end_date: oldFb.end_date }).eq('id', id);
+        toast('Błąd tworzenia nowego bloku: ' + insError.message, 'error');
+        btn.disabled = false; btn.textContent = 'Wprowadź zmianę'; return;
+    }
+
+    const tenantName = (await sb.from('tenants').select('name').eq('id', newTenantId).single()).data?.name || '';
+    const roomName = rooms.find(r => r.id === newRoomId)?.name || '';
+    const dayName = DAYS_PL[newDay] || '';
+
+    await logAudit('fixed_bookings', newRow?.id || id, 'insert', oldFb,
+        { tenant_id: newTenantId, room_id: newRoomId, day_of_week: newDay,
+          start_time: newStart, end_time: newEnd, valid_from: fromDate },
+        `Wprowadzono zmianę bloku od ${fromDate}: ${tenantName} — ${dayName} ${newStart.substring(0,5)}–${newEnd.substring(0,5)} ${roomName}`,
+        newTenantId);
+
+    toast(`Zmiana wprowadzona od ${fromDate}`, 'success');
     await autoRecalcMonthly(newTenantId);
     _fixedCache = null;
     closeModal();

@@ -1717,13 +1717,13 @@
                 <div class="table-wrap">
                     <table>
                         <thead>
-                            <tr>
-                                <th>Najemca</th>
-                                <th>Gabinet</th>
-                                <th>Dzień</th>
-                                <th>Godziny</th>
-                                <th>Od kiedy</th>
-                                <th>Aktywny</th>
+                            <tr id="fixedBookingsHead">
+                                <th data-sort="tenant" style="cursor:pointer;user-select:none;">Najemca <span class="sort-arrow"></span></th>
+                                <th data-sort="room" style="cursor:pointer;user-select:none;">Gabinet <span class="sort-arrow"></span></th>
+                                <th data-sort="day" style="cursor:pointer;user-select:none;">Dzień <span class="sort-arrow"></span></th>
+                                <th data-sort="hours" style="cursor:pointer;user-select:none;">Godziny <span class="sort-arrow"></span></th>
+                                <th data-sort="valid_from" style="cursor:pointer;user-select:none;">Od kiedy <span class="sort-arrow"></span></th>
+                                <th data-sort="active" style="cursor:pointer;user-select:none;">Aktywny <span class="sort-arrow"></span></th>
                                 <th></th>
                             </tr>
                         </thead>
@@ -4288,17 +4288,70 @@ async function autoRecalcMonthly(tenantId) {
     await sb.from('tenants').update({ monthly_fixed_amount: monthly }).eq('id', tenantId);
 }
 
+let _fixedBookingsData = [];
+let _fixedSort = { col: 'day', dir: 'asc' }; // domyślnie po dniu rosnąco
+
 async function loadFixedBookings() {
     const { data } = await sb
         .from('fixed_bookings')
-        .select('*, tenants(name), rooms(name)')
-        .order('day_of_week')
-        .order('start_time');
+        .select('*, tenants(name), rooms(name)');
 
+    _fixedBookingsData = data || [];
+    renderFixedBookings();
+
+    // Bind kliknięcia w nagłówki tylko raz
+    const head = document.getElementById('fixedBookingsHead');
+    if (head && !head._sortBound) {
+        head._sortBound = true;
+        head.querySelectorAll('th[data-sort]').forEach(th => {
+            th.addEventListener('click', () => {
+                const col = th.dataset.sort;
+                if (_fixedSort.col === col) {
+                    _fixedSort.dir = _fixedSort.dir === 'asc' ? 'desc' : 'asc';
+                } else {
+                    _fixedSort.col = col;
+                    _fixedSort.dir = 'asc';
+                }
+                renderFixedBookings();
+            });
+        });
+    }
+}
+
+function renderFixedBookings() {
     const tbody = document.getElementById('fixedBookingsTable');
-    if (!data) return;
+    if (!tbody) return;
 
-    tbody.innerHTML = data.map(f => {
+    // Sortowanie
+    const sorted = [..._fixedBookingsData].sort((a, b) => {
+        let av, bv;
+        switch (_fixedSort.col) {
+            case 'tenant':     av = (a.tenants?.name || '').toLowerCase(); bv = (b.tenants?.name || '').toLowerCase(); break;
+            case 'room':       av = (a.rooms?.name || '').toLowerCase();   bv = (b.rooms?.name || '').toLowerCase();   break;
+            case 'day':        av = a.day_of_week; bv = b.day_of_week; break;
+            case 'hours':      av = a.start_time;  bv = b.start_time;  break;
+            case 'valid_from': av = a.valid_from || '0000-00-00'; bv = b.valid_from || '0000-00-00'; break;
+            case 'active':     av = a.is_active ? 1 : 0; bv = b.is_active ? 1 : 0; break;
+            default:           av = a.day_of_week; bv = b.day_of_week;
+        }
+        if (av < bv) return _fixedSort.dir === 'asc' ? -1 : 1;
+        if (av > bv) return _fixedSort.dir === 'asc' ?  1 : -1;
+        // Stabilny tiebreaker: dzień → godzina → najemca
+        if (a.day_of_week !== b.day_of_week) return a.day_of_week - b.day_of_week;
+        if (a.start_time  !== b.start_time)  return a.start_time < b.start_time ? -1 : 1;
+        return (a.tenants?.name || '').localeCompare(b.tenants?.name || '', 'pl');
+    });
+
+    // Strzałki w nagłówkach
+    document.querySelectorAll('#fixedBookingsHead th[data-sort]').forEach(th => {
+        const arrow = th.querySelector('.sort-arrow');
+        if (!arrow) return;
+        arrow.textContent = th.dataset.sort === _fixedSort.col
+            ? (_fixedSort.dir === 'asc' ? ' ▲' : ' ▼')
+            : '';
+    });
+
+    tbody.innerHTML = sorted.map(f => {
         const validFrom = f.valid_from ? new Date(f.valid_from).toLocaleDateString('pl-PL') : '—';
         return `<tr>
         <td>${escHtml(f.tenants.name)}</td>

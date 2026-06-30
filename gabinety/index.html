@@ -4463,6 +4463,7 @@ async function showEditFixedModal(id, tenantId, roomId, dayOfWeek, startTime, en
                 <div class="form-group">
                     <label class="form-label">Obowiązuje od</label>
                     <input class="form-input" id="editFixedValidFrom" type="date" value="${validFrom || ''}">
+                    <p class="text-xs text-gray mt-1">Jeśli zmieniasz godziny, dzień, gabinet lub najemcę — wpisz datę od kiedy zmiana ma obowiązywać. Stary blok zakończy się tego dnia, nowy zacznie od tego dnia. Przeszłe rezerwacje pozostaną nietknięte.</p>
                 </div>
                 <div class="modal-actions">
                     <button class="btn btn-secondary" onclick="closeModal()">Anuluj</button>
@@ -4491,31 +4492,90 @@ async function updateFixed() {
 
     const { data: oldFb } = await sb.from('fixed_bookings').select('*').eq('id', id).single();
 
-    const updates = {
-        tenant_id: document.getElementById('editFixedTenant').value,
-        room_id: document.getElementById('editFixedRoom').value,
-        day_of_week: parseInt(document.getElementById('editFixedDay').value),
-        start_time: startTime,
-        end_time: endTime,
-        valid_from: document.getElementById('editFixedValidFrom').value || null
-    };
+    const newTenantId = document.getElementById('editFixedTenant').value;
+    const newRoomId   = document.getElementById('editFixedRoom').value;
+    const newDay      = parseInt(document.getElementById('editFixedDay').value);
+    const validFromVal = document.getElementById('editFixedValidFrom').value || null;
 
-    const { error } = await sb.from('fixed_bookings').update(updates).eq('id', id);
-    if (error) {
-        toast('Błąd: ' + error.message, 'error');
-        btn.disabled = false;
-        btn.textContent = 'Zapisz';
-        return;
+    // Sprawdź czy zmieniają się ISTOTNE pola (godziny, dzień, gabinet, najemca).
+    // Jeśli tak — robimy SPLIT (stary blok dostaje end_date = data zmiany,
+    // nowy blok zaczyna od tej daty), żeby zachować historię.
+    // Jeśli tylko valid_from się zmienia (lub żadne istotne pola) — UPDATE in-place.
+    const importantChanged =
+        oldFb.start_time !== startTime ||
+        oldFb.end_time   !== endTime   ||
+        oldFb.day_of_week !== newDay   ||
+        oldFb.room_id    !== newRoomId ||
+        oldFb.tenant_id  !== newTenantId;
+
+    const tenantName = (await sb.from('tenants').select('name').eq('id', newTenantId).single()).data?.name || '';
+    const roomName = rooms.find(r => r.id === newRoomId)?.name || '';
+    const dayName = DAYS_PL[newDay] || '';
+
+    if (importantChanged) {
+        // SPLIT: wymagana data "Obowiązuje od"
+        if (!validFromVal) {
+            toast('Aby zmienić godziny/dzień/gabinet/najemcę podaj datę "Obowiązuje od" — od tej daty zacznie obowiązywać nowa wersja, a stara skończy się dzień wcześniej.', 'error');
+            btn.disabled = false;
+            btn.textContent = 'Zapisz';
+            return;
+        }
+
+        // 1. Zakończ stary blok dokładnie na dzień przed valid_from
+        // Kalendarz filtruje `end_date > dateStr` — jeśli end_date = valid_from
+        // to dzień valid_from już NIE pokazuje starego, ale pokazuje nowy.
+        const { error: endError } = await sb
+            .from('fixed_bookings')
+            .update({ end_date: validFromVal })
+            .eq('id', id);
+        if (endError) {
+            toast('Błąd kończenia starego bloku: ' + endError.message, 'error');
+            btn.disabled = false; btn.textContent = 'Zapisz'; return;
+        }
+
+        // 2. Wstaw nowy blok od valid_from
+        const { data: newRow, error: insError } = await sb.from('fixed_bookings').insert({
+            tenant_id: newTenantId,
+            room_id: newRoomId,
+            day_of_week: newDay,
+            start_time: startTime,
+            end_time: endTime,
+            is_active: true,
+            valid_from: validFromVal
+        }).select('id').single();
+        if (insError) {
+            // Rollback: przywróć stary blok (cofnij end_date)
+            await sb.from('fixed_bookings').update({ end_date: oldFb.end_date }).eq('id', id);
+            toast('Błąd tworzenia nowego bloku: ' + insError.message, 'error');
+            btn.disabled = false; btn.textContent = 'Zapisz'; return;
+        }
+
+        await logAudit('fixed_bookings', newRow?.id || id, 'update', oldFb,
+            { start_time: startTime, end_time: endTime, day_of_week: newDay,
+              room_id: newRoomId, tenant_id: newTenantId, valid_from: validFromVal,
+              old_end_date: validFromVal },
+            `Edycja bloku (split od ${validFromVal}): ${tenantName} — ${dayName} ${startTime.substring(0,5)}–${endTime.substring(0,5)} ${roomName}`,
+            newTenantId);
+
+        toast(`Blok rozdzielony: stary kończy się ${validFromVal}, nowy zaczyna od ${validFromVal}`, 'success');
+    } else {
+        // Tylko valid_from się zmienia — UPDATE in-place
+        const updates = { valid_from: validFromVal };
+        const { error } = await sb.from('fixed_bookings').update(updates).eq('id', id);
+        if (error) {
+            toast('Błąd: ' + error.message, 'error');
+            btn.disabled = false; btn.textContent = 'Zapisz'; return;
+        }
+
+        await logAudit('fixed_bookings', id, 'update', oldFb, updates,
+            `Zmiana valid_from bloku: ${tenantName} — ${dayName} ${startTime.substring(0,5)}–${endTime.substring(0,5)} ${roomName}`,
+            newTenantId);
+
+        toast('Stały blok zaktualizowany', 'success');
     }
 
-    const tenantName = (await sb.from('tenants').select('name').eq('id', updates.tenant_id).single()).data?.name || '';
-    const roomName = rooms.find(r => r.id === updates.room_id)?.name || '';
-    const dayName = DAYS_PL[updates.day_of_week] || '';
-    await logAudit('fixed_bookings', id, 'update', oldFb, updates,
-        `Edycja bloku: ${tenantName} — ${dayName} ${startTime.substring(0,5)}–${endTime.substring(0,5)} ${roomName}`, updates.tenant_id);
-
-    toast('Stały blok zaktualizowany', 'success');
-    await autoRecalcMonthly(updates.tenant_id);
+    await autoRecalcMonthly(newTenantId);
+    _fixedCache = null;
     closeModal();
     loadFixedBookings();
 }

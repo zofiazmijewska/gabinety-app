@@ -4597,9 +4597,12 @@ async function saveFixed() {
     loadFixedBookings();
 }
 
-async function showEditFixedModal(id, tenantId, roomId, dayOfWeek, startTime, endTime, validFrom) {
+async function showEditFixedModal(id, tenantId, roomId, dayOfWeek, startTime, endTime, validFrom, endDate) {
     const { data: tenants, error } = await sb.from('tenants').select('id, name').eq('is_active', true).order('name');
     if (error) { toast('Błąd ładowania najemców: ' + error.message, 'error'); return; }
+
+    const todayStr = toLocalDateStr(new Date());
+    const currentEndDate = endDate || '';
 
     const modal = `
         <div class="modal-overlay" onclick="if(event.target===this)closeModal()">
@@ -4645,6 +4648,19 @@ async function showEditFixedModal(id, tenantId, roomId, dayOfWeek, startTime, en
                     <input class="form-input" id="editFixedValidFrom" type="date" value="${validFrom || ''}">
                     <p class="text-xs text-gray mt-1">Jeśli zmieniasz godziny, dzień, gabinet lub najemcę — wpisz datę od kiedy zmiana ma obowiązywać. Stary blok zakończy się tego dnia, nowy zacznie od tego dnia. Przeszłe rezerwacje pozostaną nietknięte.</p>
                 </div>
+
+                <hr style="margin:1rem 0;border:none;border-top:1px solid var(--border);">
+
+                <div class="form-group" style="background:#faf7fc;padding:0.75rem;border-radius:6px;">
+                    <label class="form-label" style="margin-bottom:0.5rem;">Zakończ blok od dnia</label>
+                    <div style="display:flex;gap:0.5rem;align-items:center;">
+                        <input class="form-input" id="editFixedEndDate" type="date" value="${currentEndDate}" style="flex:1;">
+                        <button class="btn btn-sm btn-secondary" id="endBlockBtn" onclick="endFixedBlock('${id}')" style="white-space:nowrap;">Zakończ</button>
+                        ${currentEndDate ? `<button class="btn btn-sm btn-secondary" onclick="reopenFixedBlock('${id}')" style="white-space:nowrap;" title="Usuń datę zakończenia (blok znów bezterminowy)">Cofnij</button>` : ''}
+                    </div>
+                    <p class="text-xs text-gray mt-1">Blok obowiązuje do wpisanej daty (wyłącznie — ostatni dzień to dzień przed). Historia pozostaje w kalendarzu; przyszłe tygodnie znikają. ${currentEndDate ? 'Aktualnie zakończony: ' + new Date(currentEndDate).toLocaleDateString('pl-PL') + '.' : ''}</p>
+                </div>
+
                 <div class="modal-actions">
                     <button class="btn btn-secondary" onclick="closeModal()">Anuluj</button>
                     <button class="btn btn-primary" id="updateFixedBtn" onclick="updateFixed()">Zapisz</button>
@@ -4652,6 +4668,57 @@ async function showEditFixedModal(id, tenantId, roomId, dayOfWeek, startTime, en
             </div>
         </div>`;
     document.getElementById('modalContainer').innerHTML = modal;
+}
+
+async function endFixedBlock(id) {
+    const dateVal = document.getElementById('editFixedEndDate').value;
+    if (!dateVal) {
+        toast('Wybierz datę zakończenia', 'error');
+        return;
+    }
+    const dateFormatted = new Date(dateVal).toLocaleDateString('pl-PL');
+    if (!confirm(`Zakończyć blok od ${dateFormatted}? Historia w kalendarzu pozostanie, ale od tego dnia blok zniknie.`)) return;
+
+    const btn = document.getElementById('endBlockBtn');
+    if (btn) { btn.disabled = true; btn.textContent = '...'; }
+
+    const { data: oldFb } = await sb.from('fixed_bookings').select('*, tenants(name), rooms(name)').eq('id', id).single();
+    const { error } = await sb.from('fixed_bookings').update({ end_date: dateVal }).eq('id', id);
+
+    if (error) {
+        toast('Błąd: ' + error.message, 'error');
+        if (btn) { btn.disabled = false; btn.textContent = 'Zakończ'; }
+        return;
+    }
+
+    const dayName = DAYS_PL[oldFb?.day_of_week] || '';
+    await logAudit('fixed_bookings', id, 'update', oldFb, { end_date: dateVal },
+        `Zakończono blok od ${dateVal}: ${oldFb?.tenants?.name || ''} — ${dayName} ${oldFb?.start_time?.substring(0,5) || ''}–${oldFb?.end_time?.substring(0,5) || ''} ${oldFb?.rooms?.name || ''}`,
+        oldFb?.tenant_id);
+
+    toast(`Blok zakończony od ${dateFormatted}`, 'success');
+    _fixedCache = null;
+    closeModal();
+    loadFixedBookings();
+}
+
+async function reopenFixedBlock(id) {
+    if (!confirm('Usunąć datę zakończenia? Blok znowu będzie obowiązywał bezterminowo.')) return;
+
+    const { data: oldFb } = await sb.from('fixed_bookings').select('*, tenants(name), rooms(name)').eq('id', id).single();
+    const { error } = await sb.from('fixed_bookings').update({ end_date: null }).eq('id', id);
+
+    if (error) { toast('Błąd: ' + error.message, 'error'); return; }
+
+    const dayName = DAYS_PL[oldFb?.day_of_week] || '';
+    await logAudit('fixed_bookings', id, 'update', oldFb, { end_date: null },
+        `Cofnięto zakończenie bloku: ${oldFb?.tenants?.name || ''} — ${dayName} ${oldFb?.start_time?.substring(0,5) || ''}–${oldFb?.end_time?.substring(0,5) || ''} ${oldFb?.rooms?.name || ''}`,
+        oldFb?.tenant_id);
+
+    toast('Data zakończenia usunięta', 'success');
+    _fixedCache = null;
+    closeModal();
+    loadFixedBookings();
 }
 
 async function updateFixed() {
@@ -5232,6 +5299,11 @@ async function generateInvoices() {
             });
         }
 
+        // Data sprzedaży: dla faktur "tylko pojedyncze godziny" — ostatni dzień
+        // poprzedniego miesiąca (kiedy faktycznie wykonano usługi). Dla faktur
+        // ze stałym blokiem — pierwszy dzień billing_month (start okresu wynajmu).
+        const sellDate = fixedAmount > 0 ? startDate : prevEndDate;
+
         invoiceSpecs.push({
             tenant_id: tenant.id,
             fakturownia_client_id: tenant.fakturownia_client_id,
@@ -5239,6 +5311,7 @@ async function generateInvoices() {
             nip: tenant.nip || '',
             buyer_email: tenant.email,
             billing_month: startDate,
+            sell_date: sellDate,
             positions
         });
     }

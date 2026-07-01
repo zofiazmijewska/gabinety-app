@@ -81,7 +81,7 @@ exports.handler = async (event) => {
         api_token: API_TOKEN,
         invoice: {
           kind: 'vat',
-          sell_date: issueDate,
+          sell_date: inv.sell_date || issueDate,
           issue_date: issueDate,
           payment_to: paymentDate,
           payment_type: 'transfer',

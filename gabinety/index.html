@@ -82,6 +82,32 @@
             font-weight: 500;
             color: var(--dark);
         }
+        .topbar-brand {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.55rem;
+        }
+        .topbar-brand-text {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.3rem;
+            font-weight: 500;
+            color: var(--dark);
+            letter-spacing: 0.02em;
+            line-height: 1;
+            white-space: nowrap;
+        }
+        .topbar-brand-circle {
+            width: 26px;
+            height: 26px;
+            border: 5px solid var(--primary-hover);
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+        @media (max-width: 520px) {
+            .topbar-brand-text { font-size: 1rem; }
+            .topbar-brand-circle { width: 20px; height: 20px; border-width: 3.5px; }
+            .topbar-brand { gap: 0.4rem; }
+        }
         .topbar-user {
             display: flex;
             align-items: center;
@@ -1701,7 +1727,10 @@
     <!-- TOP BAR -->
     <div class="topbar">
         <div class="topbar-left">
-            <span class="topbar-title">Gabinety</span>
+            <span class="topbar-brand">
+                <span class="topbar-brand-text">Pracownia Psychoterapii</span>
+                <span class="topbar-brand-circle"></span>
+            </span>
         </div>
         <div class="topbar-user">
             <span id="userName"></span>
@@ -1785,7 +1814,8 @@
                 </div>
                 <div class="stat-card">
                     <div class="stat-value" id="myFixedSingleRate">-</div>
-                    <div class="stat-label">Stawka jednorazowa</div>
+                    <div class="stat-label">Stawka za wynajem pojedynczy</div>
+                    <div class="stat-sublabel" id="myFixedSingleRateNote" style="font-size:0.78rem;color:var(--gray-light);margin-top:0.25rem;display:none;"></div>
                 </div>
             </div>
             <!-- Umowa - warunki wynajmu -->
@@ -3885,55 +3915,145 @@ function onTenantSelectorChange() {
 
 async function loadMyBookings() {
     const tenantId = getViewTenantId();
-    const { data } = await sb
+    const todayStr = toLocalDateStr(new Date());
+    // Horyzont: 12 tygodni w przyszłość (jak booking_series)
+    const horizonDate = new Date();
+    horizonDate.setDate(horizonDate.getDate() + 12 * 7);
+    const horizonStr = toLocalDateStr(horizonDate);
+
+    // 1. Pojedyncze rezerwacje (jak dotąd)
+    const { data: singles } = await sb
         .from('single_bookings')
         .select('*, rooms(name), creator:tenants!created_by(name), canceller:tenants!cancelled_by(name)')
         .eq('tenant_id', tenantId)
-        .gte('booking_date', toLocalDateStr(new Date()))
+        .gte('booking_date', todayStr)
         .order('booking_date', { ascending: true })
         .order('start_time', { ascending: true });
+
+    // 2. Stałe bloki najemcy (aktywne)
+    const { data: fixed } = await sb
+        .from('fixed_bookings')
+        .select('*, rooms(name)')
+        .eq('tenant_id', tenantId)
+        .eq('is_active', true);
+
+    // 3. Wyjątki dla tych stałych bloków w horyzoncie
+    let exceptions = [];
+    if (fixed && fixed.length > 0) {
+        const fixedIds = fixed.map(f => f.id);
+        const { data: exc } = await sb
+            .from('fixed_booking_exceptions')
+            .select('fixed_booking_id, exception_date')
+            .in('fixed_booking_id', fixedIds)
+            .gte('exception_date', todayStr)
+            .lte('exception_date', horizonStr);
+        exceptions = exc || [];
+    }
+
+    // 4. Generuj wystąpienia stałych bloków w horyzoncie
+    const fixedOccurrences = [];
+    for (const fb of (fixed || [])) {
+        // Pomiń jeśli blok już zakończony
+        if (fb.end_date && fb.end_date <= todayStr) continue;
+
+        const startBound = (fb.valid_from && fb.valid_from > todayStr) ? fb.valid_from : todayStr;
+        const endBound   = (fb.end_date   && fb.end_date   < horizonStr) ? fb.end_date   : horizonStr;
+
+        const start = parseLocalDate(startBound);
+        const end   = parseLocalDate(endBound);
+        for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+            const dow = (d.getDay() + 6) % 7; // 0=Mon
+            if (dow !== fb.day_of_week) continue;
+
+            const dateStr = toLocalDateStr(d);
+            // Pomiń odwołaną datę
+            if (exceptions.some(e => e.fixed_booking_id === fb.id && e.exception_date === dateStr)) continue;
+
+            fixedOccurrences.push({
+                _type: 'fixed',
+                booking_date: dateStr,
+                start_time: fb.start_time,
+                end_time: fb.end_time,
+                room_name: fb.rooms?.name || '-',
+                room_id: fb.room_id,
+                fixed_booking_id: fb.id,
+                tenant_id: fb.tenant_id
+            });
+        }
+    }
+
+    // 5. Połącz i posortuj chronologicznie
+    const combined = [
+        ...(singles || []).map(b => ({ _type: 'single', ...b })),
+        ...fixedOccurrences
+    ].sort((a, b) => {
+        if (a.booking_date !== b.booking_date) return a.booking_date < b.booking_date ? -1 : 1;
+        return a.start_time < b.start_time ? -1 : 1;
+    });
 
     const tbody = document.getElementById('myBookingsTable');
     const empty = document.getElementById('myBookingsEmpty');
 
-    if (!data || data.length === 0) {
+    if (combined.length === 0) {
         tbody.innerHTML = '';
         empty.style.display = '';
         return;
     }
-
     empty.style.display = 'none';
-    // Zapisz dane rezerwacji do szybkiego dostępu z onclick
+
+    // Cache pojedynczych do modalu szczegółów
     window._bookingsCache = {};
-    data.forEach(b => { window._bookingsCache[b.id] = b; });
+    (singles || []).forEach(b => { window._bookingsCache[b.id] = b; });
 
-    tbody.innerHTML = data.map(b => {
-        const datePretty = new Date(b.booking_date).toLocaleDateString('pl-PL', { weekday: 'short', day: 'numeric', month: 'short' });
-        const bookingDate = new Date(b.booking_date);
-        const daysUntil = Math.floor((bookingDate - new Date()) / (1000 * 60 * 60 * 24));
+    // Pobierz nazwę najemcy dla modalu stałych (jednorazowo)
+    const { data: tenantRow } = await sb.from('tenants').select('name').eq('id', tenantId).single();
+    const tenantName = tenantRow?.name || '';
 
-        // Adnotacja: kto i kiedy utworzył / odwołał
-        let annotation = '';
-        if (b.status === 'cancelled' && b.cancelled_at) {
-            const cancelDate = new Date(b.cancelled_at);
-            const cancelStr = cancelDate.toLocaleDateString('pl-PL', { day: 'numeric', month: 'short' }) + ' ' + cancelDate.toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' });
-            const cancellerName = b.canceller ? b.canceller.name : '';
-            annotation = `odw. ${cancelStr}${cancellerName ? '<br>' + cancellerName : ''}`;
-        } else if (b.status === 'confirmed' && b.created_at) {
-            const createDate = new Date(b.created_at);
-            const createStr = createDate.toLocaleDateString('pl-PL', { day: 'numeric', month: 'short' }) + ' ' + createDate.toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' });
-            const creatorName = b.creator ? b.creator.name : '';
-            annotation = `utw. ${createStr}${creatorName ? '<br>' + creatorName : ''}`;
+    tbody.innerHTML = combined.map(row => {
+        const datePretty = new Date(row.booking_date).toLocaleDateString('pl-PL', { weekday: 'short', day: 'numeric', month: 'short' });
+        const timeStr = row.start_time.substring(0,5) + ' - ' + row.end_time.substring(0,5);
+
+        if (row._type === 'fixed') {
+            // Wiersz stałego bloku
+            const clickable = `style="cursor:pointer;" onclick='showFixedBookingDetailModal(${JSON.stringify({
+                fixedBookingId: row.fixed_booking_id,
+                roomId: row.room_id,
+                roomName: row.room_name,
+                startTime: row.start_time,
+                endTime: row.end_time,
+                tenantId: row.tenant_id,
+                tenantName: tenantName
+            }).replace(/'/g,"&#39;")}, "${row.booking_date}")'`;
+            return `<tr ${clickable}>
+                <td>${datePretty}</td>
+                <td>${timeStr}</td>
+                <td>${escHtml(row.room_name)}</td>
+                <td><span class="badge badge-fixed">Stały blok</span></td>
+                <td><span class="text-xs text-gray">—</span></td>
+                <td class="text-xs text-gray">co tydzień</td>
+            </tr>`;
         }
 
-        const clickable = b.status === 'confirmed' ? `style="cursor:pointer;" onclick="openBookingDetail('${b.id}')"` : '';
-
+        // Wiersz pojedynczej rezerwacji
+        let annotation = '';
+        if (row.status === 'cancelled' && row.cancelled_at) {
+            const cancelDate = new Date(row.cancelled_at);
+            const cancelStr = cancelDate.toLocaleDateString('pl-PL', { day: 'numeric', month: 'short' }) + ' ' + cancelDate.toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' });
+            const cancellerName = row.canceller ? row.canceller.name : '';
+            annotation = `odw. ${cancelStr}${cancellerName ? '<br>' + cancellerName : ''}`;
+        } else if (row.status === 'confirmed' && row.created_at) {
+            const createDate = new Date(row.created_at);
+            const createStr = createDate.toLocaleDateString('pl-PL', { day: 'numeric', month: 'short' }) + ' ' + createDate.toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' });
+            const creatorName = row.creator ? row.creator.name : '';
+            annotation = `utw. ${createStr}${creatorName ? '<br>' + creatorName : ''}`;
+        }
+        const clickable = row.status === 'confirmed' ? `style="cursor:pointer;" onclick="openBookingDetail('${row.id}')"` : '';
         return `<tr ${clickable}>
             <td>${datePretty}</td>
-            <td>${b.start_time.substring(0,5)} - ${b.end_time.substring(0,5)}</td>
-            <td>${b.rooms?.name || '-'}</td>
+            <td>${timeStr}</td>
+            <td>${escHtml(row.rooms?.name || '-')}</td>
             <td><span class="badge badge-single">Pojedyncza</span></td>
-            <td><span class="badge badge-${b.status}">${b.status === 'confirmed' ? 'Potwierdzona' : 'Odwołana'}</span></td>
+            <td><span class="badge badge-${row.status}">${row.status === 'confirmed' ? 'Potwierdzona' : 'Odwołana'}</span></td>
             <td class="text-xs text-gray">${annotation}</td>
         </tr>`;
     }).join('');
@@ -4146,6 +4266,19 @@ async function loadMyFixed() {
     // 2. Stats
     document.getElementById('myFixedMonthly').textContent = monthlyAmount > 0 ? monthlyAmount.toFixed(2) + ' zł' : '-';
     document.getElementById('myFixedSingleRate').textContent = singleRate + ' zł/h';
+
+    // Notka o zmianie stawki od 1.09.2026 — pokazuj tylko przed tą datą i jeśli obecna stawka to nie 40 zł
+    const noteEl = document.getElementById('myFixedSingleRateNote');
+    const NEW_RATE_DATE = '2026-09-01';
+    const NEW_SINGLE_RATE = 40;
+    if (noteEl) {
+        if (toLocalDateStr(new Date()) < NEW_RATE_DATE && singleRate !== NEW_SINGLE_RATE) {
+            noteEl.textContent = `od 1.09.2026: ${NEW_SINGLE_RATE} zł/h`;
+            noteEl.style.display = '';
+        } else {
+            noteEl.style.display = 'none';
+        }
+    }
 
     // 3. Schedule table (same data, different display)
     const tbody = document.getElementById('myFixedTable');

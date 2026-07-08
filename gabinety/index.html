@@ -727,6 +727,55 @@
             max-width: 860px;
             margin: 0 auto;
             padding: 2.5rem 1.5rem 4rem;
+            scroll-behavior: smooth;
+        }
+        html { scroll-behavior: smooth; }
+
+        /* Landing nav (sticky) */
+        .landing-nav {
+            position: sticky;
+            top: 0;
+            z-index: 40;
+            background: rgba(255,255,255,0.96);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            border-bottom: 1px solid #EDE9F3;
+        }
+        .landing-nav-inner {
+            max-width: 860px;
+            margin: 0 auto;
+            display: flex;
+            gap: 0.25rem;
+            padding: 0 1rem;
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+        .landing-nav-inner::-webkit-scrollbar { display: none; }
+        .landing-nav a {
+            display: inline-block;
+            padding: 0.85rem 0.9rem;
+            color: var(--gray);
+            text-decoration: none;
+            font-size: 0.92rem;
+            font-family: 'DM Sans', sans-serif;
+            white-space: nowrap;
+            border-bottom: 2px solid transparent;
+            transition: color 0.15s, border-color 0.15s;
+        }
+        .landing-nav a:hover {
+            color: var(--primary-hover);
+        }
+        .landing-nav a.active {
+            color: var(--primary-hover);
+            border-bottom-color: var(--primary);
+            font-weight: 500;
+        }
+        /* offset dla sticky nav przy scroll-to-anchor */
+        .landing-section {
+            scroll-margin-top: 60px;
+        }
+        @media (max-width: 520px) {
+            .landing-nav a { padding: 0.75rem 0.7rem; font-size: 0.88rem; }
         }
         .landing-hero-title {
             font-family: 'Cormorant Garamond', serif;
@@ -1245,10 +1294,22 @@
         </button>
     </header>
 
+    <nav class="landing-nav" id="landingNav">
+        <div class="landing-nav-inner">
+            <a href="#sec-gabinety" data-target="sec-gabinety">Gabinety</a>
+            <a href="#sec-wynajem" data-target="sec-wynajem">Formy wynajmu</a>
+            <a href="#sec-praktyczne" data-target="sec-praktyczne">Jak pracujemy</a>
+            <a href="#sec-mapa" data-target="sec-mapa">Dojazd</a>
+            <a href="#sec-regulamin" data-target="sec-regulamin">Regulamin</a>
+            <a href="#sec-kontakt" data-target="sec-kontakt">Kontakt</a>
+        </div>
+    </nav>
+
     <div class="landing-content">
         <h1 class="landing-hero-title">Wynajem Gabinetów</h1>
         <p class="landing-hero-sub">ul. Puławska 26A, Warszawa — dostępne na godziny i stałe bloki</p>
 
+        <div id="sec-gabinety" class="landing-section"></div>
         <!-- GABINET 1 -->
         <div class="gabinet-card">
             <div class="gabinet-card-top">
@@ -1345,6 +1406,7 @@
         </div>
 
         <!-- JAK PRACUJEMY -->
+        <div id="sec-praktyczne" class="landing-section"></div>
         <div class="landing-desc landing-practical">
             <h3 style="font-family:'Cormorant Garamond',serif; font-size:1.15rem; margin-bottom:0.75rem; color:var(--dark);">Kilka praktycznych rzeczy</h3>
             <p>Gabinety wynajmowane są w pełnych godzinach zegarowych. Większość z nas pracuje w rytmie 50 minut sesji + 10 minut przerwy — dzięki temu godziny są zgrane i w przestrzeni wspólnej jest spokojnie.</p>
@@ -1353,6 +1415,7 @@
         </div>
 
         <!-- DWIE FORMY WYNAJMU -->
+        <div id="sec-wynajem" class="landing-section"></div>
         <h2 class="rental-options-title">Dwie formy wynajmu — wybierz swoją</h2>
         <p class="rental-options-sub">Możesz wynająć gabinet elastycznie, sesja po sesji — albo zarezerwować stały termin co tydzień na wyłączność.</p>
         <div class="rental-options-grid">
@@ -1395,6 +1458,7 @@
         </div>
 
         <!-- INFO GRID -->
+        <div id="sec-kontakt" class="landing-section"></div>
         <div class="landing-info-grid">
             <div class="landing-info-card">
                 <h3>Rozliczenia</h3>
@@ -1421,6 +1485,7 @@
         </div>
 
         <!-- MAPA -->
+        <div id="sec-mapa" class="landing-section"></div>
         <div class="landing-map">
             <h3>Okolica i dojazd</h3>
             <div class="map-photo-grid">
@@ -1441,6 +1506,7 @@
         </div>
 
         <!-- ACCORDION: REGULAMIN + RODO -->
+        <div id="sec-regulamin" class="landing-section"></div>
         <div class="accordion">
             <div class="accordion-item" id="acc-regulamin">
                 <div class="accordion-header" onclick="toggleAccordion('acc-regulamin')">
@@ -2388,6 +2454,37 @@ function toggleAccordion(id) {
     const item = document.getElementById(id);
     item.classList.toggle('open');
 }
+
+// Landing nav — podświetlanie aktywnej zakładki + auto-open regulaminu
+(function initLandingNav() {
+    const nav = document.getElementById('landingNav');
+    if (!nav) return;
+    const links = Array.from(nav.querySelectorAll('a[data-target]'));
+    const sections = links.map(a => document.getElementById(a.dataset.target)).filter(Boolean);
+    if (sections.length === 0) return;
+
+    // Kliknięcie w "Regulamin" otwiera akordeon
+    const regulaminLink = links.find(a => a.dataset.target === 'sec-regulamin');
+    if (regulaminLink) {
+        regulaminLink.addEventListener('click', () => {
+            const acc = document.getElementById('acc-regulamin');
+            if (acc && !acc.classList.contains('open')) acc.classList.add('open');
+        });
+    }
+
+    // Podświetlanie aktywnej zakładki na podstawie widocznej sekcji
+    const setActive = (id) => {
+        links.forEach(a => a.classList.toggle('active', a.dataset.target === id));
+    };
+    const observer = new IntersectionObserver(entries => {
+        // Wybierz sekcję najbardziej widoczną w górnej części ekranu
+        const visible = entries
+            .filter(e => e.isIntersecting)
+            .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
+        if (visible.length > 0) setActive(visible[0].target.id);
+    }, { rootMargin: '-60px 0px -60% 0px', threshold: 0 });
+    sections.forEach(s => observer.observe(s));
+})();
 
 function hideAllViews() {
     document.getElementById('landingView').style.display = 'none';

@@ -3,19 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gabinety — System Rezerwacji</title>
+    <title>Gabinety - System Rezerwacji</title>
     <meta name="robots" content="noindex, nofollow">
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
 
     <!-- Open Graph -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://zofiazmijewska.pl/gabinety/">
-    <meta property="og:title" content="Gabinety do wynajęcia — Pracownia Psychoterapii Zofii Żmijewskiej">
+    <meta property="og:title" content="Gabinety do wynajęcia - Pracownia Psychoterapii Zofii Żmijewskiej">
     <meta property="og:description" content="Wynajem gabinetów psychoterapeutycznych na Mokotowie w Warszawie. Rezerwacja online, elastyczne godziny.">
     <meta property="og:image" content="https://zofiazmijewska.pl/images/og-gabinety.jpg">
     <meta property="og:locale" content="pl_PL">
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Gabinety do wynajęcia — Pracownia Psychoterapii Zofii Żmijewskiej">
+    <meta name="twitter:title" content="Gabinety do wynajęcia - Pracownia Psychoterapii Zofii Żmijewskiej">
     <meta name="twitter:description" content="Wynajem gabinetów psychoterapeutycznych na Mokotowie w Warszawie.">
     <meta name="twitter:image" content="https://zofiazmijewska.pl/images/og-gabinety.jpg">
 
@@ -342,7 +342,7 @@
             font-size: 0.8rem !important;
             padding: 1px 3px !important;
         }
-        /* Linia pionowa między dniami — pseudo-element rysowany nad wszystkim */
+        /* Linia pionowa między dniami - pseudo-element rysowany nad wszystkim */
         .fc-resourceTimeGridWeek-view .day-separator {
             position: relative;
         }
@@ -686,41 +686,94 @@
             min-height: 100vh;
             background: #F9F8FA;
         }
-        .landing-header {
-            background: white;
-            border-bottom: 1px solid #E8E5EC;
-            padding: 1.25rem 2rem;
+        /* Sticky top bar — logo + nav + zaloguj w jednej linii */
+        .landing-topbar {
+            position: sticky;
+            top: 0;
+            z-index: 40;
+            background: rgba(255,255,255,0.96);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border-bottom: 1px solid #EDE9F3;
+        }
+        .landing-topbar-inner {
+            max-width: 1200px;
+            margin: 0 auto;
             display: flex;
-            justify-content: space-between;
             align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            padding: 0.5rem 1.25rem;
         }
         .landing-logo {
+            display: flex;
+            align-items: center;
+            gap: 0.55rem;
+            text-decoration: none;
+            flex-shrink: 0;
+        }
+        .landing-logo-prefix {
             font-family: 'Cormorant Garamond', serif;
-            font-size: 1.2rem;
+            font-size: 1.35rem;
             font-weight: 500;
             color: var(--dark);
             letter-spacing: 0.02em;
+            line-height: 1;
+            white-space: nowrap;
         }
-        .landing-logo span {
+        .landing-logo-circle {
+            width: 32px;
+            height: 32px;
+            border: 7px solid var(--primary-hover);
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+        .landing-logo-text {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.35rem;
+            font-weight: 500;
             color: var(--primary-hover);
+            letter-spacing: 0.02em;
+            line-height: 1;
+            white-space: nowrap;
+        }
+        .landing-nav-tabs {
+            display: flex;
+            gap: 0.1rem;
+            overflow-x: auto;
+            scrollbar-width: none;
+            flex: 1;
+            justify-content: center;
+        }
+        .landing-nav-tabs::-webkit-scrollbar { display: none; }
+        .landing-topbar .btn-login {
+            padding: 0.5rem 1.1rem !important;
+            font-size: 0.9rem !important;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+        @media (max-width: 900px) {
+            .landing-topbar-inner {
+                flex-wrap: wrap;
+                padding: 0.5rem 1rem;
+            }
+            .landing-nav-tabs {
+                order: 3;
+                width: 100%;
+                justify-content: flex-start;
+                border-top: 1px solid #EDE9F3;
+                padding-top: 0.2rem;
+            }
         }
         @media (max-width: 520px) {
-            .landing-header {
-                padding: 0.75rem 1rem;
-                gap: 0.75rem;
-            }
-            .landing-logo {
-                font-size: 1.05rem;
-                line-height: 1.3;
-            }
-            .landing-logo span {
-                display: block;
-            }
-            .landing-header .btn-login {
-                padding: 0.4rem 1rem !important;
-                font-size: 0.85rem !important;
-                white-space: nowrap;
-                align-self: center;
+            .landing-topbar-inner { padding: 0.4rem 0.75rem; gap: 0.5rem; }
+            .landing-logo-circle { width: 22px; height: 22px; border-width: 5px; }
+            .landing-logo-prefix { font-size: 0.95rem; }
+            .landing-logo-text { font-size: 0.95rem; }
+            .landing-logo { gap: 0.35rem; }
+            .landing-topbar .btn-login {
+                padding: 0.35rem 0.75rem !important;
+                font-size: 0.8rem !important;
             }
         }
         .landing-content {
@@ -731,51 +784,32 @@
         }
         html { scroll-behavior: smooth; }
 
-        /* Landing nav (sticky) */
-        .landing-nav {
-            position: sticky;
-            top: 0;
-            z-index: 40;
-            background: rgba(255,255,255,0.96);
-            backdrop-filter: blur(6px);
-            -webkit-backdrop-filter: blur(6px);
-            border-bottom: 1px solid #EDE9F3;
-        }
-        .landing-nav-inner {
-            max-width: 860px;
-            margin: 0 auto;
-            display: flex;
-            gap: 0.25rem;
-            padding: 0 1rem;
-            overflow-x: auto;
-            scrollbar-width: none;
-        }
-        .landing-nav-inner::-webkit-scrollbar { display: none; }
-        .landing-nav a {
+        /* Nav tab links (wewnątrz landing-topbar) */
+        .landing-nav-tabs a {
             display: inline-block;
-            padding: 0.85rem 0.9rem;
+            padding: 0.65rem 0.75rem;
             color: var(--gray);
             text-decoration: none;
-            font-size: 0.92rem;
+            font-size: 0.9rem;
             font-family: 'DM Sans', sans-serif;
             white-space: nowrap;
             border-bottom: 2px solid transparent;
             transition: color 0.15s, border-color 0.15s;
         }
-        .landing-nav a:hover {
+        .landing-nav-tabs a:hover {
             color: var(--primary-hover);
         }
-        .landing-nav a.active {
+        .landing-nav-tabs a.active {
             color: var(--primary-hover);
             border-bottom-color: var(--primary);
             font-weight: 500;
         }
-        /* offset dla sticky nav przy scroll-to-anchor */
+        /* offset dla sticky pasek przy scroll-to-anchor */
         .landing-section {
-            scroll-margin-top: 60px;
+            scroll-margin-top: 90px;
         }
         @media (max-width: 520px) {
-            .landing-nav a { padding: 0.75rem 0.7rem; font-size: 0.88rem; }
+            .landing-nav-tabs a { padding: 0.55rem 0.55rem; font-size: 0.85rem; }
         }
         .landing-hero-title {
             font-family: 'Cormorant Garamond', serif;
@@ -1053,7 +1087,7 @@
             margin-top: 0.5rem;
         }
 
-        /* Rental options — dwie duże karty */
+        /* Rental options - dwie duże karty */
         .rental-options-title {
             font-family: 'Cormorant Garamond', serif;
             font-size: 1.5rem;
@@ -1287,27 +1321,30 @@
 
 <!-- ==================== LANDING PAGE ==================== -->
 <div id="landingView" class="landing-page">
-    <header class="landing-header">
-        <div class="landing-logo">Pracownia Psychoterapii <span>Zofii Żmijewskiej</span></div>
-        <button class="btn-login" onclick="showLoginFromLanding()" style="background:var(--primary);color:white;border:none;padding:0.5rem 1.25rem;border-radius:7px;font-family:'DM Sans',sans-serif;font-size:0.9rem;cursor:pointer;">
-            Zaloguj się
-        </button>
-    </header>
-
-    <nav class="landing-nav" id="landingNav">
-        <div class="landing-nav-inner">
-            <a href="#sec-gabinety" data-target="sec-gabinety">Gabinety</a>
-            <a href="#sec-wynajem" data-target="sec-wynajem">Formy wynajmu</a>
-            <a href="#sec-praktyczne" data-target="sec-praktyczne">Jak pracujemy</a>
-            <a href="#sec-mapa" data-target="sec-mapa">Dojazd</a>
-            <a href="#sec-regulamin" data-target="sec-regulamin">Regulamin</a>
-            <a href="#sec-kontakt" data-target="sec-kontakt">Kontakt</a>
+    <header class="landing-topbar" id="landingNav">
+        <div class="landing-topbar-inner">
+            <a href="#" class="landing-logo" onclick="event.preventDefault();window.scrollTo({top:0,behavior:'smooth'});" aria-label="Pracownia Psychoterapii Zofii Żmijewskiej">
+                <span class="landing-logo-prefix">Pracownia Psychoterapii</span>
+                <span class="landing-logo-circle"></span>
+                <span class="landing-logo-text">Zofii Żmijewskiej</span>
+            </a>
+            <nav class="landing-nav-tabs">
+                <a href="#sec-gabinety" data-target="sec-gabinety">Gabinety</a>
+                <a href="#sec-wynajem" data-target="sec-wynajem">Formy wynajmu</a>
+                <a href="#sec-praktyczne" data-target="sec-praktyczne">Jak pracujemy</a>
+                <a href="#sec-mapa" data-target="sec-mapa">Dojazd</a>
+                <a href="#sec-regulamin" data-target="sec-regulamin">Regulamin</a>
+                <a href="#sec-kontakt" data-target="sec-kontakt">Kontakt</a>
+            </nav>
+            <button class="btn-login" onclick="showLoginFromLanding()" style="background:var(--primary);color:white;border:none;border-radius:7px;font-family:'DM Sans',sans-serif;cursor:pointer;">
+                Zaloguj się
+            </button>
         </div>
-    </nav>
+    </header>
 
     <div class="landing-content">
         <h1 class="landing-hero-title">Wynajem Gabinetów</h1>
-        <p class="landing-hero-sub">ul. Puławska 26A, Warszawa — dostępne na godziny i stałe bloki</p>
+        <p class="landing-hero-sub">ul. Puławska 26A, Warszawa - dostępne na godziny i stałe bloki</p>
 
         <div id="sec-gabinety" class="landing-section"></div>
         <!-- GABINET 1 -->
@@ -1315,10 +1352,10 @@
             <div class="gabinet-card-top">
                 <div class="gabinet-card-slider" id="slider1">
                     <span class="gab-badge" style="background:var(--room1);">Gabinet 1</span>
-                    <img src="../images/gab1-1.jpg" class="active" alt="Gabinet 1 — balkon z roślinami">
-                    <img src="../images/gab1-2.jpg" alt="Gabinet 1 — toaletka z lustrem">
-                    <img src="../images/gab1-3.jpg" alt="Gabinet 1 — fotel z lampą">
-                    <img src="../images/gab1-4.jpg" alt="Gabinet 1 — widok na balkon">
+                    <img src="../images/gab1-1.jpg" class="active" alt="Gabinet 1 - balkon z roślinami">
+                    <img src="../images/gab1-2.jpg" alt="Gabinet 1 - toaletka z lustrem">
+                    <img src="../images/gab1-3.jpg" alt="Gabinet 1 - fotel z lampą">
+                    <img src="../images/gab1-4.jpg" alt="Gabinet 1 - widok na balkon">
                     <button class="slider-btn-sm prev" onclick="cardSlider('slider1',-1)">&#8592;</button>
                     <button class="slider-btn-sm next" onclick="cardSlider('slider1',1)">&#8594;</button>
                     <div class="slider-dots-sm">
@@ -1330,7 +1367,7 @@
                 </div>
                 <div class="gabinet-card-info">
                     <h3>Gabinet 1</h3>
-                    <p>Do pracy indywidualnej. Duży balkon od podwórka, dwa fotele i duży stół. Okna na zachód — ciepłe popołudniowe światło.</p>
+                    <p>Do pracy indywidualnej. Duży balkon od podwórka, dwa fotele i duży stół. Okna na zachód - ciepłe popołudniowe światło.</p>
                     <div class="gabinet-features">
                         <span><svg class="feat-icon" viewBox="0 0 24 24"><rect x="6" y="3" width="12" height="10" rx="1"/><line x1="12" y1="3" x2="12" y2="13"/><line x1="6" y1="8" x2="18" y2="8"/><rect x="4" y="13" width="16" height="8" rx="1"/><line x1="8" y1="13" x2="8" y2="21"/><line x1="12" y1="13" x2="12" y2="21"/><line x1="16" y1="13" x2="16" y2="21"/></svg> Duży balkon</span>
                         <span><svg class="feat-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88" stroke-width="0" fill="currentColor" opacity="0.5"/></svg> Zachód</span>
@@ -1345,10 +1382,10 @@
             <div class="gabinet-card-top">
                 <div class="gabinet-card-slider" id="slider2">
                     <span class="gab-badge" style="background:var(--room2);color:#3a3f4a;">Gabinet 2</span>
-                    <img src="../images/gab2-1.jpg" class="active" alt="Gabinet 2 — kanapa i stół">
-                    <img src="../images/gab2-2.jpg" alt="Gabinet 2 — kanapa z kolorową lampą">
-                    <img src="../images/gab2-3.jpg" alt="Gabinet 2 — kominek">
-                    <img src="../images/gab2-4.jpg" alt="Gabinet 2 — fotel z lampą">
+                    <img src="../images/gab2-1.jpg" class="active" alt="Gabinet 2 - kanapa i stół">
+                    <img src="../images/gab2-2.jpg" alt="Gabinet 2 - kanapa z kolorową lampą">
+                    <img src="../images/gab2-3.jpg" alt="Gabinet 2 - kominek">
+                    <img src="../images/gab2-4.jpg" alt="Gabinet 2 - fotel z lampą">
                     <button class="slider-btn-sm prev" onclick="cardSlider('slider2',-1)">&#8592;</button>
                     <button class="slider-btn-sm next" onclick="cardSlider('slider2',1)">&#8594;</button>
                     <div class="slider-dots-sm">
@@ -1360,7 +1397,7 @@
                 </div>
                 <div class="gabinet-card-info">
                     <h3>Gabinet 2</h3>
-                    <p>Do pracy indywidualnej i z parami. Największy gabinet z wyjściem na balkon. Kominek, kanapa, fotel, duży okrągły stół. Okna na wschód — poranne światło.</p>
+                    <p>Do pracy indywidualnej i z parami. Największy gabinet z wyjściem na balkon. Kominek, kanapa, fotel, duży okrągły stół. Okna na wschód - poranne światło.</p>
                     <div class="gabinet-features">
                         <span><svg class="feat-icon" viewBox="0 0 24 24"><rect x="6" y="3" width="12" height="10" rx="1"/><line x1="12" y1="3" x2="12" y2="13"/><line x1="6" y1="8" x2="18" y2="8"/><rect x="4" y="13" width="16" height="8" rx="1"/><line x1="8" y1="13" x2="8" y2="21"/><line x1="12" y1="13" x2="12" y2="21"/><line x1="16" y1="13" x2="16" y2="21"/></svg> Balkon</span>
                         <span><svg class="feat-icon" viewBox="0 0 24 24"><path d="M12 12c2-2.96 0-7-1-8 0 3.04-4 5.5-4 8 0 2.49 2.01 5 5 5s5-2.51 5-5c0-1.2-.5-2.5-1-3.5-.5 1.5-2 3-4 3.5z"/></svg> Kominek</span>
@@ -1376,8 +1413,8 @@
             <div class="gabinet-card-top">
                 <div class="gabinet-card-slider" id="slider3">
                     <span class="gab-badge" style="background:var(--room3);color:#3a3f4a;">Gabinet 3</span>
-                    <img src="../images/gab3-1.jpg" class="active" alt="Gabinet 3 — fotele i kanapa">
-                    <img src="../images/gab3-2.jpg" alt="Gabinet 3 — szafka z książkami">
+                    <img src="../images/gab3-1.jpg" class="active" alt="Gabinet 3 - fotele i kanapa">
+                    <img src="../images/gab3-2.jpg" alt="Gabinet 3 - szafka z książkami">
                     <button class="slider-btn-sm prev" onclick="cardSlider('slider3',-1)">&#8592;</button>
                     <button class="slider-btn-sm next" onclick="cardSlider('slider3',1)">&#8594;</button>
                     <div class="slider-dots-sm">
@@ -1387,7 +1424,7 @@
                 </div>
                 <div class="gabinet-card-info">
                     <h3>Gabinet 3</h3>
-                    <p>Do pracy indywidualnej, w tym psychoanalitycznej (kozetka). Kameralny i przytulny. Dwa fotele, kanapa/kozetka, stolik i krzesło. Okna na wschód — poranne światło.</p>
+                    <p>Do pracy indywidualnej, w tym psychoanalitycznej (kozetka). Kameralny i przytulny. Dwa fotele, kanapa/kozetka, stolik i krzesło. Okna na wschód - poranne światło.</p>
                     <div class="gabinet-features">
                         <span><svg class="feat-icon" viewBox="0 0 24 24"><path d="M20 9V6a2 2 0 00-2-2H6a2 2 0 00-2 2v3"/><path d="M2 11v5a2 2 0 002 2h16a2 2 0 002-2v-5a3 3 0 00-3-3H5a3 3 0 00-3 3z"/><path d="M4 18v2"/><path d="M20 18v2"/></svg> Kozetka</span>
                         <span><svg class="feat-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88" stroke-width="0" fill="currentColor" opacity="0.5"/></svg> Wschód</span>
@@ -1399,25 +1436,25 @@
 
         <!-- OPIS -->
         <div class="landing-desc">
-            <p>Trzy gabinety terapeutyczne w zabytkowej kamienicy E. Wedla, na rogu Puławskiej i Madalińskiego. Każdy ma swój charakter — od przestronnego z kominkiem po kameralny z kozetką.</p>
-            <p>Do dyspozycji najemców jest też wspólna przestrzeń: kuchnia, kanapa, stół — miejsce na kawę między sesjami i rozmowę ze współpracownikami. Wynajmuje kilka osób na stałe i naprawdę lubimy tu razem pracować.</p>
+            <p>Trzy gabinety terapeutyczne w zabytkowej kamienicy E. Wedla, na rogu Puławskiej i Madalińskiego. Każdy ma swój charakter - od przestronnego z kominkiem po kameralny z kozetką.</p>
+            <p>Do dyspozycji najemców jest też wspólna przestrzeń: kuchnia, kanapa, stół - miejsce na kawę między sesjami i rozmowę ze współpracownikami. Wynajmuje kilka osób na stałe i naprawdę lubimy tu razem pracować.</p>
             <p>Możesz wynająć gabinet na stałe bloki godzin lub na pojedyncze sesje. Szukasz swojego miejsca do pracy terapeutycznej? <strong>Zapraszam do kontaktu!</strong> Napisz na <a href="mailto:gabinety@zofiazmijewska.pl" style="color:var(--primary-hover);">gabinety@zofiazmijewska.pl</a> lub zadzwoń: <a href="tel:+48514622225" style="color:var(--primary-hover);">514 622 225</a>.</p>
-            <p class="landing-address"><svg class="feat-icon" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg> ul. Puławska 26A (róg Madalińskiego) — kamienica E. Wedla, Warszawa</p>
+            <p class="landing-address"><svg class="feat-icon" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg> ul. Puławska 26A (róg Madalińskiego) - kamienica E. Wedla, Warszawa</p>
         </div>
 
         <!-- JAK PRACUJEMY -->
         <div id="sec-praktyczne" class="landing-section"></div>
         <div class="landing-desc landing-practical">
             <h3 style="font-family:'Cormorant Garamond',serif; font-size:1.15rem; margin-bottom:0.75rem; color:var(--dark);">Kilka praktycznych rzeczy</h3>
-            <p>Gabinety wynajmowane są w pełnych godzinach zegarowych. Większość z nas pracuje w rytmie 50 minut sesji + 10 minut przerwy — dzięki temu godziny są zgrane i w przestrzeni wspólnej jest spokojnie.</p>
-            <p>Domofon po wcześniejszym ustawieniu wpuszcza klientów automatycznie. Poczekalnia mieści jeden fotel — prosimy klientów o przychodzenie nie wcześniej niż 10 minut przed sesją. Zależy nam, aby w trakcie sesji poczekalnia była pusta. Osoby towarzyszące mogą poczekać w jednej z wielu kawiarni i restauracji w okolicy.</p>
-            <p>W kuchni jest lodówka, mikrofalówka i kawiarka przelewowa — do wspólnego użytku. Można zostawiać swoje rzeczy zarówno w gabinecie, jak i w kuchni.</p>
+            <p>Gabinety wynajmowane są w pełnych godzinach zegarowych. Większość z nas pracuje w rytmie 50 minut sesji + 10 minut przerwy - dzięki temu godziny są zgrane i w przestrzeni wspólnej jest spokojnie.</p>
+            <p>Domofon po wcześniejszym ustawieniu wpuszcza klientów automatycznie. Poczekalnia mieści jeden fotel - prosimy klientów o przychodzenie nie wcześniej niż 10 minut przed sesją. Zależy nam, aby w trakcie sesji poczekalnia była pusta. Osoby towarzyszące mogą poczekać w jednej z wielu kawiarni i restauracji w okolicy.</p>
+            <p>W kuchni jest lodówka, mikrofalówka i kawiarka przelewowa - do wspólnego użytku. Można zostawiać swoje rzeczy zarówno w gabinecie, jak i w kuchni.</p>
         </div>
 
         <!-- DWIE FORMY WYNAJMU -->
         <div id="sec-wynajem" class="landing-section"></div>
-        <h2 class="rental-options-title">Dwie formy wynajmu — wybierz swoją</h2>
-        <p class="rental-options-sub">Możesz wynająć gabinet elastycznie, sesja po sesji — albo zarezerwować stały termin co tydzień na wyłączność.</p>
+        <h2 class="rental-options-title">Dwie formy wynajmu - wybierz swoją</h2>
+        <p class="rental-options-sub">Możesz wynająć gabinet elastycznie, sesja po sesji - albo zarezerwować stały termin co tydzień na wyłączność.</p>
         <div class="rental-options-grid">
             <div class="rental-card single">
                 <span class="rental-card-tag">Elastyczny</span>
@@ -1426,7 +1463,7 @@
                     <span class="amount">40 zł</span>
                     <span class="unit">/ godzina</span>
                 </div>
-                <p class="rental-card-lead">Rezerwujesz konkretne godziny przez panel online — od pojedynczej sesji po powtarzającą się cyklicznie rezerwację.</p>
+                <p class="rental-card-lead">Rezerwujesz konkretne godziny przez panel online - od pojedynczej sesji po powtarzającą się cyklicznie rezerwację.</p>
                 <ul class="rental-features">
                     <li>Rezerwacja w każdej chwili, do godziny przed sesją</li>
                     <li>Do miesiąca w przód</li>
@@ -1442,10 +1479,14 @@
                 <h3>Wynajem stały (blok)</h3>
                 <div class="rental-card-price">
                     <span class="amount">35 zł</span>
-                    <span class="unit">/ godzina · 1–3 h</span>
+                    <span class="unit">/ godzina · 1 - 3 h</span>
                 </div>
-                <p class="rental-card-price-alt"><strong style="color:var(--primary-hover);font-family:'Cormorant Garamond',serif;font-size:1.75rem;font-weight:700;vertical-align:-2px;">30 zł</strong> / godzina · od 4 h · opłata miesięczna = stawka × godziny × 4,26</p>
-                <p class="rental-card-lead">Rezerwujesz ten sam dzień i godziny co tydzień, na czas nieokreślony. Twój termin — do Twojej wyłącznej dyspozycji.</p>
+                <div class="rental-card-price" style="margin-top:-0.1rem;">
+                    <span class="amount">30 zł</span>
+                    <span class="unit">/ godzina · 4 h+</span>
+                </div>
+                <p class="rental-card-price-alt" style="margin-top:0.4rem;">opłata miesięczna = stawka × godziny × 4,26</p>
+                <p class="rental-card-lead">Rezerwujesz ten sam dzień i godziny co tydzień, na czas nieokreślony. Twój termin - do Twojej wyłącznej dyspozycji.</p>
                 <ul class="rental-features">
                     <li>Ten sam dzień tygodnia i godziny co tydzień</li>
                     <li>Termin zarezerwowany tylko dla Ciebie</li>
@@ -1472,8 +1513,8 @@
             <div class="landing-info-card">
                 <h3>Godziny dostępności</h3>
                 <ul>
-                    <li><svg class="feat-icon" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> Poniedziałek – Niedziela</li>
-                    <li><svg class="feat-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> 7:00 – 22:00</li>
+                    <li><svg class="feat-icon" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> Poniedziałek - Niedziela</li>
+                    <li><svg class="feat-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> 7:00 - 22:00</li>
                 </ul>
                 <p style="margin-top:0.75rem;">Aktualna dostępność godzin widoczna po zalogowaniu do panelu rezerwacji.</p>
                 <h3 style="margin-top:1rem;">Kontakt</h3>
@@ -1490,8 +1531,8 @@
             <h3>Okolica i dojazd</h3>
             <div class="map-photo-grid">
                 <div>
-                    <img src="../images/okolica-park.jpg" alt="Park Morskie Oko — tuż obok gabinetów" class="okolica-photo" onclick="lightboxImages=[this.src]; lightboxIndex=0; openLightboxDirect()">
-                    <p class="okolica-caption">Park Morskie Oko — spacer od gabinetu</p>
+                    <img src="../images/okolica-park.jpg" alt="Park Morskie Oko - tuż obok gabinetów" class="okolica-photo" onclick="lightboxImages=[this.src]; lightboxIndex=0; openLightboxDirect()">
+                    <p class="okolica-caption">Park Morskie Oko - spacer od gabinetu</p>
                 </div>
                 <div>
                     <div class="map-wrap" style="height:100%;">
@@ -1516,56 +1557,56 @@
                 <div class="accordion-body">
                     <div class="accordion-body-inner">
                         <h4>§1 Postanowienia ogólne</h4>
-                        <p>Pracownia Psychoterapii Zofii Żmijewskiej to miejsce pracy dla osób zajmujących się psychoterapią i rozwojem. Każda osoba wynajmująca prowadzi własną działalność — oferowaną usługą jest podnajem wyposażonych gabinetów. Pracownia znajduje się na II piętrze kamienicy przy ul. Puławskiej 26A w Warszawie.</p>
+                        <p>Pracownia Psychoterapii Zofii Żmijewskiej to miejsce pracy dla osób zajmujących się psychoterapią i rozwojem. Każda osoba wynajmująca prowadzi własną działalność - oferowaną usługą jest podnajem wyposażonych gabinetów. Pracownia znajduje się na II piętrze kamienicy przy ul. Puławskiej 26A w Warszawie.</p>
 
                         <h4>§2 Formy wynajmu</h4>
                         <p>Gabinety wynajmowane są na pełne godziny zegarowe. Dostępne są dwie formy wynajmu. Dokonanie rezerwacji jest równoznaczne ze zobowiązaniem do zapłaty.</p>
 
                         <p><strong>1. Wynajem stały (stały blok)</strong></p>
-                        <p>Stały blok to rezerwacja tych samych godzin w tym samym dniu tygodnia, powtarzająca się co tydzień, na czas nieokreślony. Każdy najemca może utworzyć własny blok godzinowy w ramach dostępnych terminów — rezerwacja obejmuje konkretne godziny (od–do), a czas pomiędzy zarezerwowanymi blokami różnych najemców może być wynajmowany innym osobom.</p>
+                        <p>Stały blok to rezerwacja tych samych godzin w tym samym dniu tygodnia, powtarzająca się co tydzień, na czas nieokreślony. Każdy najemca może utworzyć własny blok godzinowy w ramach dostępnych terminów - rezerwacja obejmuje konkretne godziny (od-do), a czas pomiędzy zarezerwowanymi blokami różnych najemców może być wynajmowany innym osobom.</p>
                         <p><strong>Cena:</strong></p>
                         <ul>
-                            <li>35 zł/h — blok obejmujący 1–3 godziny</li>
-                            <li>30 zł/h — blok obejmujący od 4 godzin</li>
+                            <li>35 zł/h - blok obejmujący 1-3 godziny</li>
+                            <li>30 zł/h - blok obejmujący od 4 godzin</li>
                         </ul>
-                        <p>Blok to godziny wynajęte danego dnia ciągiem, bez przerw (np. 14:00–18:00). Każdy blok jest osobną rezerwacją i jest rozliczany osobno, według stawki właściwej dla liczby godzin w bloku.</p>
-                        <p>Opłata miesięczna za dany blok obliczana jest jako: <em>stawka godzinowa × liczba godzin w bloku × 4,26</em>. Współczynnik 4,26 uwzględnia miesiące pięciotygodniowe, dzięki czemu opłata jest stała w każdym miesiącu. Jeśli najemca ma kilka bloków, opłaty za poszczególne bloki sumują się. Przykład: blok 14:00–18:00 (4 godziny, stawka 30 zł/h) to opłata miesięczna 30 zł × 4 h × 4,26 = 511,20 zł.</p>
+                        <p>Blok to godziny wynajęte danego dnia ciągiem, bez przerw (np. 14:00-18:00). Każdy blok jest osobną rezerwacją i jest rozliczany osobno, według stawki właściwej dla liczby godzin w bloku.</p>
+                        <p>Opłata miesięczna za dany blok obliczana jest jako: <em>stawka godzinowa × liczba godzin w bloku × 4,26</em>. Współczynnik 4,26 uwzględnia miesiące pięciotygodniowe, dzięki czemu opłata jest stała w każdym miesiącu. Jeśli najemca ma kilka bloków, opłaty za poszczególne bloki sumują się. Przykład: blok 14:00-18:00 (4 godziny, stawka 30 zł/h) to opłata miesięczna 30 zł × 4 h × 4,26 = 511,20 zł.</p>
                         <p>Opłata za stały blok jest stałą, niezmienną kwotą miesięczną, niezależną od liczby wykorzystanych godzin, nieobecności, urlopów, przerw wakacyjnych ani liczby wystąpień danego dnia tygodnia w danym miesiącu.</p>
 
                         <p><strong>Start nowego bloku:</strong> Nowy stały blok rozpoczyna się zawsze z pierwszym dniem nowego miesiąca kalendarzowego. Jeśli najemca chce rozpocząć korzystanie z gabinetu wcześniej, w trakcie miesiąca poprzedzającego start bloku, może skorzystać z wynajmu pojedynczego. Stały blok z datą rozpoczęcia w przyszłości można zarezerwować najwcześniej na miesiąc przed jego rozpoczęciem. Rezerwacja wymaga pisemnego zgłoszenia i jest wiążąca od chwili jej dokonania.</p>
 
                         <p><strong>Zmiana istniejącego bloku:</strong></p>
                         <ul>
-                            <li><em>Zmniejszenie liczby godzin lub wypowiedzenie</em> — dwumiesięczny okres wypowiedzenia, liczony od pierwszego dnia miesiąca następującego po miesiącu, w którym dokonano zgłoszenia, ze skutkiem na koniec drugiego z tych miesięcy (przykład: zgłoszenie 15 czerwca — wynajem kończy się 31 sierpnia).</li>
-                            <li><em>Zwiększenie liczby godzin</em> — możliwe od pierwszego dnia kolejnego miesiąca, po pisemnym zgłoszeniu i przy dostępności gabinetu. Do tego czasu można korzystać z dodatkowych godzin w ramach wynajmu pojedynczego.</li>
-                            <li><em>Przesunięcie bloku w obrębie tego samego dnia tygodnia</em> (ta sama liczba godzin, ciągłość zachowana) — możliwe od razu po pisemnym zgłoszeniu, pod warunkiem dostępności. Zmiana dnia tygodnia lub liczby godzin traktowana jest jako wypowiedzenie z zachowaniem dwumiesięcznego okresu.</li>
+                            <li><em>Zmniejszenie liczby godzin lub wypowiedzenie</em> - dwumiesięczny okres wypowiedzenia, liczony od pierwszego dnia miesiąca następującego po miesiącu, w którym dokonano zgłoszenia, ze skutkiem na koniec drugiego z tych miesięcy (przykład: zgłoszenie 15 czerwca - wynajem kończy się 31 sierpnia).</li>
+                            <li><em>Zwiększenie liczby godzin</em> - możliwe od pierwszego dnia kolejnego miesiąca, po pisemnym zgłoszeniu i przy dostępności gabinetu. Do tego czasu można korzystać z dodatkowych godzin w ramach wynajmu pojedynczego.</li>
+                            <li><em>Przesunięcie bloku w obrębie tego samego dnia tygodnia</em> (ta sama liczba godzin, ciągłość zachowana) - możliwe od razu po pisemnym zgłoszeniu, pod warunkiem dostępności. Zmiana dnia tygodnia lub liczby godzin traktowana jest jako wypowiedzenie z zachowaniem dwumiesięcznego okresu.</li>
                         </ul>
 
                         <p><strong>2. Wynajem pojedynczy</strong></p>
-                        <p>Rezerwacja konkretnego terminu przez panel online. Każda rezerwacja stanowi osobne zobowiązanie do zapłaty. Rezerwacji można dokonywać najwcześniej na miesiąc w przód i najpóźniej na godzinę przed rozpoczęciem. Rezerwować można wyłącznie pełne godziny zegarowe — jeśli sesja wykracza poza pełną godzinę (np. 12:30–13:30), należy zarezerwować odpowiednią liczbę pełnych godzin (w tym przypadku 12:00–14:00).</p>
-                        <p><strong>Rezerwacja cykliczna:</strong> można ustawić rezerwację jako cykliczną — powtarza się co tydzień i odnawia automatycznie do czasu odwołania. Rezerwacja cykliczna pozostaje wynajmem pojedynczym: obowiązują dla niej zasady odwołania z §4B i stawka 40 zł/h, niezależnie od tego że się powtarza.</p>
+                        <p>Rezerwacja konkretnego terminu przez panel online. Każda rezerwacja stanowi osobne zobowiązanie do zapłaty. Rezerwacji można dokonywać najwcześniej na miesiąc w przód i najpóźniej na godzinę przed rozpoczęciem. Rezerwować można wyłącznie pełne godziny zegarowe - jeśli sesja wykracza poza pełną godzinę (np. 12:30-13:30), należy zarezerwować odpowiednią liczbę pełnych godzin (w tym przypadku 12:00-14:00).</p>
+                        <p><strong>Rezerwacja cykliczna:</strong> można ustawić rezerwację jako cykliczną - powtarza się co tydzień i odnawia automatycznie do czasu odwołania. Rezerwacja cykliczna pozostaje wynajmem pojedynczym: obowiązują dla niej zasady odwołania z §4B i stawka 40 zł/h, niezależnie od tego że się powtarza.</p>
                         <p><strong>Cena:</strong> 40 zł/h.</p>
 
                         <h4>§3 Płatności</h4>
                         <p>Faktury wystawiane są na początku miesiąca z terminem płatności do 8. dnia miesiąca i przesyłane do Krajowego Systemu e-Faktur (KSeF). Wynajem stały rozliczany jest z góry za dany miesiąc. Pojedyncze godziny zarezerwowane w poprzednim miesiącu są sumowane i doliczane do kolejnej faktury.</p>
-                        <p>Prosimy o terminowe płatności — pozwala to sprawnie zarządzać grafikiem pracowni. W przypadku przedłużającej się zaległości może to skutkować czasowym wstrzymaniem dostępu do gabinetu, do czasu uregulowania należności.</p>
+                        <p>Prosimy o terminowe płatności - pozwala to sprawnie zarządzać grafikiem pracowni. W przypadku przedłużającej się zaległości może to skutkować czasowym wstrzymaniem dostępu do gabinetu, do czasu uregulowania należności.</p>
 
                         <h4>§4 Nieobecności i odwołania</h4>
-                        <p><strong>A. Wynajem stały</strong> — opłata jest należna w pełnej wysokości niezależnie od obecności, w tym podczas urlopów, wyjazdów i przerw. Odwołanie pojedynczej sesji nie zmniejsza opłaty miesięcznej. Nie ma potrzeby informowania o nieobecności — zarezerwowany termin pozostaje przypisany do najemcy i nie jest udostępniany innym osobom.</p>
-                        <p><strong>B. Wynajem pojedynczy</strong> — rezerwację można odwołać bezpłatnie z wyprzedzeniem co najmniej 7 dni (7 × 24h liczone od godziny rozpoczęcia). Odwołanie w terminie krótszym skutkuje pełną opłatą za zarezerwowaną godzinę.</p>
-                        <p><strong>C. Niedostępność gabinetu z przyczyn leżących po stronie Pracowni</strong> — w przypadku niedostępności gabinetu z przyczyn niezależnych od najemcy (awaria, prace remontowe, siła wyższa), Pracownia zaproponuje zastępczy termin lub gabinet. Jeśli nie będzie to możliwe, opłata za niewykorzystany czas zostanie proporcjonalnie pomniejszona lub przeniesiona na kolejny okres rozliczeniowy.</p>
+                        <p><strong>A. Wynajem stały</strong> - opłata jest należna w pełnej wysokości niezależnie od obecności, w tym podczas urlopów, wyjazdów i przerw. Odwołanie pojedynczej sesji nie zmniejsza opłaty miesięcznej. Nie ma potrzeby informowania o nieobecności - zarezerwowany termin pozostaje przypisany do najemcy i nie jest udostępniany innym osobom.</p>
+                        <p><strong>B. Wynajem pojedynczy</strong> - rezerwację można odwołać bezpłatnie z wyprzedzeniem co najmniej 7 dni (7 × 24h liczone od godziny rozpoczęcia). Odwołanie w terminie krótszym skutkuje pełną opłatą za zarezerwowaną godzinę.</p>
+                        <p><strong>C. Niedostępność gabinetu z przyczyn leżących po stronie Pracowni</strong> - w przypadku niedostępności gabinetu z przyczyn niezależnych od najemcy (awaria, prace remontowe, siła wyższa), Pracownia zaproponuje zastępczy termin lub gabinet. Jeśli nie będzie to możliwe, opłata za niewykorzystany czas zostanie proporcjonalnie pomniejszona lub przeniesiona na kolejny okres rozliczeniowy.</p>
 
                         <h4>§5 Zasady korzystania</h4>
                         <ul>
-                            <li>Jeśli bezpośrednio po zakończeniu wynajmu jednego najemcy następuje wynajem kolejnego w tym samym gabinecie, najemca zobowiązany jest opuścić gabinet 5 minut przed końcem swojego czasu — jest to umowny czas przeznaczony na zmianę terapeuty w gabinecie.</li>
-                            <li>Prosimy o pozostawienie gabinetu w takim stanie, w jakim chcielibyśmy go zastać. Ustawienie mebli jest stałe — można je dostosować na czas sesji, ale prosimy o przywrócenie układu po zakończeniu.</li>
-                            <li>W gabinecie dbamy o ciszę i prywatność — zarówno swoją, jak i innych najemców.</li>
+                            <li>Jeśli bezpośrednio po zakończeniu wynajmu jednego najemcy następuje wynajem kolejnego w tym samym gabinecie, najemca zobowiązany jest opuścić gabinet 5 minut przed końcem swojego czasu - jest to umowny czas przeznaczony na zmianę terapeuty w gabinecie.</li>
+                            <li>Prosimy o pozostawienie gabinetu w takim stanie, w jakim chcielibyśmy go zastać. Ustawienie mebli jest stałe - można je dostosować na czas sesji, ale prosimy o przywrócenie układu po zakończeniu.</li>
+                            <li>W gabinecie dbamy o ciszę i prywatność - zarówno swoją, jak i innych najemców.</li>
                             <li>Każdy najemca dba o porządek w gabinecie, poczekalni, kuchni i łazienkach.</li>
-                            <li>Kuchnia jest dostępna wyłącznie dla terapeutów — klienci i pacjenci nie powinni z niej korzystać. Kawę, herbatę i inne produkty spożywcze każdy zapewnia sobie sam.</li>
+                            <li>Kuchnia jest dostępna wyłącznie dla terapeutów - klienci i pacjenci nie powinni z niej korzystać. Kawę, herbatę i inne produkty spożywcze każdy zapewnia sobie sam.</li>
                             <li>Na terenie pracowni nie palimy i nie spożywamy alkoholu.</li>
                             <li>Kod dostępu do pracowni jest zmieniany okresowo. Zakazane jest udostępnianie go osobom trzecim.</li>
-                            <li>Gabinetu nie można użyczać innym osobom ani przekazywać swojego terminu pod nieobecność — dotyczy to także sytuacji wyjazdów czy urlopów. Najemca musi być osobiście obecny w zarezerwowanym czasie i jest odpowiedzialny za gabinet w tym okresie.</li>
-                            <li>Osoba prowadząca zajęcia grupowe zobowiązana jest zarezerwować czas z zapasem obejmującym także ustawienie i uporządkowanie mebli oraz krzeseł — cała ta czynność, łącznie z obecnością w gabinecie, musi zmieścić się w zarezerwowanym czasie wynajmu.</li>
+                            <li>Gabinetu nie można użyczać innym osobom ani przekazywać swojego terminu pod nieobecność - dotyczy to także sytuacji wyjazdów czy urlopów. Najemca musi być osobiście obecny w zarezerwowanym czasie i jest odpowiedzialny za gabinet w tym okresie.</li>
+                            <li>Osoba prowadząca zajęcia grupowe zobowiązana jest zarezerwować czas z zapasem obejmującym także ustawienie i uporządkowanie mebli oraz krzeseł - cała ta czynność, łącznie z obecnością w gabinecie, musi zmieścić się w zarezerwowanym czasie wynajmu.</li>
                         </ul>
 
                         <h4>§6 Kontakt</h4>
@@ -1638,7 +1679,7 @@
 
         <div class="consent-summary">
             <strong>W skrócie:</strong><br>
-            Korzystając z systemu rezerwacji gabinetów, zobowiązujesz się do przestrzegania regulaminu miejsca — w tym do terminowej płatności za zarezerwowane godziny oraz poszanowania zasad współdzielenia przestrzeni.
+            Korzystając z systemu rezerwacji gabinetów, zobowiązujesz się do przestrzegania regulaminu miejsca - w tym do terminowej płatności za zarezerwowane godziny oraz poszanowania zasad współdzielenia przestrzeni.
         </div>
 
         <div class="consent-checkbox-wrap" onclick="document.getElementById('consentCheck').click()">
@@ -1735,15 +1776,15 @@
             <h2 class="card-title mb-1">Wynajem stały</h2>
             <div class="stats-grid" id="myFixedStats" style="margin-bottom:1.5rem;">
                 <div class="stat-card">
-                    <div class="stat-value" id="myFixedHours">—</div>
+                    <div class="stat-value" id="myFixedHours">-</div>
                     <div class="stat-label">Godzin / tydzień</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-value" id="myFixedMonthly">—</div>
+                    <div class="stat-value" id="myFixedMonthly">-</div>
                     <div class="stat-label">Kwota miesięczna</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-value" id="myFixedSingleRate">—</div>
+                    <div class="stat-value" id="myFixedSingleRate">-</div>
                     <div class="stat-label">Stawka jednorazowa</div>
                 </div>
             </div>
@@ -1760,7 +1801,7 @@
                     </table>
                 </div>
                 <div id="myFixedTermsEmpty" class="text-center text-gray" style="padding:2rem;display:none;">
-                    Brak warunków umowy — skontaktuj się z administratorem
+                    Brak warunków umowy - skontaktuj się z administratorem
                 </div>
             </div>
             <!-- Harmonogram -->
@@ -1824,19 +1865,19 @@
                 <div style="margin-top:0.75rem;padding-top:0.75rem;border-top:2px solid var(--gray-light);">
                     <div class="stats-grid">
                         <div class="stat-card">
-                            <div class="stat-value" id="summaryGrandFixed">—</div>
+                            <div class="stat-value" id="summaryGrandFixed">-</div>
                             <div class="stat-label">Suma stały wynajem</div>
                         </div>
                         <div class="stat-card">
-                            <div class="stat-value" id="summaryGrandSingleHours">—</div>
+                            <div class="stat-value" id="summaryGrandSingleHours">-</div>
                             <div class="stat-label">Suma godziny</div>
                         </div>
                         <div class="stat-card">
-                            <div class="stat-value" id="summaryGrandSingle">—</div>
+                            <div class="stat-value" id="summaryGrandSingle">-</div>
                             <div class="stat-label">Suma za godziny</div>
                         </div>
                         <div class="stat-card">
-                            <div class="stat-value" id="summaryGrandTotal">—</div>
+                            <div class="stat-value" id="summaryGrandTotal">-</div>
                             <div class="stat-label">RAZEM</div>
                         </div>
                     </div>
@@ -1846,19 +1887,19 @@
             <div id="summarySingleTenant">
                 <div class="stats-grid">
                     <div class="stat-card">
-                        <div class="stat-value" id="summaryFixedAmount">—</div>
+                        <div class="stat-value" id="summaryFixedAmount">-</div>
                         <div class="stat-label">Wynajem stały (miesięcznie)</div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-value" id="summarySingleHours">—</div>
+                        <div class="stat-value" id="summarySingleHours">-</div>
                         <div class="stat-label">Godziny pojedyncze</div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-value" id="summarySingleAmount">—</div>
+                        <div class="stat-value" id="summarySingleAmount">-</div>
                         <div class="stat-label">Kwota za godziny pojedyncze</div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-value" id="summaryTotal">—</div>
+                        <div class="stat-value" id="summaryTotal">-</div>
                         <div class="stat-label">Suma na fakturze</div>
                     </div>
                 </div>
@@ -1885,56 +1926,56 @@
                 <p style="font-size:0.85rem;color:var(--gray-light);margin-bottom:1rem;">Obowiązuje od 1.09.2026</p>
                 <div style="color:var(--gray); font-size:0.9rem; line-height:1.7;">
                     <h4 style="font-size:0.95rem; margin:1rem 0 0.3rem; color:var(--dark);">§1 Postanowienia ogólne</h4>
-                    <p>Pracownia Psychoterapii Zofii Żmijewskiej to miejsce pracy dla osób zajmujących się psychoterapią i rozwojem. Każda osoba wynajmująca prowadzi własną działalność — oferowaną usługą jest podnajem wyposażonych gabinetów. Pracownia znajduje się na II piętrze kamienicy przy ul. Puławskiej 26A/7 w Warszawie.</p>
+                    <p>Pracownia Psychoterapii Zofii Żmijewskiej to miejsce pracy dla osób zajmujących się psychoterapią i rozwojem. Każda osoba wynajmująca prowadzi własną działalność - oferowaną usługą jest podnajem wyposażonych gabinetów. Pracownia znajduje się na II piętrze kamienicy przy ul. Puławskiej 26A/7 w Warszawie.</p>
 
                     <h4 style="font-size:0.95rem; margin:1rem 0 0.3rem; color:var(--dark);">§2 Formy wynajmu</h4>
                     <p>Gabinety wynajmowane są na pełne godziny zegarowe. Dostępne są dwie formy wynajmu. Dokonanie rezerwacji jest równoznaczne ze zobowiązaniem do zapłaty.</p>
 
                     <p style="margin-top:0.75rem;"><strong>1. Wynajem stały (stały blok)</strong></p>
-                    <p>Stały blok to rezerwacja tych samych godzin w tym samym dniu tygodnia, powtarzająca się co tydzień, na czas nieokreślony. Każdy najemca może utworzyć własny blok godzinowy w ramach dostępnych terminów — rezerwacja obejmuje konkretne godziny (od–do), a czas pomiędzy zarezerwowanymi blokami różnych najemców może być wynajmowany innym osobom.</p>
+                    <p>Stały blok to rezerwacja tych samych godzin w tym samym dniu tygodnia, powtarzająca się co tydzień, na czas nieokreślony. Każdy najemca może utworzyć własny blok godzinowy w ramach dostępnych terminów - rezerwacja obejmuje konkretne godziny (od-do), a czas pomiędzy zarezerwowanymi blokami różnych najemców może być wynajmowany innym osobom.</p>
                     <p><strong>Cena:</strong></p>
                     <ul style="padding-left:1.2rem; margin-bottom:0.5rem;">
-                        <li>35 zł/h — blok obejmujący 1–3 godziny</li>
-                        <li>30 zł/h — blok obejmujący od 4 godzin</li>
+                        <li>35 zł/h - blok obejmujący 1-3 godziny</li>
+                        <li>30 zł/h - blok obejmujący od 4 godzin</li>
                     </ul>
-                    <p>Blok to godziny wynajęte danego dnia ciągiem, bez przerw (np. 14:00–18:00). Każdy blok jest osobną rezerwacją i jest rozliczany osobno, według stawki właściwej dla liczby godzin w bloku.</p>
-                    <p>Opłata miesięczna za dany blok obliczana jest jako: <em>stawka godzinowa × liczba godzin w bloku × 4,26</em>. Współczynnik 4,26 uwzględnia miesiące pięciotygodniowe, dzięki czemu opłata jest stała w każdym miesiącu. Jeśli najemca ma kilka bloków, opłaty za poszczególne bloki sumują się. Przykład: blok 14:00–18:00 (4 godziny, stawka 30 zł/h) to opłata miesięczna 30 zł × 4 h × 4,26 = 511,20 zł.</p>
+                    <p>Blok to godziny wynajęte danego dnia ciągiem, bez przerw (np. 14:00-18:00). Każdy blok jest osobną rezerwacją i jest rozliczany osobno, według stawki właściwej dla liczby godzin w bloku.</p>
+                    <p>Opłata miesięczna za dany blok obliczana jest jako: <em>stawka godzinowa × liczba godzin w bloku × 4,26</em>. Współczynnik 4,26 uwzględnia miesiące pięciotygodniowe, dzięki czemu opłata jest stała w każdym miesiącu. Jeśli najemca ma kilka bloków, opłaty za poszczególne bloki sumują się. Przykład: blok 14:00-18:00 (4 godziny, stawka 30 zł/h) to opłata miesięczna 30 zł × 4 h × 4,26 = 511,20 zł.</p>
                     <p>Opłata za stały blok jest stałą, niezmienną kwotą miesięczną, niezależną od liczby wykorzystanych godzin, nieobecności, urlopów, przerw wakacyjnych ani liczby wystąpień danego dnia tygodnia w danym miesiącu.</p>
 
                     <p><strong>Start nowego bloku:</strong> Nowy stały blok rozpoczyna się zawsze z pierwszym dniem nowego miesiąca kalendarzowego. Jeśli najemca chce rozpocząć korzystanie z gabinetu wcześniej, w trakcie miesiąca poprzedzającego start bloku, może skorzystać z wynajmu pojedynczego. Stały blok z datą rozpoczęcia w przyszłości można zarezerwować najwcześniej na miesiąc przed jego rozpoczęciem. Rezerwacja wymaga pisemnego zgłoszenia i jest wiążąca od chwili jej dokonania. Przykład: blok rozpoczynający się 1 września można zarezerwować najwcześniej 1 sierpnia.</p>
 
                     <p><strong>Zmiana istniejącego bloku:</strong></p>
                     <ul style="padding-left:1.2rem; margin-bottom:0.5rem;">
-                        <li><em>Zmniejszenie liczby godzin lub wypowiedzenie</em> — dwumiesięczny okres wypowiedzenia, liczony od pierwszego dnia miesiąca następującego po miesiącu, w którym dokonano zgłoszenia, ze skutkiem na koniec drugiego z tych miesięcy (przykład: zgłoszenie 15 czerwca — wynajem kończy się 31 sierpnia).</li>
-                        <li><em>Zwiększenie liczby godzin</em> — możliwe od pierwszego dnia kolejnego miesiąca kalendarzowego, po pisemnym zgłoszeniu na adres gabinety@zofiazmijewska.pl i przy dostępności gabinetu. Do tego czasu najemca może skorzystać z dodatkowych godzin w ramach wynajmu pojedynczego.</li>
+                        <li><em>Zmniejszenie liczby godzin lub wypowiedzenie</em> - dwumiesięczny okres wypowiedzenia, liczony od pierwszego dnia miesiąca następującego po miesiącu, w którym dokonano zgłoszenia, ze skutkiem na koniec drugiego z tych miesięcy (przykład: zgłoszenie 15 czerwca - wynajem kończy się 31 sierpnia).</li>
+                        <li><em>Zwiększenie liczby godzin</em> - możliwe od pierwszego dnia kolejnego miesiąca kalendarzowego, po pisemnym zgłoszeniu na adres gabinety@zofiazmijewska.pl i przy dostępności gabinetu. Do tego czasu najemca może skorzystać z dodatkowych godzin w ramach wynajmu pojedynczego.</li>
                         <li><em>Przesunięcie stałego bloku w obrębie tego samego dnia tygodnia</em>, z zachowaniem tej samej liczby godzin i ciągłości bloku, możliwe jest od razu po pisemnym zgłoszeniu na adres gabinety@zofiazmijewska.pl, pod warunkiem dostępności nowego terminu. Zmiana dnia tygodnia lub liczby godzin traktowana jest jako wypowiedzenie dotychczasowego bloku, z zachowaniem dwumiesięcznego okresu wypowiedzenia, oraz zarezerwowanie nowego terminu według dostępności.</li>
                     </ul>
 
                     <p style="margin-top:0.75rem;"><strong>2. Wynajem pojedynczy</strong></p>
-                    <p>Rezerwacja konkretnego terminu dokonywana przez panel rezerwacyjny online. Każda rezerwacja stanowi osobne zobowiązanie do zapłaty. Rezerwacji można dokonywać najwcześniej na miesiąc w przód i najpóźniej na godzinę przed rozpoczęciem. Rezerwować można wyłącznie pełne godziny zegarowe — jeśli sesja wykracza poza pełną godzinę (np. 12:30–13:30), należy zarezerwować odpowiednią liczbę pełnych godzin zegarowych (w tym przypadku 12:00–14:00).</p>
-                    <p><strong>Rezerwacja cykliczna:</strong> rezerwację można ustawić jako cykliczną — powtarza się co tydzień i odnawia się automatycznie aż do jej odwołania. Rezerwacja cykliczna pozostaje wynajmem pojedynczym: obowiązują dla niej zasady odwołania z §4B i stawka 40 zł/h, niezależnie od tego że się powtarza.</p>
+                    <p>Rezerwacja konkretnego terminu dokonywana przez panel rezerwacyjny online. Każda rezerwacja stanowi osobne zobowiązanie do zapłaty. Rezerwacji można dokonywać najwcześniej na miesiąc w przód i najpóźniej na godzinę przed rozpoczęciem. Rezerwować można wyłącznie pełne godziny zegarowe - jeśli sesja wykracza poza pełną godzinę (np. 12:30-13:30), należy zarezerwować odpowiednią liczbę pełnych godzin zegarowych (w tym przypadku 12:00-14:00).</p>
+                    <p><strong>Rezerwacja cykliczna:</strong> rezerwację można ustawić jako cykliczną - powtarza się co tydzień i odnawia się automatycznie aż do jej odwołania. Rezerwacja cykliczna pozostaje wynajmem pojedynczym: obowiązują dla niej zasady odwołania z §4B i stawka 40 zł/h, niezależnie od tego że się powtarza.</p>
                     <p><strong>Cena:</strong> 40 zł/h.</p>
 
                     <h4 style="font-size:0.95rem; margin:1rem 0 0.3rem; color:var(--dark);">§3 Płatności</h4>
                     <p>Faktury wystawiane są na początku miesiąca z terminem płatności do 8. dnia miesiąca i przesyłane do Krajowego Systemu e-Faktur (KSeF). Wynajem stały rozliczany jest z góry za dany miesiąc. Pojedyncze godziny zarezerwowane w poprzednim miesiącu są sumowane i doliczane do kolejnej faktury.</p>
-                    <p>Prosimy o terminowe płatności — pozwala to sprawnie zarządzać grafikiem pracowni. W przypadku przedłużającej się zaległości może to skutkować czasowym wstrzymaniem dostępu do gabinetu, do czasu uregulowania należności.</p>
+                    <p>Prosimy o terminowe płatności - pozwala to sprawnie zarządzać grafikiem pracowni. W przypadku przedłużającej się zaległości może to skutkować czasowym wstrzymaniem dostępu do gabinetu, do czasu uregulowania należności.</p>
 
                     <h4 style="font-size:0.95rem; margin:1rem 0 0.3rem; color:var(--dark);">§4 Nieobecności i odwołania</h4>
-                    <p><strong>A. Wynajem stały</strong> — opłata jest należna w pełnej wysokości niezależnie od obecności, w tym podczas urlopów, wyjazdów i przerw. Odwołanie pojedynczej sesji nie zmniejsza opłaty miesięcznej. Nie ma potrzeby informowania o nieobecności — zarezerwowany termin pozostaje przypisany do najemcy i nie jest udostępniany innym osobom.</p>
-                    <p><strong>B. Wynajem pojedynczy</strong> — rezerwację można odwołać bezpłatnie z wyprzedzeniem co najmniej 7 dni (7 × 24h liczone od godziny rozpoczęcia). Odwołanie w terminie krótszym skutkuje pełną opłatą za zarezerwowaną godzinę.</p>
-                    <p><strong>C. Niedostępność gabinetu z przyczyn leżących po stronie Pracowni</strong> — w przypadku niedostępności gabinetu z przyczyn niezależnych od najemcy (awaria, prace remontowe, siła wyższa), Pracownia zaproponuje zastępczy termin lub gabinet. Jeśli nie będzie to możliwe, opłata za niewykorzystany czas zostanie proporcjonalnie pomniejszona lub przeniesiona na kolejny okres rozliczeniowy.</p>
+                    <p><strong>A. Wynajem stały</strong> - opłata jest należna w pełnej wysokości niezależnie od obecności, w tym podczas urlopów, wyjazdów i przerw. Odwołanie pojedynczej sesji nie zmniejsza opłaty miesięcznej. Nie ma potrzeby informowania o nieobecności - zarezerwowany termin pozostaje przypisany do najemcy i nie jest udostępniany innym osobom.</p>
+                    <p><strong>B. Wynajem pojedynczy</strong> - rezerwację można odwołać bezpłatnie z wyprzedzeniem co najmniej 7 dni (7 × 24h liczone od godziny rozpoczęcia). Odwołanie w terminie krótszym skutkuje pełną opłatą za zarezerwowaną godzinę.</p>
+                    <p><strong>C. Niedostępność gabinetu z przyczyn leżących po stronie Pracowni</strong> - w przypadku niedostępności gabinetu z przyczyn niezależnych od najemcy (awaria, prace remontowe, siła wyższa), Pracownia zaproponuje zastępczy termin lub gabinet. Jeśli nie będzie to możliwe, opłata za niewykorzystany czas zostanie proporcjonalnie pomniejszona lub przeniesiona na kolejny okres rozliczeniowy.</p>
 
                     <h4 style="font-size:0.95rem; margin:1rem 0 0.3rem; color:var(--dark);">§5 Zasady korzystania</h4>
                     <ul style="padding-left:1.2rem; margin-bottom:0.5rem;">
-                        <li>Jeśli bezpośrednio po zakończeniu wynajmu jednego najemcy (zarówno w ramach stałego bloku, jak i wynajmu pojedynczego) następuje wynajem kolejnego najemcy w tym samym gabinecie, najemca zobowiązany jest opuścić gabinet 5 minut przed końcem swojego czasu — jest to umowny czas przeznaczony na zmianę terapeuty w gabinecie.</li>
-                        <li>Prosimy o pozostawienie gabinetu w takim stanie, w jakim chcielibyśmy go zastać. Ustawienie mebli jest stałe — można je dostosować na czas sesji, ale prosimy o przywrócenie układu po zakończeniu.</li>
-                        <li>W gabinecie dbamy o ciszę i prywatność — zarówno swoją, jak i innych najemców.</li>
+                        <li>Jeśli bezpośrednio po zakończeniu wynajmu jednego najemcy (zarówno w ramach stałego bloku, jak i wynajmu pojedynczego) następuje wynajem kolejnego najemcy w tym samym gabinecie, najemca zobowiązany jest opuścić gabinet 5 minut przed końcem swojego czasu - jest to umowny czas przeznaczony na zmianę terapeuty w gabinecie.</li>
+                        <li>Prosimy o pozostawienie gabinetu w takim stanie, w jakim chcielibyśmy go zastać. Ustawienie mebli jest stałe - można je dostosować na czas sesji, ale prosimy o przywrócenie układu po zakończeniu.</li>
+                        <li>W gabinecie dbamy o ciszę i prywatność - zarówno swoją, jak i innych najemców.</li>
                         <li>Każdy najemca dba o porządek w gabinecie, poczekalni, kuchni i łazienkach.</li>
-                        <li>Kuchnia jest dostępna wyłącznie dla terapeutów — klienci i pacjenci nie powinni z niej korzystać. Kawę, herbatę i inne produkty spożywcze każdy zapewnia sobie sam.</li>
+                        <li>Kuchnia jest dostępna wyłącznie dla terapeutów - klienci i pacjenci nie powinni z niej korzystać. Kawę, herbatę i inne produkty spożywcze każdy zapewnia sobie sam.</li>
                         <li>Na terenie pracowni nie palimy i nie spożywamy alkoholu.</li>
                         <li>Kod dostępu do pracowni jest zmieniany okresowo. Zakazane jest udostępnianie go osobom trzecim.</li>
-                        <li>Gabinetu nie można użyczać innym osobom ani przekazywać swojego terminu pod nieobecność — dotyczy to także sytuacji wyjazdów czy urlopów. Najemca musi być osobiście obecny w zarezerwowanym czasie i jest odpowiedzialny za gabinet w tym okresie.</li>
-                        <li>Osoba prowadząca zajęcia grupowe zobowiązana jest zarezerwować czas z zapasem obejmującym także ustawienie i uporządkowanie mebli oraz krzeseł — cała ta czynność, łącznie z obecnością w gabinecie, musi zmieścić się w zarezerwowanym czasie wynajmu.</li>
+                        <li>Gabinetu nie można użyczać innym osobom ani przekazywać swojego terminu pod nieobecność - dotyczy to także sytuacji wyjazdów czy urlopów. Najemca musi być osobiście obecny w zarezerwowanym czasie i jest odpowiedzialny za gabinet w tym okresie.</li>
+                        <li>Osoba prowadząca zajęcia grupowe zobowiązana jest zarezerwować czas z zapasem obejmującym także ustawienie i uporządkowanie mebli oraz krzeseł - cała ta czynność, łącznie z obecnością w gabinecie, musi zmieścić się w zarezerwowanym czasie wynajmu.</li>
                     </ul>
 
                     <h4 style="font-size:0.95rem; margin:1rem 0 0.3rem; color:var(--dark);">§6 Kontakt</h4>
@@ -2204,7 +2245,7 @@ async function init() {
                 if (ok) showApp(); else showLogin();
             }
         } else if (event === 'TOKEN_REFRESHED' && session) {
-            // Token refreshed silently — just update user, don't re-render
+            // Token refreshed silently - just update user, don't re-render
             currentUser = session.user;
         } else if (event === 'SIGNED_OUT') {
             // Only show landing if we truly have no session
@@ -2357,7 +2398,7 @@ async function loadTenantProfile() {
 // ================================================================
 // UI SWITCHING
 // ================================================================
-// ==================== LANDING PAGE — CARD SLIDERS ====================
+// ==================== LANDING PAGE - CARD SLIDERS ====================
 function cardSliderGo(sliderId, n) {
     const container = document.getElementById(sliderId);
     const imgs = container.querySelectorAll('img');
@@ -2455,7 +2496,7 @@ function toggleAccordion(id) {
     item.classList.toggle('open');
 }
 
-// Landing nav — podświetlanie aktywnej zakładki + auto-open regulaminu
+// Landing nav - podświetlanie aktywnej zakładki + auto-open regulaminu
 (function initLandingNav() {
     const nav = document.getElementById('landingNav');
     if (!nav) return;
@@ -2502,7 +2543,7 @@ function showLogin() {
     hideAllViews();
     document.getElementById('loginView').style.display = '';
 }
-const showLoginFromLanding = showLogin; // alias — wywoływany z landing page
+const showLoginFromLanding = showLogin; // alias - wywoływany z landing page
 
 function showConsent() {
     hideAllViews();
@@ -2563,7 +2604,7 @@ async function handleConsent() {
     currentTenant.accepted_terms_at = now;
     btn.textContent = 'Akceptuję i przechodzę do panelu';
 
-    // Reuse showApp() — accepted_terms_at is now set
+    // Reuse showApp() - accepted_terms_at is now set
     showApp();
 }
 
@@ -2815,7 +2856,7 @@ function initCalendar() {
 
                 return { html: html };
             }
-            // Widok dnia — zwróć domyślny format z tytułem i godziną
+            // Widok dnia - zwróć domyślny format z tytułem i godziną
             const t = arg.event.title || '';
             const timeText = arg.timeText || '';
             return { html: '<div class="fc-event-main-frame"><div class="fc-event-time">' + timeText + '</div><div class="fc-event-title-container"><div class="fc-event-title fc-sticky">' + t + '</div></div></div>' };
@@ -2890,7 +2931,7 @@ let _fixedCacheTime = 0;
 
 async function fetchCalendarEvents(fetchInfo, successCallback, failureCallback) {
   const timeout = setTimeout(() => {
-    console.warn('Calendar fetch timeout — returning empty');
+    console.warn('Calendar fetch timeout - returning empty');
     successCallback([]);
   }, 10000);
   try {
@@ -2922,7 +2963,7 @@ async function fetchCalendarEvents(fetchInfo, successCallback, failureCallback) 
                     tenantId: b.tenant_id,
                     tenantName: b.tenants?.name || '',
                     roomId: b.room_id,
-                    roomName: b.rooms?.name || '—',
+                    roomName: b.rooms?.name || '-',
                     bookingDate: b.booking_date,
                     startTime: b.start_time,
                     endTime: b.end_time,
@@ -2990,7 +3031,7 @@ async function fetchCalendarEvents(fetchInfo, successCallback, failureCallback) 
                                 tenantId: f.tenant_id,
                                 tenantName: f.tenants?.name || '',
                                 roomId: f.room_id,
-                                roomName: f.rooms?.name || '—',
+                                roomName: f.rooms?.name || '-',
                                 startTime: f.start_time,
                                 endTime: f.end_time
                             }
@@ -3019,7 +3060,7 @@ async function fetchCalendarEvents(fetchInfo, successCallback, failureCallback) 
                             tenantId: f.tenant_id,
                             tenantName: f.tenants?.name || '',
                             roomId: f.room_id,
-                            roomName: f.rooms?.name || '—',
+                            roomName: f.rooms?.name || '-',
                             startTime: f.start_time,
                             endTime: f.end_time
                         }
@@ -3079,7 +3120,7 @@ async function showBookingModal(start, end, resourceId) {
         <div class="modal-overlay" onclick="if(event.target===this)closeModal()">
             <div class="modal">
                 <h2>Nowa rezerwacja</h2>
-                <p class="text-gray text-sm mb-1">${datePretty}, ${String(startH).padStart(2,'0')}:00 – ${String(endH).padStart(2,'0')}:00 (${hours} godz.)</p>
+                <p class="text-gray text-sm mb-1">${datePretty}, ${String(startH).padStart(2,'0')}:00 - ${String(endH).padStart(2,'0')}:00 (${hours} godz.)</p>
                 ${tenantSelectHtml}
                 <div class="form-group">
                     <label class="form-label">Gabinet</label>
@@ -3202,7 +3243,7 @@ async function confirmBooking(dateStr, startH, endH) {
     const autoRenewCheck = document.getElementById('bookAutoRenew');
     const autoRenew = !!(autoRenewCheck && autoRenewCheck.checked);
 
-    // Jeśli rezerwacja cykliczna — zapisz wzorzec do booking_series (Etap 1 auto-przedłużania)
+    // Jeśli rezerwacja cykliczna - zapisz wzorzec do booking_series (Etap 1 auto-przedłużania)
     // series_id w single_bookings będzie wskazywać na to id (kompatybilne wstecz: stare serie miały losowy UUID)
     let seriesId = null;
     if (repeatWeeks > 1) {
@@ -3218,7 +3259,7 @@ async function confirmBooking(dateStr, startH, endH) {
         }).select('id').single();
 
         if (seriesErr || !seriesRow) {
-            // Fallback — jakby tabela jeszcze nie istniała, używamy losowego UUID jak wcześniej
+            // Fallback - jakby tabela jeszcze nie istniała, używamy losowego UUID jak wcześniej
             console.warn('booking_series insert failed, fallback to random UUID', seriesErr);
             seriesId = crypto.randomUUID();
         } else {
@@ -3274,12 +3315,12 @@ async function confirmBooking(dateStr, startH, endH) {
     const roomName = rooms.find(r => r.id === bookings[0]?.room_id)?.name || '';
     const renewLabel = autoRenew ? ', auto-przedłużanie' : '';
     const desc = repeatWeeks > 1
-        ? `Rezerwacja (${repeatWeeks} tygodni${renewLabel}): ${tenantName} — ${dateStr} ${String(startH).padStart(2,'0')}:00–${String(endH).padStart(2,'0')}:00 ${roomName}`
-        : `Nowa rezerwacja: ${tenantName} — ${dateStr} ${String(startH).padStart(2,'0')}:00–${String(endH).padStart(2,'0')}:00 ${roomName}`;
+        ? `Rezerwacja (${repeatWeeks} tygodni${renewLabel}): ${tenantName} - ${dateStr} ${String(startH).padStart(2,'0')}:00-${String(endH).padStart(2,'0')}:00 ${roomName}`
+        : `Nowa rezerwacja: ${tenantName} - ${dateStr} ${String(startH).padStart(2,'0')}:00-${String(endH).padStart(2,'0')}:00 ${roomName}`;
     await logAudit('single_bookings', null, 'insert', null, { tenant_id: bookingTenantId, booking_date: dateStr, start_time: bookings[0]?.start_time, room_id: bookings[0]?.room_id }, desc, bookingTenantId);
 
     const toastMsg = repeatWeeks > 1
-        ? (autoRenew ? `Zarezerwowano ${repeatWeeks} tygodni — będzie przedłużane automatycznie` : `Zarezerwowano ${repeatWeeks} tygodni!`)
+        ? (autoRenew ? `Zarezerwowano ${repeatWeeks} tygodni - będzie przedłużane automatycznie` : `Zarezerwowano ${repeatWeeks} tygodni!`)
         : 'Rezerwacja potwierdzona!';
     toast(toastMsg, 'success');
     closeModal();
@@ -3319,7 +3360,7 @@ function showBookingDetailModal(props) {
                 ${isAdmin && !isOwn ? `<p class="text-sm text-gray">Najemca: <strong>${props.tenantName || ''}</strong></p>` : ''}
                 <p><strong>${props.roomName}</strong></p>
                 <p>${datePretty}</p>
-                <p>${props.startTime.substring(0,5)} – ${props.endTime.substring(0,5)}</p>
+                <p>${props.startTime.substring(0,5)} - ${props.endTime.substring(0,5)}</p>
                 <p class="text-sm text-gray mt-1">${currentTenant.single_hourly_rate || PRICE_PER_HOUR} zł</p>
                 ${createdInfo}
                 ${isAdmin && daysUntil < CANCEL_DAYS ?
@@ -3344,9 +3385,9 @@ function openBookingDetail(bookingId) {
     const b = window._bookingsCache && window._bookingsCache[bookingId];
     if (!b) { toast('Nie znaleziono rezerwacji', 'error'); return; }
 
-    const roomName = b.rooms?.name || '—';
+    const roomName = b.rooms?.name || '-';
     const datePretty = new Date(b.booking_date).toLocaleDateString('pl-PL', { weekday: 'long', day: 'numeric', month: 'long' });
-    const time = b.start_time.substring(0,5) + ' – ' + b.end_time.substring(0,5);
+    const time = b.start_time.substring(0,5) + ' - ' + b.end_time.substring(0,5);
     const admin = currentTenant && currentTenant.is_admin;
 
     const modal = `
@@ -3479,7 +3520,7 @@ async function saveEditBooking(bookingId) {
     const tenantName = (await sb.from('tenants').select('name').eq('id', newTenantId).single()).data?.name || '';
     const roomName = rooms.find(r => r.id === newRoomId)?.name || '';
     await logAudit('single_bookings', bookingId, 'update', oldBooking, newData,
-        `Edycja rezerwacji: ${tenantName} — ${newDate} ${String(newStartH).padStart(2,'0')}:00–${String(newEndH).padStart(2,'0')}:00 ${roomName}`, newTenantId);
+        `Edycja rezerwacji: ${tenantName} - ${newDate} ${String(newStartH).padStart(2,'0')}:00-${String(newEndH).padStart(2,'0')}:00 ${roomName}`, newTenantId);
 
     toast('Rezerwacja zaktualizowana', 'success');
     closeModal();
@@ -3495,7 +3536,7 @@ async function cancelBooking(bookingId) {
         .update({ status: 'cancelled', cancelled_at: new Date().toISOString(), cancelled_by: currentTenant.id })
         .eq('id', bookingId);
 
-    // Admin może odwoływać rezerwacje innych — nie filtruj po tenant_id
+    // Admin może odwoływać rezerwacje innych - nie filtruj po tenant_id
     if (!currentTenant.is_admin) {
         query = query.eq('tenant_id', currentTenant.id);
     }
@@ -3511,7 +3552,7 @@ async function cancelBooking(bookingId) {
         const tenantName = oldBooking.tenants?.name || '';
         const roomName = oldBooking.rooms?.name || '';
         await logAudit('single_bookings', bookingId, 'cancel', oldBooking, null,
-            `Odwołano rezerwację: ${tenantName} — ${oldBooking.booking_date} ${oldBooking.start_time.substring(0,5)}–${oldBooking.end_time.substring(0,5)} ${roomName}`, oldBooking.tenant_id);
+            `Odwołano rezerwację: ${tenantName} - ${oldBooking.booking_date} ${oldBooking.start_time.substring(0,5)}-${oldBooking.end_time.substring(0,5)} ${roomName}`, oldBooking.tenant_id);
     }
 
     toast('Rezerwacja odwołana', 'info');
@@ -3542,7 +3583,7 @@ async function cancelSeriesFuture(seriesId, fromDate) {
     }
 
     // Wyłącz też auto-przedłużanie tej serii (jeśli istnieje w booking_series)
-    // — kompatybilne wstecz: dla starych serii bez rekordu w booking_series
+    // - kompatybilne wstecz: dla starych serii bez rekordu w booking_series
     // operacja nic nie zaktualizuje i to OK
     await sb.from('booking_series')
         .update({ is_active: false })
@@ -3553,7 +3594,7 @@ async function cancelSeriesFuture(seriesId, fromDate) {
     if (calendar) calendar.refetchEvents();
 }
 
-// Fixed booking detail modal (admin only — cancel on specific date)
+// Fixed booking detail modal (admin only - cancel on specific date)
 function showFixedBookingDetailModal(props, dateStr) {
     const datePretty = new Date(dateStr).toLocaleDateString('pl-PL', { weekday: 'long', day: 'numeric', month: 'long' });
 
@@ -3564,7 +3605,7 @@ function showFixedBookingDetailModal(props, dateStr) {
                 <p class="text-sm text-gray">Najemca: <strong>${props.tenantName || ''}</strong></p>
                 <p><strong>${props.roomName}</strong></p>
                 <p>Cyklicznie: co tydzień</p>
-                <p>${props.startTime.substring(0,5)} – ${props.endTime.substring(0,5)}</p>
+                <p>${props.startTime.substring(0,5)} - ${props.endTime.substring(0,5)}</p>
                 <hr style="margin:0.75rem 0;border-color:var(--border)">
                 <p class="text-sm">Wybrany dzień: <strong>${datePretty}</strong></p>
                 <div class="modal-actions" style="flex-wrap:wrap;gap:0.5rem;">
@@ -3671,7 +3712,7 @@ async function saveEditFixedBooking(fixedBookingId) {
         return;
     }
 
-    // 1. Zakończ starą rezerwację — end_date = data zmiany
+    // 1. Zakończ starą rezerwację - end_date = data zmiany
     const { error: endError } = await sb
         .from('fixed_bookings')
         .update({ end_date: fromDate })
@@ -3784,7 +3825,7 @@ function showRestoreCancelledModal(props, dateStr) {
                 <h2>Odwołana rezerwacja</h2>
                 <p class="text-sm text-gray">Najemca: <strong>${props.tenantName || ''}</strong></p>
                 <p><strong>${props.roomName}</strong></p>
-                <p>${props.startTime.substring(0,5)} – ${props.endTime.substring(0,5)}</p>
+                <p>${props.startTime.substring(0,5)} - ${props.endTime.substring(0,5)}</p>
                 <hr style="margin:0.75rem 0;border-color:var(--border)">
                 <p class="text-sm">Odwołana na dzień: <strong>${datePretty}</strong></p>
                 <p class="text-sm text-gray mt-1">Możesz przywrócić tę rezerwację.</p>
@@ -3830,7 +3871,7 @@ async function initTenantSelector() {
     const sel = document.getElementById('tenantSelector');
     if (sel.options.length > 1) return; // already populated
     const { data } = await sb.from('tenants').select('id, name').eq('is_active', true).order('name');
-    sel.innerHTML = `<option value="">— Moje rezerwacje —</option>` +
+    sel.innerHTML = `<option value="">- Moje rezerwacje -</option>` +
         (data || []).map(t => `<option value="${t.id}">${t.name}</option>`).join('');
 }
 
@@ -3889,8 +3930,8 @@ async function loadMyBookings() {
 
         return `<tr ${clickable}>
             <td>${datePretty}</td>
-            <td>${b.start_time.substring(0,5)} – ${b.end_time.substring(0,5)}</td>
-            <td>${b.rooms?.name || '—'}</td>
+            <td>${b.start_time.substring(0,5)} - ${b.end_time.substring(0,5)}</td>
+            <td>${b.rooms?.name || '-'}</td>
             <td><span class="badge badge-single">Pojedyncza</span></td>
             <td><span class="badge badge-${b.status}">${b.status === 'confirmed' ? 'Potwierdzona' : 'Odwołana'}</span></td>
             <td class="text-xs text-gray">${annotation}</td>
@@ -3962,7 +4003,7 @@ function initMyCalendar() {
                 singles.forEach(b => {
                     window._bookingsCache[b.id] = b;
                     events.push({
-                        title: b.rooms?.name || '—',
+                        title: b.rooms?.name || '-',
                         start: b.booking_date + 'T' + b.start_time,
                         end: b.booking_date + 'T' + b.end_time,
                         backgroundColor: '#A4AECC',
@@ -4007,7 +4048,7 @@ function initMyCalendar() {
                             const isExcepted = exceptions.some(e => e.fixed_booking_id === fb.id && e.exception_date === dateStr);
                             if (!isExcepted) {
                                 events.push({
-                                    title: (fb.rooms?.name || '—') + ' (stała)',
+                                    title: (fb.rooms?.name || '-') + ' (stała)',
                                     start: dateStr + 'T' + fb.start_time,
                                     end: dateStr + 'T' + fb.end_time,
                                     backgroundColor: '#596B84',
@@ -4071,8 +4112,8 @@ async function loadMyFixed() {
             totalWeeklyHours += hours;
             return `<tr>
                 <td>${DAYS_PL[f.day_of_week]}</td>
-                <td>${f.start_time.substring(0,5)} – ${f.end_time.substring(0,5)} (${hours}h)</td>
-                <td>${f.rooms?.name || '—'}</td>
+                <td>${f.start_time.substring(0,5)} - ${f.end_time.substring(0,5)} (${hours}h)</td>
+                <td>${f.rooms?.name || '-'}</td>
                 <td>${(hours * hourlyRate).toFixed(0)} zł</td>
             </tr>`;
         }).join('');
@@ -4099,11 +4140,11 @@ async function loadMyFixed() {
         termsEmpty.style.display = monthlyAmount > 0 ? '' : 'none';
         termsTbody.innerHTML = '';
         termsFoot.innerHTML = '';
-        document.getElementById('myFixedHours').textContent = '—';
+        document.getElementById('myFixedHours').textContent = '-';
     }
 
     // 2. Stats
-    document.getElementById('myFixedMonthly').textContent = monthlyAmount > 0 ? monthlyAmount.toFixed(2) + ' zł' : '—';
+    document.getElementById('myFixedMonthly').textContent = monthlyAmount > 0 ? monthlyAmount.toFixed(2) + ' zł' : '-';
     document.getElementById('myFixedSingleRate').textContent = singleRate + ' zł/h';
 
     // 3. Schedule table (same data, different display)
@@ -4121,8 +4162,8 @@ async function loadMyFixed() {
             const hours = endH - startH;
             return `<tr>
                 <td>${DAYS_PL[f.day_of_week]}</td>
-                <td>${f.start_time.substring(0,5)} – ${f.end_time.substring(0,5)}</td>
-                <td>${f.rooms?.name || '—'}</td>
+                <td>${f.start_time.substring(0,5)} - ${f.end_time.substring(0,5)}</td>
+                <td>${f.rooms?.name || '-'}</td>
                 <td>${hours}h</td>
             </tr>`;
         }).join('');
@@ -4230,9 +4271,9 @@ async function loadSummaryAll(startDate, endDate) {
 
             rows += `<tr>
                 <td><strong>${escHtml(t.name)}</strong></td>
-                <td>${fixedAmt > 0 ? fixedAmt.toFixed(0) + ' zł' : '—'}</td>
-                <td>${hours > 0 ? hours + ' h' : '—'}</td>
-                <td>${hours > 0 ? singleAmt.toFixed(0) + ' zł' : '—'}</td>
+                <td>${fixedAmt > 0 ? fixedAmt.toFixed(0) + ' zł' : '-'}</td>
+                <td>${hours > 0 ? hours + ' h' : '-'}</td>
+                <td>${hours > 0 ? singleAmt.toFixed(0) + ' zł' : '-'}</td>
                 <td><strong>${total.toFixed(0)} zł</strong></td>
             </tr>`;
         });
@@ -4290,8 +4331,8 @@ async function loadSummarySingle(tenantId, startDate, endDate) {
         const datePretty = new Date(b.booking_date).toLocaleDateString('pl-PL', { weekday: 'short', day: 'numeric', month: 'short' });
         return `<tr>
             <td>${datePretty}</td>
-            <td>${b.start_time.substring(0,5)} – ${b.end_time.substring(0,5)}</td>
-            <td>${b.rooms?.name || '—'}</td>
+            <td>${b.start_time.substring(0,5)} - ${b.end_time.substring(0,5)}</td>
+            <td>${b.rooms?.name || '-'}</td>
             <td>${tenantRate} zł</td>
         </tr>`;
     }).join('');
@@ -4313,7 +4354,7 @@ async function loadTenants() {
             const timeStr = d.toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' });
             consentHtml = `<span class="badge badge-confirmed" title="${dateStr} ${timeStr}">✓ ${dateStr}</span>`;
         } else if (t.is_admin) {
-            consentHtml = `<span style="color:var(--gray-light);font-size:0.8rem;">—</span>`;
+            consentHtml = `<span style="color:var(--gray-light);font-size:0.8rem;">-</span>`;
         } else {
             consentHtml = `<span class="badge badge-cancelled">Brak</span>`;
         }
@@ -4407,10 +4448,10 @@ async function showEditTenantModal(tenantId) {
         const start = parseInt(fb.start_time.substring(0,2));
         const end = parseInt(fb.end_time.substring(0,2));
         const hours = end - start;
-        const validFrom = fb.valid_from ? new Date(fb.valid_from).toLocaleDateString('pl-PL') : '—';
+        const validFrom = fb.valid_from ? new Date(fb.valid_from).toLocaleDateString('pl-PL') : '-';
         return `<tr>
             <td>${DAYS_PL[fb.day_of_week]}</td>
-            <td>${fb.start_time.substring(0,5)} – ${fb.end_time.substring(0,5)} (${hours}h)</td>
+            <td>${fb.start_time.substring(0,5)} - ${fb.end_time.substring(0,5)} (${hours}h)</td>
             <td>${escHtml(fb.rooms.name)}</td>
             <td>${validFrom}</td>
         </tr>`;
@@ -4712,15 +4753,15 @@ function renderFixedBookings() {
     }
 
     tbody.innerHTML = sorted.map(f => {
-        const validFrom = f.valid_from ? new Date(f.valid_from).toLocaleDateString('pl-PL') : '—';
-        const endDate   = f.end_date   ? new Date(f.end_date).toLocaleDateString('pl-PL')   : '—';
+        const validFrom = f.valid_from ? new Date(f.valid_from).toLocaleDateString('pl-PL') : '-';
+        const endDate   = f.end_date   ? new Date(f.end_date).toLocaleDateString('pl-PL')   : '-';
         const st = FIXED_STATUS_LABEL[f._status];
         const statusBadge = `<span style="display:inline-block;padding:0.15rem 0.5rem;border-radius:4px;font-size:0.8rem;background:${st.bg};color:${st.color};">${st.text}</span>`;
         return `<tr${f._status === 'ended' ? ' style="opacity:0.6;"' : ''}>
         <td>${escHtml(f.tenants.name)}</td>
         <td>${escHtml(f.rooms.name)}</td>
         <td>${DAYS_PL[f.day_of_week]}</td>
-        <td>${f.start_time.substring(0,5)} – ${f.end_time.substring(0,5)}</td>
+        <td>${f.start_time.substring(0,5)} - ${f.end_time.substring(0,5)}</td>
         <td>${validFrom}</td>
         <td>${endDate}</td>
         <td>${statusBadge}</td>
@@ -4827,7 +4868,7 @@ async function saveFixed() {
     const roomName = rooms.find(r => r.id === data.room_id)?.name || '';
     const dayName = DAYS_PL[data.day_of_week] || '';
     await logAudit('fixed_bookings', inserted?.id, 'insert', null, inserted,
-        `Stały blok: ${tenantName} — ${dayName} ${data.start_time.substring(0,5)}–${data.end_time.substring(0,5)} ${roomName}`, data.tenant_id);
+        `Stały blok: ${tenantName} - ${dayName} ${data.start_time.substring(0,5)}-${data.end_time.substring(0,5)} ${roomName}`, data.tenant_id);
 
     toast('Stały blok dodany', 'success');
     await autoRecalcMonthly(data.tenant_id);
@@ -4884,7 +4925,7 @@ async function showEditFixedModal(id, tenantId, roomId, dayOfWeek, startTime, en
                 <div class="form-group">
                     <label class="form-label">Obowiązuje od</label>
                     <input class="form-input" id="editFixedValidFrom" type="date" value="${validFrom || ''}">
-                    <p class="text-xs text-gray mt-1">Jeśli zmieniasz godziny, dzień, gabinet lub najemcę — wpisz datę od kiedy zmiana ma obowiązywać. Stary blok zakończy się tego dnia, nowy zacznie od tego dnia. Przeszłe rezerwacje pozostaną nietknięte.</p>
+                    <p class="text-xs text-gray mt-1">Jeśli zmieniasz godziny, dzień, gabinet lub najemcę - wpisz datę od kiedy zmiana ma obowiązywać. Stary blok zakończy się tego dnia, nowy zacznie od tego dnia. Przeszłe rezerwacje pozostaną nietknięte.</p>
                 </div>
 
                 <hr style="margin:1rem 0;border:none;border-top:1px solid var(--border);">
@@ -4896,7 +4937,7 @@ async function showEditFixedModal(id, tenantId, roomId, dayOfWeek, startTime, en
                         <button class="btn btn-sm btn-secondary" id="endBlockBtn" onclick="endFixedBlock('${id}')" style="white-space:nowrap;">Zakończ</button>
                         ${currentEndDate ? `<button class="btn btn-sm btn-secondary" onclick="reopenFixedBlock('${id}')" style="white-space:nowrap;" title="Usuń datę zakończenia (blok znów bezterminowy)">Cofnij</button>` : ''}
                     </div>
-                    <p class="text-xs text-gray mt-1">Blok obowiązuje do wpisanej daty (wyłącznie — ostatni dzień to dzień przed). Historia pozostaje w kalendarzu; przyszłe tygodnie znikają. ${currentEndDate ? 'Aktualnie zakończony: ' + new Date(currentEndDate).toLocaleDateString('pl-PL') + '.' : ''}</p>
+                    <p class="text-xs text-gray mt-1">Blok obowiązuje do wpisanej daty (wyłącznie - ostatni dzień to dzień przed). Historia pozostaje w kalendarzu; przyszłe tygodnie znikają. ${currentEndDate ? 'Aktualnie zakończony: ' + new Date(currentEndDate).toLocaleDateString('pl-PL') + '.' : ''}</p>
                 </div>
 
                 <div class="modal-actions">
@@ -4931,7 +4972,7 @@ async function endFixedBlock(id) {
 
     const dayName = DAYS_PL[oldFb?.day_of_week] || '';
     await logAudit('fixed_bookings', id, 'update', oldFb, { end_date: dateVal },
-        `Zakończono blok od ${dateVal}: ${oldFb?.tenants?.name || ''} — ${dayName} ${oldFb?.start_time?.substring(0,5) || ''}–${oldFb?.end_time?.substring(0,5) || ''} ${oldFb?.rooms?.name || ''}`,
+        `Zakończono blok od ${dateVal}: ${oldFb?.tenants?.name || ''} - ${dayName} ${oldFb?.start_time?.substring(0,5) || ''}-${oldFb?.end_time?.substring(0,5) || ''} ${oldFb?.rooms?.name || ''}`,
         oldFb?.tenant_id);
 
     toast(`Blok zakończony od ${dateFormatted}`, 'success');
@@ -4950,7 +4991,7 @@ async function reopenFixedBlock(id) {
 
     const dayName = DAYS_PL[oldFb?.day_of_week] || '';
     await logAudit('fixed_bookings', id, 'update', oldFb, { end_date: null },
-        `Cofnięto zakończenie bloku: ${oldFb?.tenants?.name || ''} — ${dayName} ${oldFb?.start_time?.substring(0,5) || ''}–${oldFb?.end_time?.substring(0,5) || ''} ${oldFb?.rooms?.name || ''}`,
+        `Cofnięto zakończenie bloku: ${oldFb?.tenants?.name || ''} - ${dayName} ${oldFb?.start_time?.substring(0,5) || ''}-${oldFb?.end_time?.substring(0,5) || ''} ${oldFb?.rooms?.name || ''}`,
         oldFb?.tenant_id);
 
     toast('Data zakończenia usunięta', 'success');
@@ -4983,9 +5024,9 @@ async function updateFixed() {
     const validFromVal = document.getElementById('editFixedValidFrom').value || null;
 
     // Sprawdź czy zmieniają się ISTOTNE pola (godziny, dzień, gabinet, najemca).
-    // Jeśli tak — robimy SPLIT (stary blok dostaje end_date = data zmiany,
+    // Jeśli tak - robimy SPLIT (stary blok dostaje end_date = data zmiany,
     // nowy blok zaczyna od tej daty), żeby zachować historię.
-    // Jeśli tylko valid_from się zmienia (lub żadne istotne pola) — UPDATE in-place.
+    // Jeśli tylko valid_from się zmienia (lub żadne istotne pola) - UPDATE in-place.
     const importantChanged =
         oldFb.start_time !== startTime ||
         oldFb.end_time   !== endTime   ||
@@ -5000,14 +5041,14 @@ async function updateFixed() {
     if (importantChanged) {
         // SPLIT: wymagana data "Obowiązuje od"
         if (!validFromVal) {
-            toast('Aby zmienić godziny/dzień/gabinet/najemcę podaj datę "Obowiązuje od" — od tej daty zacznie obowiązywać nowa wersja, a stara skończy się dzień wcześniej.', 'error');
+            toast('Aby zmienić godziny/dzień/gabinet/najemcę podaj datę "Obowiązuje od" - od tej daty zacznie obowiązywać nowa wersja, a stara skończy się dzień wcześniej.', 'error');
             btn.disabled = false;
             btn.textContent = 'Zapisz';
             return;
         }
 
         // 1. Zakończ stary blok dokładnie na dzień przed valid_from
-        // Kalendarz filtruje `end_date > dateStr` — jeśli end_date = valid_from
+        // Kalendarz filtruje `end_date > dateStr` - jeśli end_date = valid_from
         // to dzień valid_from już NIE pokazuje starego, ale pokazuje nowy.
         const { error: endError } = await sb
             .from('fixed_bookings')
@@ -5039,12 +5080,12 @@ async function updateFixed() {
             { start_time: startTime, end_time: endTime, day_of_week: newDay,
               room_id: newRoomId, tenant_id: newTenantId, valid_from: validFromVal,
               old_end_date: validFromVal },
-            `Edycja bloku (split od ${validFromVal}): ${tenantName} — ${dayName} ${startTime.substring(0,5)}–${endTime.substring(0,5)} ${roomName}`,
+            `Edycja bloku (split od ${validFromVal}): ${tenantName} - ${dayName} ${startTime.substring(0,5)}-${endTime.substring(0,5)} ${roomName}`,
             newTenantId);
 
         toast(`Blok rozdzielony: stary kończy się ${validFromVal}, nowy zaczyna od ${validFromVal}`, 'success');
     } else {
-        // Tylko valid_from się zmienia — UPDATE in-place
+        // Tylko valid_from się zmienia - UPDATE in-place
         const updates = { valid_from: validFromVal };
         const { error } = await sb.from('fixed_bookings').update(updates).eq('id', id);
         if (error) {
@@ -5053,7 +5094,7 @@ async function updateFixed() {
         }
 
         await logAudit('fixed_bookings', id, 'update', oldFb, updates,
-            `Zmiana valid_from bloku: ${tenantName} — ${dayName} ${startTime.substring(0,5)}–${endTime.substring(0,5)} ${roomName}`,
+            `Zmiana valid_from bloku: ${tenantName} - ${dayName} ${startTime.substring(0,5)}-${endTime.substring(0,5)} ${roomName}`,
             newTenantId);
 
         toast('Stały blok zaktualizowany', 'success');
@@ -5066,10 +5107,10 @@ async function updateFixed() {
 }
 
 // ================================================================
-// SPLIT FIXED BLOCK — "Wprowadź zmianę od…"
+// SPLIT FIXED BLOCK - "Wprowadź zmianę od…"
 // Dzieli istniejący blok na dwa: stary zostaje z end_date,
 // nowy z nową wersją zaczyna od podanej daty.
-// Czytelniejszy UX niż Edytuj — wymusza datę i jasno mówi co robi.
+// Czytelniejszy UX niż Edytuj - wymusza datę i jasno mówi co robi.
 // ================================================================
 async function showSplitFixedModal(id, tenantId, roomId, dayOfWeek, startTime, endTime) {
     const { data: tenants, error } = await sb.from('tenants').select('id, name').eq('is_active', true).order('name');
@@ -5087,7 +5128,7 @@ async function showSplitFixedModal(id, tenantId, roomId, dayOfWeek, startTime, e
                 <input type="hidden" id="splitFixedId" value="${id}">
                 <div style="background:#f5f3f8;padding:0.75rem;border-radius:6px;margin-bottom:1rem;">
                     <p class="text-sm" style="margin:0;"><strong>Obecny blok:</strong></p>
-                    <p class="text-sm" style="margin:0.25rem 0 0 0;">${escHtml(tenantName)} — ${dayName} ${startTime.substring(0,5)}–${endTime.substring(0,5)} ${escHtml(roomName)}</p>
+                    <p class="text-sm" style="margin:0.25rem 0 0 0;">${escHtml(tenantName)} - ${dayName} ${startTime.substring(0,5)}-${endTime.substring(0,5)} ${escHtml(roomName)}</p>
                 </div>
                 <div class="form-group">
                     <label class="form-label">Zmiana obowiązuje od dnia</label>
@@ -5196,7 +5237,7 @@ async function splitFixed() {
     await logAudit('fixed_bookings', newRow?.id || id, 'insert', oldFb,
         { tenant_id: newTenantId, room_id: newRoomId, day_of_week: newDay,
           start_time: newStart, end_time: newEnd, valid_from: fromDate },
-        `Wprowadzono zmianę bloku od ${fromDate}: ${tenantName} — ${dayName} ${newStart.substring(0,5)}–${newEnd.substring(0,5)} ${roomName}`,
+        `Wprowadzono zmianę bloku od ${fromDate}: ${tenantName} - ${dayName} ${newStart.substring(0,5)}-${newEnd.substring(0,5)} ${roomName}`,
         newTenantId);
 
     toast(`Zmiana wprowadzona od ${fromDate}`, 'success');
@@ -5215,7 +5256,7 @@ async function toggleFixed(id, active) {
         const tenantName = fb.tenants?.name || '';
         const roomName = fb.rooms?.name || '';
         await logAudit('fixed_bookings', id, active ? 'activate' : 'deactivate', { is_active: !active }, { is_active: active },
-            `${active ? 'Aktywowano' : 'Dezaktywowano'} blok: ${tenantName} — ${dayName} ${fb.start_time.substring(0,5)}–${fb.end_time.substring(0,5)} ${roomName}`, fb.tenant_id);
+            `${active ? 'Aktywowano' : 'Dezaktywowano'} blok: ${tenantName} - ${dayName} ${fb.start_time.substring(0,5)}-${fb.end_time.substring(0,5)} ${roomName}`, fb.tenant_id);
         await autoRecalcMonthly(fb.tenant_id);
     }
     toast(active ? 'Blok aktywowany' : 'Blok dezaktywowany', 'success');
@@ -5233,7 +5274,7 @@ async function deleteFixed(id) {
         const tenantName = fb.tenants?.name || '';
         const roomName = fb.rooms?.name || '';
         await logAudit('fixed_bookings', id, 'delete', fb, null,
-            `Usunięto blok: ${tenantName} — ${dayName} ${fb.start_time.substring(0,5)}–${fb.end_time.substring(0,5)} ${roomName}`, fb.tenant_id);
+            `Usunięto blok: ${tenantName} - ${dayName} ${fb.start_time.substring(0,5)}-${fb.end_time.substring(0,5)} ${roomName}`, fb.tenant_id);
         await autoRecalcMonthly(fb.tenant_id);
     }
     toast('Blok usunięty', 'info');
@@ -5241,7 +5282,7 @@ async function deleteFixed(id) {
 }
 
 // ================================================================
-// ADMIN: BOOKING SERIES (serie cykliczne — wzorce auto-przedłużania)
+// ADMIN: BOOKING SERIES (serie cykliczne - wzorce auto-przedłużania)
 // ================================================================
 const DOW_NAMES_PL = ['poniedziałek','wtorek','środa','czwartek','piątek','sobota','niedziela'];
 
@@ -5280,16 +5321,16 @@ async function loadBookingSeries() {
 
     const tbody = document.getElementById('bookingSeriesTable');
     tbody.innerHTML = series.map(s => {
-        const tenant = s.tenants?.name || '—';
-        const room   = s.rooms?.name || '—';
+        const tenant = s.tenants?.name || '-';
+        const room   = s.rooms?.name || '-';
         const day    = DOW_NAMES_PL[s.day_of_week] || '?';
-        const hours  = `${s.start_time.substring(0,5)}–${s.end_time.substring(0,5)}`;
+        const hours  = `${s.start_time.substring(0,5)}-${s.end_time.substring(0,5)}`;
         const lastExt = s.last_extended_at
             ? new Date(s.last_extended_at).toLocaleDateString('pl-PL')
-            : '—';
+            : '-';
         const farthest = farthestBySeries[s.id]
             ? new Date(farthestBySeries[s.id]).toLocaleDateString('pl-PL')
-            : '—';
+            : '-';
         const autoBadge = s.auto_renew
             ? '<span style="color:#2d7a2d;font-weight:600;">tak</span>'
             : '<span style="color:#888;">nie</span>';
@@ -5427,7 +5468,7 @@ async function generateInvoices() {
     const endDate = `${endD.getFullYear()}-${String(endD.getMonth() + 1).padStart(2,'0')}-${String(endD.getDate()).padStart(2,'0')}`;
     const monthLabel = new Date(year, month - 1).toLocaleDateString('pl-PL', { month: 'long', year: 'numeric' });
 
-    // Poprzedni miesiąc — na godziny pojedyncze (płatne z dołu)
+    // Poprzedni miesiąc - na godziny pojedyncze (płatne z dołu)
     const prevMonth = new Date(year, month - 2, 1);
     const prevStartDate = `${prevMonth.getFullYear()}-${String(prevMonth.getMonth() + 1).padStart(2,'0')}-01`;
     const prevEndD = new Date(prevMonth.getFullYear(), prevMonth.getMonth() + 1, 0);
@@ -5520,7 +5561,7 @@ async function generateInvoices() {
         const positions = [];
         if (fixedAmount > 0) {
             positions.push({
-                name: 'Wynajem gabinetu — stały',
+                name: 'Wynajem gabinetu - stały',
                 quantity: 1,
                 quantity_unit: 'mies.',
                 total_price_gross: fixedAmount,
@@ -5529,7 +5570,7 @@ async function generateInvoices() {
         }
         if (singleHours > 0) {
             positions.push({
-                name: `Wynajem gabinetu — godziny pojedyncze (${prevMonthLabel})`,
+                name: `Wynajem gabinetu - godziny pojedyncze (${prevMonthLabel})`,
                 quantity: singleHours,
                 quantity_unit: 'godz.',
                 total_price_gross: singleAmount,
@@ -5537,9 +5578,9 @@ async function generateInvoices() {
             });
         }
 
-        // Data sprzedaży: dla faktur "tylko pojedyncze godziny" — ostatni dzień
+        // Data sprzedaży: dla faktur "tylko pojedyncze godziny" - ostatni dzień
         // poprzedniego miesiąca (kiedy faktycznie wykonano usługi). Dla faktur
-        // ze stałym blokiem — pierwszy dzień billing_month (start okresu wynajmu).
+        // ze stałym blokiem - pierwszy dzień billing_month (start okresu wynajmu).
         const sellDate = fixedAmount > 0 ? startDate : prevEndDate;
 
         invoiceSpecs.push({
@@ -5584,10 +5625,10 @@ async function generateInvoices() {
             if (result.created > 0 && errors.length === 0) {
                 toast(`Faktury wysłane do Fakturownia: ${result.created}`, 'success');
             } else if (result.created > 0 && errors.length > 0) {
-                toast(`Wysłano ${result.created} faktur, ${errors.length} błędów — sprawdź szczegóły w konsoli`, 'warning');
+                toast(`Wysłano ${result.created} faktur, ${errors.length} błędów - sprawdź szczegóły w konsoli`, 'warning');
                 console.warn('Fakturownia errors:', errors);
             } else if (errors.length > 0) {
-                toast(`Błąd Fakturownia dla ${errors.length} faktur — sprawdź konsolę`, 'error');
+                toast(`Błąd Fakturownia dla ${errors.length} faktur - sprawdź konsolę`, 'error');
                 console.error('Fakturownia errors:', errors);
             } else {
                 toast(`Dane faktur zapisane (${generated}). Brak faktur do wysłania do Fakturowni (sprawdź ID klientów).`, 'info');
@@ -5674,7 +5715,7 @@ function renderAuditRows(data, showUndo, showPerformer) {
             + ' ' + dt.toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' });
         const al = ACTION_LABELS[entry.action] || { label: entry.action, cls: 'badge-single' };
         const performerCell = showPerformer
-            ? `<br><span style="font-size:0.75rem;color:#aaa;">${entry.performer?.name || '—'}</span>` : '';
+            ? `<br><span style="font-size:0.75rem;color:#aaa;">${entry.performer?.name || '-'}</span>` : '';
         const canUndo = showUndo && (now - dt.getTime()) < UNDO_WINDOW_MS
             && ['insert', 'update', 'delete'].includes(entry.action);
         const undoBtn = canUndo

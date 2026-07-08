@@ -1004,6 +1004,117 @@
             margin-top: 0.5rem;
         }
 
+        /* Rental options — dwie duże karty */
+        .rental-options-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.5rem;
+            text-align: center;
+            margin: 2rem 0 0.5rem;
+            color: var(--dark);
+        }
+        .rental-options-sub {
+            text-align: center;
+            color: var(--gray);
+            font-size: 0.95rem;
+            margin-bottom: 1.25rem;
+        }
+        .rental-options-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.25rem;
+            margin-bottom: 2rem;
+        }
+        @media (max-width: 700px) { .rental-options-grid { grid-template-columns: 1fr; } }
+        .rental-card {
+            background: white;
+            border-radius: 14px;
+            padding: 1.75rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            box-shadow: 0 2px 12px rgba(58, 63, 74, 0.06);
+            border-top: 5px solid var(--primary);
+            position: relative;
+        }
+        .rental-card.single { border-top-color: #A4AECC; }
+        .rental-card.block  { border-top-color: #7B9A7B; }
+        .rental-card-tag {
+            display: inline-block;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 0.3rem 0.6rem;
+            border-radius: 4px;
+            width: fit-content;
+        }
+        .rental-card.single .rental-card-tag { background: #E4EAF5; color: #4A5878; }
+        .rental-card.block  .rental-card-tag { background: #E1EBE1; color: #3E5A3E; }
+        .rental-card h3 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.5rem;
+            color: var(--dark);
+            margin: 0.25rem 0;
+        }
+        .rental-card-price {
+            display: flex;
+            align-items: baseline;
+            gap: 0.4rem;
+            margin: 0.5rem 0 0.25rem;
+        }
+        .rental-card-price .amount {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary-hover);
+            font-family: 'Cormorant Garamond', serif;
+        }
+        .rental-card-price .unit {
+            font-size: 0.95rem;
+            color: var(--gray);
+        }
+        .rental-card-price-alt {
+            font-size: 0.85rem;
+            color: var(--gray);
+            margin-top: -0.4rem;
+        }
+        .rental-card-lead {
+            color: var(--gray);
+            font-size: 0.95rem;
+            line-height: 1.55;
+            margin: 0.25rem 0 0.5rem;
+        }
+        .rental-card ul.rental-features {
+            list-style: none;
+            padding: 0;
+            margin: 0.5rem 0;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        .rental-card ul.rental-features li {
+            display: flex;
+            gap: 0.5rem;
+            align-items: flex-start;
+            font-size: 0.92rem;
+            color: var(--dark);
+            line-height: 1.45;
+        }
+        .rental-card ul.rental-features li::before {
+            content: "✓";
+            color: var(--primary-hover);
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+        .rental-card.block ul.rental-features li::before { color: #5A805A; }
+        .rental-card-for {
+            font-size: 0.85rem;
+            color: var(--gray-light);
+            font-style: italic;
+            margin-top: auto;
+            padding-top: 0.75rem;
+            border-top: 1px dashed #EDE9F3;
+        }
+
         /* Info grid */
         .landing-info-grid {
             display: grid;
@@ -1241,26 +1352,58 @@
             <p>W kuchni jest lodówka, mikrofalówka i kawiarka przelewowa — do wspólnego użytku. Można zostawiać swoje rzeczy zarówno w gabinecie, jak i w kuchni.</p>
         </div>
 
+        <!-- DWIE FORMY WYNAJMU -->
+        <h2 class="rental-options-title">Dwie formy wynajmu — wybierz swoją</h2>
+        <p class="rental-options-sub">Możesz wynająć gabinet elastycznie, sesja po sesji — albo zarezerwować stały termin co tydzień na wyłączność.</p>
+        <div class="rental-options-grid">
+            <div class="rental-card single">
+                <span class="rental-card-tag">Elastyczny</span>
+                <h3>Wynajem pojedynczy</h3>
+                <div class="rental-card-price">
+                    <span class="amount">40 zł</span>
+                    <span class="unit">/ godzina</span>
+                </div>
+                <p class="rental-card-lead">Rezerwujesz konkretne godziny przez panel online — od pojedynczej sesji po powtarzającą się cyklicznie rezerwację.</p>
+                <ul class="rental-features">
+                    <li>Rezerwacja w każdej chwili, do godziny przed sesją</li>
+                    <li>Do miesiąca w przód</li>
+                    <li>Bezpłatne odwołanie do 7 dni przed sesją</li>
+                    <li>Możliwość powtarzania co tydzień (opcja odnawialna)</li>
+                    <li>Płacisz tylko za wykorzystane godziny</li>
+                </ul>
+                <p class="rental-card-for"><strong>Dla kogo:</strong> początek własnej praktyki, uzupełnienie stałego grafiku, testowanie miejsca, sporadyczne sesje.</p>
+            </div>
+
+            <div class="rental-card block">
+                <span class="rental-card-tag">Stały</span>
+                <h3>Wynajem stały (blok)</h3>
+                <div class="rental-card-price">
+                    <span class="amount">35 zł</span>
+                    <span class="unit">/ godzina · 1–3 h</span>
+                </div>
+                <p class="rental-card-price-alt"><strong style="color:var(--primary-hover);font-size:1.05rem;">30 zł/h</strong> przy blokach od 4 godzin · opłata miesięczna = stawka × godziny × 4,26</p>
+                <p class="rental-card-lead">Rezerwujesz ten sam dzień i godziny co tydzień, na czas nieokreślony. Twój termin — do Twojej wyłącznej dyspozycji.</p>
+                <ul class="rental-features">
+                    <li>Ten sam dzień tygodnia i godziny co tydzień</li>
+                    <li>Termin zarezerwowany tylko dla Ciebie</li>
+                    <li>Opłata stała miesięcznie, niezależna od nieobecności</li>
+                    <li>Rozpoczęcie od pierwszego dnia nowego miesiąca</li>
+                    <li>Dwumiesięczne wypowiedzenie w razie rezygnacji</li>
+                </ul>
+                <p class="rental-card-for"><strong>Dla kogo:</strong> regularna praktyka terapeutyczna, klienci wracający co tydzień, przewidywalny grafik.</p>
+            </div>
+        </div>
+
         <!-- INFO GRID -->
         <div class="landing-info-grid">
             <div class="landing-info-card">
-                <h3>Cennik wynajmu</h3>
-                <div class="price-row">
-                    <span>Pojedyncza godzina</span>
-                    <span class="price-amount">40 zł/h</span>
-                </div>
-                <div class="price-row">
-                    <span>Stały blok 1–3 godziny</span>
-                    <span class="price-amount">35 zł/h</span>
-                </div>
-                <div class="price-row">
-                    <span>Stały blok od 4 godzin</span>
-                    <span class="price-amount">30 zł/h</span>
-                </div>
-                <div class="price-row" style="margin-top:0.5rem; padding-top:0.5rem; border-top: 1px solid #F0EDF4;flex-direction:column;align-items:flex-start;gap:0.25rem;">
-                    <span style="font-size:0.82rem; color:var(--gray-light);">Opłata miesięczna za stały blok = stawka × liczba godzin × 4,26</span>
-                    <span style="font-size:0.82rem; color:var(--gray-light);">Możliwość wystawienia faktury VAT</span>
-                </div>
+                <h3>Rozliczenia</h3>
+                <ul>
+                    <li><svg class="feat-icon" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> Faktura VAT wystawiana na początku miesiąca</li>
+                    <li><svg class="feat-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Termin płatności do 8. dnia miesiąca</li>
+                    <li><svg class="feat-icon" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> Wysyłka do KSeF automatyczna</li>
+                </ul>
+                <p style="margin-top:0.75rem;font-size:0.82rem;color:var(--gray-light);">Wynajem stały rozliczany z góry za dany miesiąc, pojedyncze godziny sumowane do faktury za kolejny miesiąc.</p>
             </div>
             <div class="landing-info-card">
                 <h3>Godziny dostępności</h3>

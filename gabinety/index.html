@@ -22,17 +22,24 @@
     <meta name="twitter:description" content="Wynajmij gabinet psychoterapeutyczny w Warszawie na Mokotowie. Puławska 26A - elastyczny wynajem.">
     <meta name="twitter:image" content="https://zofiazmijewska.pl/images/og-gabinety.jpg">
 
-    <!-- JSON-LD structured data: LocalBusiness -->
+    <!-- JSON-LD: LocalBusiness (wynajem gabinetów) -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
       "@type": "LocalBusiness",
-      "@id": "https://zofiazmijewska.pl/gabinety/",
-      "name": "Pracownia Psychoterapii Zofii Żmijewskiej - wynajem gabinetów",
-      "description": "Wynajem gabinetów psychoterapeutycznych w Warszawie na Mokotowie. Trzy urządzone gabinety, elastyczny wynajem na godziny lub stałe bloki.",
+      "@id": "https://zofiazmijewska.pl/gabinety/#business",
+      "name": "Wynajem gabinetów - Pracownia Psychoterapii Zofii Żmijewskiej",
+      "alternateName": "Gabinety terapeutyczne Puławska 26A",
+      "description": "Wynajem gabinetów psychoterapeutycznych w Warszawie na Mokotowie. Trzy urządzone gabinety w zabytkowej kamienicy przy ul. Puławskiej 26A. Elastyczny wynajem na pojedyncze godziny lub stałe bloki tygodniowe. Kameralna przestrzeń z kuchnią i poczekalnią, rezerwacje online.",
       "url": "https://zofiazmijewska.pl/gabinety/",
       "telephone": "+48514622225",
       "email": "gabinety@zofiazmijewska.pl",
+      "image": [
+        "https://zofiazmijewska.pl/images/gab1-1.jpg",
+        "https://zofiazmijewska.pl/images/gab2-1.jpg",
+        "https://zofiazmijewska.pl/images/gab3-1.jpg"
+      ],
+      "logo": "https://zofiazmijewska.pl/images/logo.svg",
       "address": {
         "@type": "PostalAddress",
         "streetAddress": "ul. Puławska 26A",
@@ -46,12 +53,116 @@
         "latitude": "52.2055",
         "longitude": "21.0025"
       },
-      "openingHours": "Mo-Su 07:00-22:00",
+      "openingHoursSpecification": [{
+        "@type": "OpeningHoursSpecification",
+        "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"],
+        "opens": "07:00",
+        "closes": "22:00"
+      }],
       "priceRange": "25-40 zł/h",
-      "areaServed": {
-        "@type": "City",
-        "name": "Warszawa"
+      "areaServed": [
+        { "@type": "City", "name": "Warszawa" },
+        { "@type": "AdministrativeArea", "name": "Mokotów" }
+      ],
+      "hasOfferCatalog": {
+        "@type": "OfferCatalog",
+        "name": "Formy wynajmu gabinetów terapeutycznych",
+        "itemListElement": [
+          {
+            "@type": "Offer",
+            "name": "Wynajem pojedynczy - godzina",
+            "description": "Rezerwacja konkretnego terminu online. Elastyczne odwoływanie, opcja cykliczna. Idealne na początek własnej praktyki lub uzupełnienie stałego grafiku.",
+            "price": "40",
+            "priceCurrency": "PLN",
+            "priceSpecification": {
+              "@type": "UnitPriceSpecification",
+              "price": "40",
+              "priceCurrency": "PLN",
+              "unitCode": "HUR",
+              "unitText": "godzina"
+            },
+            "availability": "https://schema.org/InStock",
+            "url": "https://zofiazmijewska.pl/gabinety/#sec-wynajem"
+          },
+          {
+            "@type": "Offer",
+            "name": "Wynajem stały (blok) - 1-3 godziny/tydzień",
+            "description": "Stały termin ten sam dzień tygodnia co tydzień, na czas nieokreślony. Termin zarezerwowany tylko dla Ciebie.",
+            "price": "35",
+            "priceCurrency": "PLN",
+            "priceSpecification": {
+              "@type": "UnitPriceSpecification",
+              "price": "35",
+              "priceCurrency": "PLN",
+              "unitCode": "HUR",
+              "unitText": "godzina"
+            },
+            "availability": "https://schema.org/InStock",
+            "url": "https://zofiazmijewska.pl/gabinety/#sec-wynajem"
+          },
+          {
+            "@type": "Offer",
+            "name": "Wynajem stały (blok) - od 4 godzin/tydzień",
+            "description": "Stały termin ten sam dzień tygodnia co tydzień, na czas nieokreślony. Rabat przy większym bloku godzinowym.",
+            "price": "30",
+            "priceCurrency": "PLN",
+            "priceSpecification": {
+              "@type": "UnitPriceSpecification",
+              "price": "30",
+              "priceCurrency": "PLN",
+              "unitCode": "HUR",
+              "unitText": "godzina"
+            },
+            "availability": "https://schema.org/InStock",
+            "url": "https://zofiazmijewska.pl/gabinety/#sec-wynajem"
+          }
+        ]
+      },
+      "amenityFeature": [
+        {"@type":"LocationFeatureSpecification","name":"Poczekalnia","value":true},
+        {"@type":"LocationFeatureSpecification","name":"Kuchnia (lodówka, kawiarka)","value":true},
+        {"@type":"LocationFeatureSpecification","name":"Winda w budynku","value":true},
+        {"@type":"LocationFeatureSpecification","name":"Kozetka (Gabinet 3)","value":true},
+        {"@type":"LocationFeatureSpecification","name":"Balkon (Gabinet 1 i 2)","value":true},
+        {"@type":"LocationFeatureSpecification","name":"Kominek (Gabinet 2)","value":true},
+        {"@type":"LocationFeatureSpecification","name":"Parking miejski","value":true}
+      ],
+      "makesOffer": {
+        "@type": "Offer",
+        "itemOffered": {
+          "@type": "Service",
+          "name": "Wynajem gabinetu terapeutycznego",
+          "provider": {
+            "@type": "Person",
+            "name": "Zofia Żmijewska",
+            "jobTitle": "Psychoterapeutka"
+          },
+          "areaServed": "Warszawa Mokotów",
+          "serviceType": "Wynajem powierzchni terapeutycznej"
+        }
       }
+    }
+    </script>
+
+    <!-- JSON-LD: BreadcrumbList -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Pracownia Psychoterapii Zofii Żmijewskiej",
+          "item": "https://zofiazmijewska.pl/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Wynajem gabinetów",
+          "item": "https://zofiazmijewska.pl/gabinety/"
+        }
+      ]
     }
     </script>
 
@@ -1414,10 +1525,10 @@
             <div class="gabinet-card-top">
                 <div class="gabinet-card-slider" id="slider1">
                     <span class="gab-badge" style="background:var(--room1);">Gabinet 1</span>
-                    <img src="../images/gab1-1.jpg" class="active" alt="Gabinet 1 - balkon z roślinami">
-                    <img src="../images/gab1-2.jpg" alt="Gabinet 1 - toaletka z lustrem">
-                    <img src="../images/gab1-3.jpg" alt="Gabinet 1 - fotel z lampą">
-                    <img src="../images/gab1-4.jpg" alt="Gabinet 1 - widok na balkon">
+                    <img src="../images/gab1-1.jpg" class="active" alt="Gabinet 1 - przestronny gabinet terapeutyczny z balkonem, wynajem Warszawa Puławska">
+                    <img src="../images/gab1-2.jpg" alt="Gabinet 1 - wynajem gabinetu psychoterapeutycznego Warszawa Mokotów, zabytkowa toaletka">
+                    <img src="../images/gab1-3.jpg" alt="Gabinet 1 - fotel terapeutyczny w wynajmowanym gabinecie, Puławska 26A Warszawa">
+                    <img src="../images/gab1-4.jpg" alt="Gabinet 1 - widok z gabinetu terapeutycznego na balkon, Warszawa Mokotów">
                     <button class="slider-btn-sm prev" onclick="cardSlider('slider1',-1)">&#8592;</button>
                     <button class="slider-btn-sm next" onclick="cardSlider('slider1',1)">&#8594;</button>
                     <div class="slider-dots-sm">
@@ -1444,10 +1555,10 @@
             <div class="gabinet-card-top">
                 <div class="gabinet-card-slider" id="slider2">
                     <span class="gab-badge" style="background:var(--room2);color:#3a3f4a;">Gabinet 2</span>
-                    <img src="../images/gab2-1.jpg" class="active" alt="Gabinet 2 - kanapa i stół">
-                    <img src="../images/gab2-2.jpg" alt="Gabinet 2 - kanapa z kolorową lampą">
-                    <img src="../images/gab2-3.jpg" alt="Gabinet 2 - kominek">
-                    <img src="../images/gab2-4.jpg" alt="Gabinet 2 - fotel z lampą">
+                    <img src="../images/gab2-1.jpg" class="active" alt="Gabinet 2 - największy gabinet terapeutyczny z kanapą do wynajęcia w Warszawie">
+                    <img src="../images/gab2-2.jpg" alt="Gabinet 2 - jasny gabinet terapeutyczny z kanapą, wynajem Warszawa Puławska 26A">
+                    <img src="../images/gab2-3.jpg" alt="Gabinet 2 - kameralny gabinet z kominkiem, wynajem dla terapeutów Mokotów">
+                    <img src="../images/gab2-4.jpg" alt="Gabinet 2 - stanowisko terapeutyczne w wynajmowanym gabinecie, Warszawa">
                     <button class="slider-btn-sm prev" onclick="cardSlider('slider2',-1)">&#8592;</button>
                     <button class="slider-btn-sm next" onclick="cardSlider('slider2',1)">&#8594;</button>
                     <div class="slider-dots-sm">
@@ -1475,8 +1586,8 @@
             <div class="gabinet-card-top">
                 <div class="gabinet-card-slider" id="slider3">
                     <span class="gab-badge" style="background:var(--room3);color:#3a3f4a;">Gabinet 3</span>
-                    <img src="../images/gab3-1.jpg" class="active" alt="Gabinet 3 - fotele i kanapa">
-                    <img src="../images/gab3-2.jpg" alt="Gabinet 3 - szafka z książkami">
+                    <img src="../images/gab3-1.jpg" class="active" alt="Gabinet 3 - gabinet z kozetką do psychoanalizy, wynajem Warszawa Mokotów">
+                    <img src="../images/gab3-2.jpg" alt="Gabinet 3 - kameralny gabinet psychoanalityczny, ul. Puławska 26A Warszawa">
                     <button class="slider-btn-sm prev" onclick="cardSlider('slider3',-1)">&#8592;</button>
                     <button class="slider-btn-sm next" onclick="cardSlider('slider3',1)">&#8594;</button>
                     <div class="slider-dots-sm">
@@ -1593,7 +1704,7 @@
             <h3>Okolica i dojazd</h3>
             <div class="map-photo-grid">
                 <div>
-                    <img src="../images/okolica-park.jpg" alt="Park Morskie Oko - tuż obok gabinetów" class="okolica-photo" onclick="lightboxImages=[this.src]; lightboxIndex=0; openLightboxDirect()">
+                    <img src="../images/okolica-park.jpg" alt="Park Morskie Oko przy wynajmowanych gabinetach terapeutycznych - Warszawa Stary Mokotów" class="okolica-photo" onclick="lightboxImages=[this.src]; lightboxIndex=0; openLightboxDirect()">
                     <p class="okolica-caption">Park Morskie Oko - spacer od gabinetu</p>
                 </div>
                 <div>

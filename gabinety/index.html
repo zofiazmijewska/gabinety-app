@@ -1802,7 +1802,13 @@
 
         <!-- ==================== MY FIXED RENTAL VIEW ==================== -->
         <div id="view-myFixed" class="view">
-            <h2 class="card-title mb-1">Wynajem stały</h2>
+            <div class="flex-between mb-1">
+                <h2 class="card-title" style="margin:0;">Wynajem stały</h2>
+                <div id="tenantSelectorFixedWrap" style="display:none;">
+                    <select class="form-select" id="tenantSelectorFixed" style="min-width:200px;" onchange="onTenantSelectorFixedChange()">
+                    </select>
+                </div>
+            </div>
             <div class="stats-grid" id="myFixedStats" style="margin-bottom:1.5rem;">
                 <div class="stat-card">
                     <div class="stat-value" id="myFixedHours">-</div>
@@ -1813,9 +1819,8 @@
                     <div class="stat-label">Kwota miesięczna</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-value" id="myFixedSingleRate">-</div>
-                    <div class="stat-label">Stawka za wynajem pojedynczy</div>
-                    <div class="stat-sublabel" id="myFixedSingleRateNote" style="font-size:0.78rem;color:var(--gray-light);margin-top:0.25rem;display:none;"></div>
+                    <div class="stat-value" id="myFixedHourlyRate">-</div>
+                    <div class="stat-label">Stawka za godzinę w bloku</div>
                 </div>
             </div>
             <!-- Umowa - warunki wynajmu -->
@@ -2050,6 +2055,7 @@
                                 <th>Kwota stała/mies.</th>
                                 <th>Faktura VAT</th>
                                 <th>Zgoda (regulamin)</th>
+                                <th>Regulamin od 1.09.2026</th>
                                 <th>Status</th>
                                 <th></th>
                             </tr>
@@ -2713,7 +2719,7 @@ function switchView(viewName) {
     switch (viewName) {
         case 'calendar': if (calendar) calendar.refetchEvents(); break;
         case 'myBookings': initTenantSelector(); loadMyBookings(); initMyCalendar(); break;
-        case 'myFixed': loadMyFixed(); break;
+        case 'myFixed': initTenantSelectorFixed(); loadMyFixed(); break;
         case 'summary': initSummaryMonths(); loadSummary(); break;
         case 'adminTenants': loadTenants(); break;
         case 'adminFixed': loadFixedBookings(); break;
@@ -3911,6 +3917,32 @@ function onTenantSelectorChange() {
     loadMyBookings();
     if (myCalendar) { myCalendar.destroy(); myCalendar = null; }
     initMyCalendar();
+    // Zsynchronizuj też selektor w widoku Wynajem stały
+    const selFixed = document.getElementById('tenantSelectorFixed');
+    if (selFixed) selFixed.value = val || '';
+}
+
+async function initTenantSelectorFixed() {
+    const wrap = document.getElementById('tenantSelectorFixedWrap');
+    if (!isAdmin) { wrap.style.display = 'none'; return; }
+    wrap.style.display = '';
+    const sel = document.getElementById('tenantSelectorFixed');
+    if (sel.options.length === 0) {
+        const { data } = await sb.from('tenants').select('id, name').eq('is_active', true).order('name');
+        sel.innerHTML = `<option value="">- Mój wynajem -</option>` +
+            (data || []).map(t => `<option value="${t.id}">${t.name}</option>`).join('');
+    }
+    // Zsynchronizuj z bieżącym wyborem globalnym
+    sel.value = selectedTenantId || '';
+}
+
+function onTenantSelectorFixedChange() {
+    const val = document.getElementById('tenantSelectorFixed').value;
+    selectedTenantId = val || null;
+    loadMyFixed();
+    // Zsynchronizuj też selektor w widoku Moje rezerwacje
+    const selMain = document.getElementById('tenantSelector');
+    if (selMain) selMain.value = val || '';
 }
 
 async function loadMyBookings() {
@@ -4202,18 +4234,34 @@ function initMyCalendar() {
 // MY FIXED RENTAL
 // ================================================================
 async function loadMyFixed() {
-    const singleRate = currentTenant.single_hourly_rate || PRICE_PER_HOUR;
-    const hourlyRate = currentTenant.hourly_rate || PRICE_PER_HOUR;
-    const monthlyAmount = currentTenant.monthly_fixed_amount || 0;
+    const tenantId = getViewTenantId();
+    // Pobierz dane najemcy (może to być inny niż currentTenant gdy admin
+    // ogląda wynajem konkretnego najemcy przez selektor)
+    let viewTenant = currentTenant;
+    if (tenantId !== currentTenant.id) {
+        const { data } = await sb.from('tenants').select('*').eq('id', tenantId).single();
+        if (data) viewTenant = data;
+    }
+    const singleRate = viewTenant.single_hourly_rate || PRICE_PER_HOUR;
+    const hourlyRate = viewTenant.hourly_rate || PRICE_PER_HOUR;
+    const monthlyAmount = viewTenant.monthly_fixed_amount || 0;
 
     // 1. Load fixed bookings (schedule + billing source)
-    const { data: bookings } = await sb
+    // Filtruj tylko bloki AKTUALNIE OBOWIĄZUJĄCE (nie pokazuj starych zakończonych
+    // ani jeszcze niezaczętych — te są w historii bloków po stronie admina)
+    const { data: bookingsAll } = await sb
         .from('fixed_bookings')
         .select('*, rooms(name)')
-        .eq('tenant_id', currentTenant.id)
+        .eq('tenant_id', tenantId)
         .eq('is_active', true)
         .order('day_of_week')
         .order('start_time');
+
+    const today = toLocalDateStr(new Date());
+    const bookings = (bookingsAll || []).filter(f =>
+        (!f.valid_from || f.valid_from <= today) &&
+        (!f.end_date   || f.end_date   >  today)
+    );
 
     let totalWeeklyHours = 0;
     const termsTbody = document.getElementById('myFixedTermsTable');
@@ -4265,20 +4313,7 @@ async function loadMyFixed() {
 
     // 2. Stats
     document.getElementById('myFixedMonthly').textContent = monthlyAmount > 0 ? monthlyAmount.toFixed(2) + ' zł' : '-';
-    document.getElementById('myFixedSingleRate').textContent = singleRate + ' zł/h';
-
-    // Notka o zmianie stawki od 1.09.2026 — pokazuj tylko przed tą datą i jeśli obecna stawka to nie 40 zł
-    const noteEl = document.getElementById('myFixedSingleRateNote');
-    const NEW_RATE_DATE = '2026-09-01';
-    const NEW_SINGLE_RATE = 40;
-    if (noteEl) {
-        if (toLocalDateStr(new Date()) < NEW_RATE_DATE && singleRate !== NEW_SINGLE_RATE) {
-            noteEl.textContent = `od 1.09.2026: ${NEW_SINGLE_RATE} zł/h`;
-            noteEl.style.display = '';
-        } else {
-            noteEl.style.display = 'none';
-        }
-    }
+    document.getElementById('myFixedHourlyRate').textContent = hourlyRate + ' zł/h';
 
     // 3. Schedule table (same data, different display)
     const tbody = document.getElementById('myFixedTable');
@@ -4447,7 +4482,30 @@ async function loadSummarySingle(tenantId, startDate, endDate) {
     const tenantRate = tenant.single_hourly_rate || PRICE_PER_HOUR;
     const singleHours = singles ? singles.length : 0;
     const singleAmount = singleHours * tenantRate;
-    const fixedAmount = tenant.monthly_fixed_amount || 0;
+
+    // Wynajem stały: policz dla konkretnego miesiąca — bierz tylko bloki
+    // aktywne w tym miesiącu (valid_from <= ostatni dzień, end_date > pierwszy dzień)
+    const { data: activeFixed } = await sb
+        .from('fixed_bookings')
+        .select('start_time, end_time, valid_from, end_date')
+        .eq('tenant_id', tenantId)
+        .eq('is_active', true);
+
+    let monthlyWeeklyHours = 0;
+    if (activeFixed) {
+        activeFixed.forEach(f => {
+            const validFromOk = !f.valid_from || f.valid_from <= endDate;
+            const endDateOk   = !f.end_date   || f.end_date   > startDate;
+            if (!validFromOk || !endDateOk) return;
+            monthlyWeeklyHours += parseInt(f.end_time.split(':')[0]) - parseInt(f.start_time.split(':')[0]);
+        });
+    }
+    const hourlyRate = tenant.hourly_rate || 35;
+    const calculatedFixed = parseFloat((monthlyWeeklyHours * hourlyRate * 4.26).toFixed(2));
+
+    // Preferuj kalkulację z aktywnych bloków dla tego miesiąca.
+    // Fallback do stored monthly_fixed_amount tylko gdy nie ma żadnych bloków.
+    const fixedAmount = monthlyWeeklyHours > 0 ? calculatedFixed : (tenant.monthly_fixed_amount || 0);
     const total = fixedAmount + singleAmount;
 
     document.getElementById('summaryFixedAmount').textContent = fixedAmount.toFixed(0) + ' zł';
@@ -4491,12 +4549,26 @@ async function loadTenants() {
         } else {
             consentHtml = `<span class="badge badge-cancelled">Brak</span>`;
         }
+
+        let consentV2Html = '';
+        if (t.accepted_terms_v2_at) {
+            const d2 = new Date(t.accepted_terms_v2_at);
+            const dateStr2 = d2.toLocaleDateString('pl-PL', { day: '2-digit', month: '2-digit', year: 'numeric' });
+            const timeStr2 = d2.toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' });
+            consentV2Html = `<span class="badge badge-confirmed" title="${dateStr2} ${timeStr2}">✓ ${dateStr2}</span>`;
+        } else if (t.is_admin) {
+            consentV2Html = `<span style="color:var(--gray-light);font-size:0.8rem;">-</span>`;
+        } else {
+            consentV2Html = `<span class="badge badge-cancelled">Brak</span>`;
+        }
+
         return `<tr>
         <td><strong>${escHtml(t.name)}</strong>${t.is_admin ? ' <span class="badge badge-fixed">Admin</span>' : ''}</td>
         <td>${escHtml(t.email)}</td>
         <td>${t.monthly_fixed_amount || 0} zł</td>
         <td><span class="badge badge-${t.wants_invoice ? 'confirmed' : 'cancelled'}">${t.wants_invoice ? 'Tak' : 'Nie'}</span></td>
         <td>${consentHtml}</td>
+        <td>${consentV2Html}</td>
         <td><span class="badge badge-${t.is_active ? 'confirmed' : 'cancelled'}">${t.is_active ? 'Aktywny' : 'Nieaktywny'}</span></td>
         <td>
             <button class="btn btn-sm btn-secondary" onclick="showEditTenantModal('${t.id}')">Edytuj</button>
@@ -4665,6 +4737,13 @@ async function showEditTenantModal(tenantId) {
                     <label class="form-label">ID klienta w Fakturownia.pl</label>
                     <input class="form-input" id="tenantFakturowniaId" type="number" value="${t.fakturownia_client_id || ''}" placeholder="np. 191509963">
                 </div>
+                <div class="form-group" style="display:flex;align-items:center;gap:0.5rem;background:#faf7fc;padding:0.5rem 0.75rem;border-radius:6px;">
+                    <input type="checkbox" id="tenantAcceptedV2" ${t.accepted_terms_v2_at ? 'checked' : ''} style="width:18px;height:18px;cursor:pointer;">
+                    <label for="tenantAcceptedV2" style="font-size:0.9rem;color:var(--dark);cursor:pointer;margin:0;">
+                        Podpisał regulamin obowiązujący od 1.09.2026
+                        ${t.accepted_terms_v2_at ? `<span style="font-size:0.75rem;color:var(--gray-light);margin-left:0.5rem;">(${new Date(t.accepted_terms_v2_at).toLocaleDateString('pl-PL')})</span>` : ''}
+                    </label>
+                </div>
                 <div class="modal-actions">
                     <button class="btn btn-secondary" onclick="closeModal()">Anuluj</button>
                     <button class="btn btn-primary" id="saveTenantBtn">Zapisz</button>
@@ -4690,6 +4769,25 @@ async function saveTenant(existingId) {
         const fakturowniaIdEl = document.getElementById('tenantFakturowniaId');
         const singleRateEl = document.getElementById('tenantSingleRate');
         const hourlyRateEl = document.getElementById('tenantHourlyRate');
+        const acceptedV2El = document.getElementById('tenantAcceptedV2');
+
+        // Regulamin od 1.09.2026: ustaw NOW gdy zaznaczony, wyczyść gdy odznaczony.
+        // Ale jeśli zaznaczony i wcześniej już był ustawiony - zostaw starą datę.
+        let acceptedV2Val = undefined;
+        if (acceptedV2El) {
+            if (acceptedV2El.checked) {
+                // Sprawdź stan poprzedni - jeśli już był ustawiony, zostaw
+                if (existingId) {
+                    const { data: prev } = await sb.from('tenants').select('accepted_terms_v2_at').eq('id', existingId).single();
+                    acceptedV2Val = prev?.accepted_terms_v2_at || new Date().toISOString();
+                } else {
+                    acceptedV2Val = new Date().toISOString();
+                }
+            } else {
+                acceptedV2Val = null;
+            }
+        }
+
         const data = {
             name: nameEl ? nameEl.value.trim() : '',
             email: emailEl ? emailEl.value.trim() : '',
@@ -4701,7 +4799,8 @@ async function saveTenant(existingId) {
             hourly_rate: hourlyRateEl ? (parseFloat(hourlyRateEl.value) || 35) : 35,
             single_hourly_rate: singleRateEl ? (parseFloat(singleRateEl.value) || 35) : 35,
             wants_invoice: wantsInvoiceEl ? wantsInvoiceEl.checked : false,
-            fakturownia_client_id: fakturowniaIdEl && fakturowniaIdEl.value ? parseInt(fakturowniaIdEl.value) : null
+            fakturownia_client_id: fakturowniaIdEl && fakturowniaIdEl.value ? parseInt(fakturowniaIdEl.value) : null,
+            accepted_terms_v2_at: acceptedV2Val
         };
 
         if (!data.name || !data.email) {
@@ -4762,19 +4861,25 @@ function useCalcAmount() {
 // ADMIN: FIXED BOOKINGS
 // ================================================================
 async function autoRecalcMonthly(tenantId) {
-    // Recalculate monthly_fixed_amount from active fixed_bookings
+    // Recalculate monthly_fixed_amount z aktywnych fixed_bookings.
+    // Uwzględnia valid_from i end_date - pomija bloki zakończone lub jeszcze
+    // niezaczęte (żeby nie liczyć starych wersji po podzieleniu bloku).
     const { data: tenant } = await sb.from('tenants').select('hourly_rate').eq('id', tenantId).single();
     const rate = (tenant && tenant.hourly_rate) || 35;
 
     const { data: bookings } = await sb
         .from('fixed_bookings')
-        .select('start_time, end_time')
+        .select('start_time, end_time, valid_from, end_date')
         .eq('tenant_id', tenantId)
         .eq('is_active', true);
 
+    const today = toLocalDateStr(new Date());
     let weeklyHours = 0;
     if (bookings) {
         bookings.forEach(f => {
+            // Pomiń bloki które już się zakończyły lub jeszcze nie zaczęły
+            if (f.end_date && f.end_date <= today) return;
+            if (f.valid_from && f.valid_from > today) return;
             weeklyHours += parseInt(f.end_time.split(':')[0]) - parseInt(f.start_time.split(':')[0]);
         });
     }

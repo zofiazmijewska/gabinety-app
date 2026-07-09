@@ -1150,13 +1150,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            cursor: pointer;
-            transition: background 0.2s ease;
             margin-bottom: 2rem;
-        }
-
-        .map-placeholder:hover {
-            background: #DDD8E8;
         }
 
         .map-placeholder-inner {
@@ -1466,16 +1460,16 @@
                 <button class="lightbox-next" onclick="lightboxNext(event)">&#8250;</button>
             </div>
 
-            <!-- Maps (lazy load) -->
+            <!-- Maps (lazy load on scroll into view) -->
             <div class="maps-container" id="mapsContainer">
-                <div class="map-placeholder" id="mapPlaceholder" onclick="loadMap()" role="button" tabindex="0" aria-label="Kliknij, aby załadować mapę Google">
+                <div class="map-placeholder" id="mapPlaceholder" aria-label="Mapa Google - ul. Puławska 26A/7, Warszawa">
                     <div class="map-placeholder-inner">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/>
                             <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z"/>
                         </svg>
                         <p>ul. Puławska 26A/7, Warszawa</p>
-                        <span>Kliknij, aby załadować mapę</span>
+                        <span>Ładowanie mapy...</span>
                     </div>
                 </div>
             </div>
@@ -1662,7 +1656,7 @@
             });
         });
 
-        // ==================== LAZY MAP ====================
+        // ==================== LAZY MAP (auto-load on scroll into view) ====================
         function loadMap() {
             const container = document.getElementById('mapsContainer');
             const iframe = document.createElement('iframe');
@@ -1679,13 +1673,18 @@
             container.appendChild(iframe);
         }
 
-        // Also allow keyboard activation of map placeholder
-        document.addEventListener('keydown', (e) => {
-            const placeholder = document.getElementById('mapPlaceholder');
-            if (placeholder && document.activeElement === placeholder && (e.key === 'Enter' || e.key === ' ')) {
-                loadMap();
-            }
-        });
+        const mapPlaceholder = document.getElementById('mapPlaceholder');
+        if (mapPlaceholder) {
+            const mapObserver = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        loadMap();
+                        observer.disconnect();
+                    }
+                });
+            }, { rootMargin: '200px' });
+            mapObserver.observe(mapPlaceholder);
+        }
     </script>
 
     <!-- Cal.com Embed Script -->

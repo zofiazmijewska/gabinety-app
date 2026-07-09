@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="750" height="310" viewBox="30 50 325 135">
+  <defs>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,500&amp;display=swap');
+    </style>
+  </defs>
+
+  <!-- PRACOWNIA -->
+  <text x="40" y="110"
+        font-family="'Playfair Display', Didot, 'Bodoni MT', Georgia, serif"
+        font-weight="900"
+        font-size="29"
+        fill="#3d3b3a"
+        letter-spacing="4">PRACOWNIA</text>
+
+  <!-- PSYCHOTERAPII -->
+  <text x="40" y="143"
+        font-family="'Playfair Display', Didot, 'Bodoni MT', Georgia, serif"
+        font-weight="900"
+        font-size="29"
+        fill="#3d3b3a"
+        letter-spacing="4">PSYCHOTERAPII</text>
+
+  <!-- Zofii Żmijewskiej -->
+  <text x="40" y="176"
+        font-family="'Playfair Display', Didot, 'Bodoni MT', Georgia, serif"
+        font-weight="500"
+        font-style="italic"
+        font-size="27"
+        fill="#3d3b3a"
+        letter-spacing="1">Zofii Żmijewskiej</text>
+
+  <!-- Kółko -->
+  <circle cx="310" cy="93" r="25" fill="none" stroke="#B8A9C9" stroke-width="12"/>
+</svg>

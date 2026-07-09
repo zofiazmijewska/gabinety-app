@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <title>Hero Editor — przesuń logo i przycisk osobno</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: #2E3440; font-family: 'DM Sans', sans-serif; }
+
+        .editor-bar {
+            background: #1a1e26;
+            color: white;
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-size: 14px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            flex-wrap: wrap;
+        }
+        .editor-bar code {
+            background: #2E3440;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 13px;
+            color: #88C0D0;
+        }
+        .editor-bar .hint {
+            color: #999;
+            font-size: 12px;
+        }
+        .editor-bar button {
+            padding: 3px 10px;
+            border: 1px solid #555;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        .editor-bar .separator {
+            width: 1px;
+            height: 20px;
+            background: #555;
+        }
+        .editor-bar .row2 {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding-top: 6px;
+            border-top: 1px solid #333;
+            margin-top: 2px;
+        }
+        .active-tab {
+            background: #88C0D0 !important;
+            color: #1a1e26 !important;
+            border-color: #88C0D0 !important;
+        }
+
+        /* === HERO — identyczne jak na stronie === */
+        .hero {
+            margin: 100px 0 20px;
+            height: 700px;
+            background: linear-gradient(to right, rgba(42, 55, 80, 0.35) 0%, rgba(42, 55, 80, 0.15) 40%, transparent 70%), url('images/hero.jpg');
+            background-size: cover, cover;
+            background-position: center 0%, center 35%;
+            background-repeat: no-repeat, no-repeat;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-overlay {
+            position: absolute;
+            inset: 0;
+            background: none;
+            z-index: 2;
+            pointer-events: none;
+        }
+
+        /* Logo — oddzielny element */
+        .hero-logo {
+            position: absolute;
+            z-index: 10;
+            bottom: 24.3%;
+            left: 9.2%;
+            max-width: 474px;
+            width: 474px;
+            filter: brightness(0) invert(1);
+            cursor: grab;
+            border: 2px dashed rgba(136, 192, 208, 0.3);
+        }
+        .hero-logo:active {
+            cursor: grabbing;
+        }
+        .hero-logo.active-el {
+            border-color: #88C0D0;
+        }
+
+        /* Przycisk — oddzielny element */
+        .hero-btn {
+            position: absolute;
+            z-index: 11;
+            bottom: 14.9%;
+            left: 16.6%;
+            display: inline-block;
+            padding: 16px 46px;
+            background: #B8A9C9;
+            color: white;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 23px;
+            cursor: grab;
+            border: 2px dashed rgba(255, 150, 50, 0.5);
+        }
+        .hero-btn:active {
+            cursor: grabbing;
+        }
+        .hero-btn.active-el {
+            border-color: #FF9632;
+        }
+
+        /* Labels */
+        .editor-label {
+            position: absolute;
+            z-index: 25;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 2px 8px;
+            border-radius: 3px;
+            pointer-events: none;
+        }
+        .label-logo {
+            background: #88C0D0;
+            color: #1a1e26;
+        }
+        .label-btn {
+            background: #FF9632;
+            color: #1a1e26;
+        }
+
+        /* Resize handles */
+        .resize-handle {
+            position: absolute;
+            width: 14px;
+            height: 14px;
+            background: #88C0D0;
+            border: 2px solid #1a1e26;
+            border-radius: 3px;
+            cursor: nwse-resize;
+            z-index: 20;
+            display: none;
+        }
+        .resize-handle.logo-resize {
+            /* positioned by JS near bottom-right of logo */
+        }
+        .resize-handle.btn-resize {
+            background: #B8A9C9;
+            /* positioned by JS near bottom-right of button */
+        }
+
+        /* Center dots */
+        .center-dot {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            z-index: 15;
+            pointer-events: none;
+            transform: translate(-50%, -50%);
+            display: none;
+        }
+        .center-dot.logo-dot { background: #88C0D0; }
+        .center-dot.btn-dot { background: #B8A9C9; }
+
+        /* Guide lines */
+        .guide-v {
+            position: absolute;
+            width: 1px;
+            top: 0;
+            bottom: 0;
+            border-left: 1px dashed rgba(136, 192, 208, 0.5);
+            z-index: 5;
+            pointer-events: none;
+            display: none;
+        }
+        .guide-h {
+            position: absolute;
+            height: 1px;
+            left: 0;
+            right: 0;
+            border-top: 1px dashed rgba(136, 192, 208, 0.5);
+            z-index: 5;
+            pointer-events: none;
+            display: none;
+        }
+
+        /* Alignment line between logo and button */
+        .align-line {
+            position: absolute;
+            z-index: 5;
+            pointer-events: none;
+            display: none;
+        }
+        .align-line-v {
+            width: 1px;
+            top: 0;
+            bottom: 0;
+            border-left: 1px solid rgba(255, 200, 50, 0.5);
+        }
+
+        /* Output CSS box */
+        .output-box {
+            max-width: 1100px;
+            margin: 20px auto;
+            background: #1a1e26;
+            border-radius: 8px;
+            padding: 20px;
+            color: #D8DEE9;
+            font-family: monospace;
+            font-size: 13px;
+            white-space: pre;
+            line-height: 1.6;
+        }
+        .output-box .comment { color: #616E88; }
+        .output-box .prop { color: #88C0D0; }
+        .output-box .val { color: #A3BE8C; }
+    </style>
+</head>
+<body>
+
+<div class="editor-bar">
+    <span>🎨 Hero Editor</span>
+    <div class="separator"></div>
+    <span>Aktywny:</span>
+    <button id="tab-logo" class="active-tab" onclick="setActive('logo')">Logo</button>
+    <button id="tab-btn" onclick="setActive('btn')">Przycisk</button>
+    <div class="separator"></div>
+    <span>Logo: <code id="logo-pos">—</code> <code id="logo-size-info">474px</code></span>
+    <div class="separator"></div>
+    <span>Przycisk: <code id="btn-pos">—</code> <code id="btn-size-info">23px</code></span>
+    <div class="separator"></div>
+    <span>Overlay:</span>
+    <button onclick="toggleOverlay('none')" style="background:#333;color:white">brak</button>
+    <button onclick="toggleOverlay('light')" style="background:#555;color:white">lekki</button>
+    <button onclick="toggleOverlay('medium')" style="background:#777;color:white">średni</button>
+    <button onclick="toggleOverlay('strong')" style="background:#999;color:white">mocny</button>
+    <div class="row2">
+        <span>Logo kolor:</span>
+        <button onclick="setLogoWhite()" style="background:white;color:#333">biały</button>
+        <button onclick="setLogoDark()" style="background:#2E3440;color:white">granat</button>
+        <input type="color" id="custom-color" value="#ffffff" style="width:24px;height:24px;border:none;cursor:pointer" title="własny kolor">
+        <div class="separator"></div>
+        <span>Wysokość hero: <code id="hero-h-info">700px</code></span>
+        <input type="range" id="hero-h" min="500" max="900" value="700" step="10" style="width:120px">
+        <div class="separator"></div>
+        <span>Kadr Y: <code id="bg-y-info">35%</code></span>
+        <input type="range" id="bg-y" min="0" max="100" value="35" step="1" style="width:120px">
+        <div class="separator"></div>
+        <span class="hint">Kliknij element → przeciągaj | Strzałki = precyzyjne | Scroll = rozmiar</span>
+    </div>
+</div>
+
+<div class="hero" id="hero">
+    <div class="hero-overlay" id="overlay"></div>
+
+    <!-- Guides -->
+    <div class="guide-v" id="guide-v"></div>
+    <div class="guide-h" id="guide-h"></div>
+    <div class="align-line align-line-v" id="align-left"></div>
+    <div class="center-dot logo-dot" id="logo-dot"></div>
+    <div class="center-dot btn-dot" id="btn-dot"></div>
+
+    <!-- Labels -->
+    <div class="editor-label label-logo" id="label-logo">LOGO</div>
+    <div class="editor-label label-btn" id="label-btn">PRZYCISK</div>
+
+    <!-- Logo — oddzielny element (tak jak na stronie) -->
+    <img src="images/logo.svg" alt="" class="hero-logo active-el" id="logo-img">
+
+    <!-- Przycisk — oddzielny element (tak jak na stronie) -->
+    <a href="#" class="hero-btn" id="btn" onclick="event.preventDefault()">Umów wizytę</a>
+
+    <!-- Resize handles -->
+    <div class="resize-handle logo-resize" id="logo-resize"></div>
+    <div class="resize-handle btn-resize" id="btn-resize"></div>
+</div>
+
+<!-- Output CSS -->
+<div class="output-box" id="output">
+    <span class="comment">/* Skopiuj te wartości do index.html */</span>
+</div>
+
+<script>
+    const hero = document.getElementById('hero');
+    const logoImg = document.getElementById('logo-img');
+    const btn = document.getElementById('btn');
+    const overlay = document.getElementById('overlay');
+    const logoResize = document.getElementById('logo-resize');
+    const btnResize = document.getElementById('btn-resize');
+    const guideV = document.getElementById('guide-v');
+    const guideH = document.getElementById('guide-h');
+    const logoDot = document.getElementById('logo-dot');
+    const btnDot = document.getElementById('btn-dot');
+    const alignLeft = document.getElementById('align-left');
+    const labelLogo = document.getElementById('label-logo');
+    const labelBtn = document.getElementById('label-btn');
+
+    let activeElement = 'logo'; // 'logo' or 'btn'
+    let dragging = null; // null, 'logo', or 'btn'
+    let resizing = null; // null, 'logo', or 'btn'
+    let startX, startY, startLeft, startBottom, startWidth, startFontSize;
+
+    // ---- Active element ----
+    function setActive(which) {
+        activeElement = which;
+        document.getElementById('tab-logo').className = which === 'logo' ? 'active-tab' : '';
+        document.getElementById('tab-btn').className = which === 'btn' ? 'active-tab' : '';
+        logoImg.classList.toggle('active-el', which === 'logo');
+        btn.classList.toggle('active-el', which === 'btn');
+        updateResizeHandles();
+    }
+
+    // ---- Info display ----
+    function updateInfo() {
+        const heroRect = hero.getBoundingClientRect();
+
+        // Logo
+        const logoRect = logoImg.getBoundingClientRect();
+        const logoLeftPct = ((logoRect.left - heroRect.left) / heroRect.width * 100).toFixed(1);
+        const logoBottomPct = ((heroRect.bottom - logoRect.bottom) / heroRect.height * 100).toFixed(1);
+        const logoW = Math.round(logoImg.offsetWidth);
+        document.getElementById('logo-pos').textContent = `left:${logoLeftPct}% bottom:${logoBottomPct}%`;
+        document.getElementById('logo-size-info').textContent = `${logoW}px`;
+
+        // Button
+        const btnRect = btn.getBoundingClientRect();
+        const btnLeftPct = ((btnRect.left - heroRect.left) / heroRect.width * 100).toFixed(1);
+        const btnBottomPct = ((heroRect.bottom - btnRect.bottom) / heroRect.height * 100).toFixed(1);
+        const btnFs = Math.round(parseFloat(window.getComputedStyle(btn).fontSize));
+        document.getElementById('btn-pos').textContent = `left:${btnLeftPct}% bottom:${btnBottomPct}%`;
+        document.getElementById('btn-size-info').textContent = `${btnFs}px`;
+
+        // Center dots
+        showDot(logoDot, logoRect, heroRect);
+        showDot(btnDot, btnRect, heroRect);
+
+        // Resize handles
+        updateResizeHandles();
+
+        // Check vertical alignment (left edges)
+        checkAlignment(logoRect, btnRect, heroRect);
+
+        // Update output CSS
+        updateOutput(logoLeftPct, logoBottomPct, logoW, btnLeftPct, btnBottomPct, btnFs);
+    }
+
+    function showDot(dot, elRect, heroRect) {
+        const cx = elRect.left - heroRect.left + elRect.width / 2;
+        const cy = elRect.top - heroRect.top + elRect.height / 2;
+        dot.style.left = cx + 'px';
+        dot.style.top = cy + 'px';
+        dot.style.display = 'block';
+    }
+
+    function updateResizeHandles() {
+        const heroRect = hero.getBoundingClientRect();
+
+        // Logo resize + label
+        const lr = logoImg.getBoundingClientRect();
+        logoResize.style.left = (lr.right - heroRect.left - 7) + 'px';
+        logoResize.style.top = (lr.bottom - heroRect.top - 7) + 'px';
+        logoResize.style.display = activeElement === 'logo' ? 'block' : 'none';
+        labelLogo.style.left = (lr.left - heroRect.left) + 'px';
+        labelLogo.style.top = (lr.top - heroRect.top - 18) + 'px';
+
+        // Btn resize + label
+        const br = btn.getBoundingClientRect();
+        btnResize.style.left = (br.right - heroRect.left - 7) + 'px';
+        btnResize.style.top = (br.bottom - heroRect.top - 7) + 'px';
+        btnResize.style.display = activeElement === 'btn' ? 'block' : 'none';
+        labelBtn.style.left = (br.left - heroRect.left) + 'px';
+        labelBtn.style.top = (br.top - heroRect.top - 18) + 'px';
+    }
+
+    function checkAlignment(logoRect, btnRect, heroRect) {
+        const logoLeft = logoRect.left - heroRect.left;
+        const btnLeft = btnRect.left - heroRect.left;
+        const logoCenterX = logoLeft + logoRect.width / 2;
+        const btnCenterX = btnLeft + btnRect.width / 2;
+
+        // Check if centers are aligned (within 3px)
+        if (Math.abs(logoCenterX - btnCenterX) < 3) {
+            alignLeft.style.left = logoCenterX + 'px';
+            alignLeft.style.display = 'block';
+            alignLeft.style.borderColor = 'rgba(255, 200, 50, 0.7)';
+        }
+        // Check if left edges aligned
+        else if (Math.abs(logoLeft - btnLeft) < 3) {
+            alignLeft.style.left = logoLeft + 'px';
+            alignLeft.style.display = 'block';
+            alignLeft.style.borderColor = 'rgba(255, 200, 50, 0.4)';
+        } else {
+            alignLeft.style.display = 'none';
+        }
+    }
+
+    function showGuides(el) {
+        const heroRect = hero.getBoundingClientRect();
+        const elRect = el.getBoundingClientRect();
+        const cx = elRect.left - heroRect.left + elRect.width / 2;
+        const cy = elRect.top - heroRect.top + elRect.height / 2;
+        guideV.style.left = cx + 'px';
+        guideV.style.display = 'block';
+        guideH.style.top = cy + 'px';
+        guideH.style.display = 'block';
+    }
+
+    function hideGuides() {
+        guideV.style.display = 'none';
+        guideH.style.display = 'none';
+        alignLeft.style.display = 'none';
+    }
+
+    function updateOutput(logoLeft, logoBottom, logoW, btnLeft, btnBottom, btnFs) {
+        const btnPadV = (btnFs * 0.7).toFixed(0);
+        const btnPadH = (btnFs * 2).toFixed(0);
+        const heroH = parseInt(document.getElementById('hero-h').value);
+        const bgY = parseInt(document.getElementById('bg-y').value);
+        const out = document.getElementById('output');
+        out.innerHTML =
+            `<span class="comment">/* Skopiuj te wartości do index.html */</span>\n\n` +
+            `<span class="comment">/* .hero */</span>\n` +
+            `<span class="prop">height</span>: <span class="val">${heroH}px</span>;\n` +
+            `<span class="prop">background-position</span>: <span class="val">center ${bgY}%</span>;\n\n` +
+            `<span class="comment">/* .hero-logo (pozycjonowanie absolutne) */</span>\n` +
+            `<span class="prop">position</span>: <span class="val">absolute</span>;\n` +
+            `<span class="prop">bottom</span>: <span class="val">${logoBottom}%</span>;\n` +
+            `<span class="prop">left</span>: <span class="val">${logoLeft}%</span>;\n` +
+            `<span class="prop">max-width</span>: <span class="val">${logoW}px</span>;\n` +
+            `<span class="prop">width</span>: <span class="val">${logoW}px</span>;\n\n` +
+            `<span class="comment">/* .hero-btn (pozycjonowanie absolutne) */</span>\n` +
+            `<span class="prop">position</span>: <span class="val">absolute</span>;\n` +
+            `<span class="prop">bottom</span>: <span class="val">${btnBottom}%</span>;\n` +
+            `<span class="prop">left</span>: <span class="val">${btnLeft}%</span>;\n` +
+            `<span class="prop">font-size</span>: <span class="val">${btnFs}px</span>;\n` +
+            `<span class="prop">padding</span>: <span class="val">${btnPadV}px ${btnPadH}px</span>;`;
+    }
+
+    // ---- Hero height slider ----
+    document.getElementById('hero-h').addEventListener('input', function() {
+        const h = parseInt(this.value);
+        hero.style.height = h + 'px';
+        document.getElementById('hero-h-info').textContent = h + 'px';
+        updateInfo();
+    });
+
+    // ---- Background Y position slider ----
+    document.getElementById('bg-y').addEventListener('input', function() {
+        const y = parseInt(this.value);
+        hero.style.backgroundPosition = `center 0%, center ${y}%`;
+        document.getElementById('bg-y-info').textContent = y + '%';
+        updateInfo();
+    });
+
+    // ---- Drag logo ----
+    logoImg.addEventListener('mousedown', (e) => {
+        setActive('logo');
+        dragging = 'logo';
+        startX = e.clientX;
+        startY = e.clientY;
+        const heroRect = hero.getBoundingClientRect();
+        const r = logoImg.getBoundingClientRect();
+        startLeft = r.left - heroRect.left;
+        startBottom = heroRect.bottom - r.bottom;
+        e.preventDefault();
+    });
+
+    // ---- Drag button ----
+    btn.addEventListener('mousedown', (e) => {
+        setActive('btn');
+        dragging = 'btn';
+        startX = e.clientX;
+        startY = e.clientY;
+        const heroRect = hero.getBoundingClientRect();
+        const r = btn.getBoundingClientRect();
+        startLeft = r.left - heroRect.left;
+        startBottom = heroRect.bottom - r.bottom;
+        e.preventDefault();
+    });
+
+    // ---- Resize logo (handle) ----
+    logoResize.addEventListener('mousedown', (e) => {
+        resizing = 'logo';
+        startX = e.clientX;
+        startWidth = logoImg.offsetWidth;
+        e.preventDefault();
+        e.stopPropagation();
+    });
+
+    // ---- Resize button (handle) ----
+    btnResize.addEventListener('mousedown', (e) => {
+        resizing = 'btn';
+        startX = e.clientX;
+        startFontSize = parseFloat(window.getComputedStyle(btn).fontSize);
+        e.preventDefault();
+        e.stopPropagation();
+    });
+
+    // ---- Mouse move ----
+    document.addEventListener('mousemove', (e) => {
+        if (resizing === 'logo') {
+            const diff = e.clientX - startX;
+            const newWidth = Math.max(150, startWidth + diff);
+            logoImg.style.width = newWidth + 'px';
+            logoImg.style.maxWidth = newWidth + 'px';
+            showGuides(logoImg);
+            updateInfo();
+            return;
+        }
+        if (resizing === 'btn') {
+            const diff = e.clientX - startX;
+            const newFs = Math.max(10, Math.min(40, startFontSize + diff * 0.15));
+            btn.style.fontSize = newFs + 'px';
+            btn.style.padding = `${newFs * 0.7}px ${newFs * 2}px`;
+            showGuides(btn);
+            updateInfo();
+            return;
+        }
+        if (!dragging) return;
+
+        const heroRect = hero.getBoundingClientRect();
+        const dx = e.clientX - startX;
+        const dy = e.clientY - startY;
+        const newLeft = startLeft + dx;
+        const newBottom = startBottom - dy;
+        const leftPct = (newLeft / heroRect.width * 100).toFixed(1);
+        const bottomPct = (newBottom / heroRect.height * 100).toFixed(1);
+
+        if (dragging === 'logo') {
+            logoImg.style.left = leftPct + '%';
+            logoImg.style.bottom = bottomPct + '%';
+            showGuides(logoImg);
+        } else {
+            btn.style.left = leftPct + '%';
+            btn.style.bottom = bottomPct + '%';
+            showGuides(btn);
+        }
+        updateInfo();
+    });
+
+    document.addEventListener('mouseup', () => {
+        dragging = null;
+        resizing = null;
+        hideGuides();
+    });
+
+    // ---- Scroll = resize active element ----
+    hero.addEventListener('wheel', (e) => {
+        e.preventDefault();
+        const delta = e.deltaY > 0 ? -1 : 1;
+
+        if (activeElement === 'logo') {
+            const currentW = logoImg.offsetWidth;
+            const step = e.shiftKey ? 10 : 3;
+            const newW = Math.max(150, currentW + delta * step);
+            logoImg.style.width = newW + 'px';
+            logoImg.style.maxWidth = newW + 'px';
+        } else {
+            const currentFs = parseFloat(window.getComputedStyle(btn).fontSize);
+            const newFs = Math.max(10, Math.min(40, currentFs + delta));
+            btn.style.fontSize = newFs + 'px';
+            btn.style.padding = `${newFs * 0.7}px ${newFs * 2}px`;
+        }
+        updateInfo();
+    }, { passive: false });
+
+    // ---- Arrow keys ----
+    document.addEventListener('keydown', (e) => {
+        if (!['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(e.key)) return;
+        const step = e.shiftKey ? 0.5 : 0.1;
+
+        const el = activeElement === 'logo' ? logoImg : btn;
+        const heroRect = hero.getBoundingClientRect();
+        const elRect = el.getBoundingClientRect();
+        let leftPct = (elRect.left - heroRect.left) / heroRect.width * 100;
+        let bottomPct = (heroRect.bottom - elRect.bottom) / heroRect.height * 100;
+
+        if (e.key === 'ArrowLeft') leftPct -= step;
+        if (e.key === 'ArrowRight') leftPct += step;
+        if (e.key === 'ArrowUp') bottomPct += step;
+        if (e.key === 'ArrowDown') bottomPct -= step;
+
+        el.style.left = leftPct.toFixed(1) + '%';
+        el.style.bottom = bottomPct.toFixed(1) + '%';
+
+        showGuides(el);
+        updateInfo();
+        setTimeout(hideGuides, 500);
+        e.preventDefault();
+    });
+
+    // ---- Tab key to switch active ----
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Tab') {
+            e.preventDefault();
+            setActive(activeElement === 'logo' ? 'btn' : 'logo');
+        }
+    });
+
+    // ---- Overlay toggle ----
+    window.toggleOverlay = function(level) {
+        const gradients = {
+            'none': 'none',
+            'light': 'linear-gradient(to top, rgba(42,55,80,0.3) 0%, rgba(42,55,80,0.1) 25%, transparent 45%)',
+            'medium': 'linear-gradient(to top, rgba(42,55,80,0.5) 0%, rgba(42,55,80,0.25) 30%, transparent 50%)',
+            'strong': 'linear-gradient(to top, rgba(42,55,80,0.7) 0%, rgba(42,55,80,0.3) 30%, transparent 50%)'
+        };
+        overlay.style.background = gradients[level];
+    };
+
+    // ---- Logo color ----
+    window.setLogoWhite = function() {
+        logoImg.style.filter = 'brightness(0) invert(1)';
+    };
+    window.setLogoDark = function() {
+        logoImg.style.filter = 'none';
+    };
+    document.getElementById('custom-color').addEventListener('input', function() {
+        const color = this.value;
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        const tempImg = new Image();
+        tempImg.onload = function() {
+            canvas.width = tempImg.naturalWidth;
+            canvas.height = tempImg.naturalHeight;
+            ctx.drawImage(tempImg, 0, 0);
+            ctx.globalCompositeOperation = 'source-in';
+            ctx.fillStyle = color;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            logoImg.src = canvas.toDataURL();
+            logoImg.style.filter = 'none';
+        };
+        tempImg.src = 'images/logo.svg';
+    });
+
+    // ---- Initial update ----
+    setTimeout(updateInfo, 500);
+</script>
+</body>
+</html>

@@ -652,48 +652,197 @@
         }
 
         .services-container {
-            max-width: 1200px;
+            max-width: 1000px;
             margin: 0 auto;
-        }
-
-        .services-intro {
-            max-width: 620px;
-            margin: 0 auto 2.5rem;
-            text-align: center;
-            font-size: 1rem;
-            line-height: 1.7;
-            color: #7A8090;
         }
 
         .services h2 {
             font-size: 2.2rem;
             text-align: center;
-            margin-bottom: 3.5rem;
+            margin-bottom: 3rem;
             color: #2E3440;
         }
 
-        .tags {
+        .offer-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.6rem;
+            align-items: stretch;
+        }
+
+        .offer-card {
+            background: white;
+            border: 1px solid rgba(184, 169, 201, 0.2);
+            border-radius: 16px;
+            padding: 2rem 1.8rem 1.9rem;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .offer-card-eyebrow {
+            font-size: 0.68rem;
+            letter-spacing: 0.13em;
+            text-transform: uppercase;
+            color: #7E689B;
+            font-weight: 700;
+            margin: 0 0 0.45rem;
+        }
+
+        .offer-card h3 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.7rem;
+            font-weight: 600;
+            margin: 0 0 0.7rem;
+            color: #2E3440;
+        }
+
+        .offer-card-intro {
+            color: #7A8090;
+            font-size: 0.93rem;
+            line-height: 1.6;
+            margin: 0 0 1.4rem;
+        }
+
+        .offer-services {
+            display: flex;
+            flex-direction: column;
+            gap: 0.55rem;
+            margin-bottom: 1.4rem;
+        }
+
+        .svc {
+            background: #F7F5FA;
+            border: 1px solid transparent;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .svc.featured {
+            background: #EDE7F5;
+            border-color: #B8A9C9;
+        }
+
+        .svc-head {
+            width: 100%;
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 0.8rem;
+            background: none;
+            border: none;
+            text-align: left;
+            padding: 0.85rem 1rem;
+            cursor: pointer;
+            font: inherit;
+            color: inherit;
+        }
+
+        .svc-head:focus-visible {
+            outline: 2px solid #7E689B;
+            outline-offset: -2px;
+            border-radius: 10px;
+        }
+
+        .svc-name {
+            display: block;
+            font-size: 0.98rem;
+            font-weight: 600;
+            margin: 0 0 0.15rem;
+            color: #2E3440;
+        }
+
+        .svc.featured .svc-name {
+            color: #7E689B;
+        }
+
+        .svc-meta {
+            display: block;
+            font-size: 0.85rem;
+            color: #7A8090;
+            margin: 0;
+        }
+
+        .svc.featured .svc-meta {
+            color: #7E689B;
+            opacity: 0.9;
+        }
+
+        .svc-chev {
+            flex-shrink: 0;
+            width: 18px;
+            height: 18px;
+            margin-top: 0.15rem;
+            color: #7A8090;
+            transition: transform 0.2s ease;
+        }
+
+        .svc.open .svc-chev {
+            transform: rotate(180deg);
+        }
+
+        .svc-body {
+            display: none;
+            padding: 0 1rem 0.95rem;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            color: #5A6070;
+        }
+
+        .svc.open .svc-body {
+            display: block;
+        }
+
+        .svc-body p {
+            margin: 0;
+        }
+
+        .svc-body a {
+            color: #7E689B;
+            font-weight: 600;
+            text-decoration: none;
+            border-bottom: 1px solid #B8A9C9;
+        }
+
+        .svc-body a:hover,
+        .svc-body a:focus-visible {
+            border-bottom-color: #7E689B;
+        }
+
+        .offer-tags-label {
+            font-size: 0.68rem;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: #7A8090;
+            font-weight: 600;
+            margin: 0 0 0.6rem;
+        }
+
+        .offer-tags {
             display: flex;
             flex-wrap: wrap;
-            justify-content: center;
-            gap: 0.6rem;
-            max-width: 750px;
-            margin: 0 auto;
+            gap: 0.45rem;
         }
 
-        .tag {
+        .offer-tags .tag {
             background: white;
-            padding: 0.5rem 1.1rem;
-            border-radius: 6px;
-            font-size: 0.88rem;
+            border: 1px solid rgba(184, 169, 201, 0.3);
             color: #5A6070;
-            border: 1px solid rgba(184, 169, 201, 0.2);
-            transition: all 0.3s ease;
+            padding: 0.35rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.81rem;
         }
 
-        .tag:hover {
-            border-color: #B8A9C9;
-            color: #2E3440;
+        .offer-note {
+            max-width: 1000px;
+            margin: 2rem auto 0;
+            text-align: center;
+            font-size: 0.9rem;
+            color: #7A8090;
+        }
+
+        .offer-note:empty {
+            display: none;
         }
 
         @media (max-width: 768px) {
@@ -701,105 +850,13 @@
                 padding: 3rem 1.5rem;
             }
 
-            .services-intro {
-                font-size: 1rem;
+            .offer-grid {
+                grid-template-columns: 1fr;
             }
-        }
-
-        /* ==================== PRICING SECTION ==================== */
-        .pricing {
-            background: #EFEAF4;
-            color: #2E3440;
-            padding: 5rem 2rem;
-        }
-
-        .pricing-container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .pricing h2 {
-            font-size: 2.2rem;
-            text-align: center;
-            margin-bottom: 3.5rem;
-            color: #2E3440;
-        }
-
-        .pricing-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 1.2rem;
-            max-width: 800px;
-            margin: 0 auto;
-        }
-
-        .pricing-card {
-            background: white;
-            padding: 1.8rem 1.5rem;
-            border-radius: 8px;
-            border: 1px solid rgba(184, 169, 201, 0.2);
-            text-align: center;
-            box-shadow: 0 2px 12px rgba(0,0,0,0.04);
-        }
-
-        .pricing-card h3 {
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 1.15rem;
-            margin-bottom: 1rem;
-            font-weight: 500;
-            color: #2E3440;
-        }
-
-        .pricing-price {
-            font-size: 1.8rem;
-            font-weight: 600;
-            margin-bottom: 0.3rem;
-            font-family: 'DM Sans', sans-serif;
-            color: #2E3440;
-        }
-
-        .pricing-duration {
-            font-size: 0.85rem;
-            color: #8A849A;
-            margin-bottom: 1rem;
-        }
-
-        .pricing-card p {
-            font-size: 0.82rem;
-            line-height: 1.6;
-            color: #7A8090;
-        }
-
-        .pricing-notes {
-            max-width: 800px;
-            margin: 2.5rem auto 0;
-            text-align: center;
-        }
-
-        .pricing-notes p {
-            font-size: 0.88rem;
-            color: #7A8090;
-            line-height: 1.6;
-            margin-bottom: 0.4rem;
         }
 
         .en-only {
             display: none;
-        }
-
-        @media (max-width: 768px) {
-            .pricing {
-                padding: 3rem 1.5rem;
-            }
-
-            .pricing h2 {
-                font-size: 1.8rem;
-            }
-
-            .pricing-grid {
-                grid-template-columns: 1fr;
-                max-width: 100%;
-            }
         }
 
         /* ==================== OFFICE & CONTACT SECTION ==================== */
@@ -1042,6 +1099,101 @@
             display: none !important;
         }
 
+        /* ==================== CRISIS / EMERGENCY LINES ==================== */
+        .crisis {
+            background: #EFEAF4;
+            padding: 4rem 2rem;
+        }
+
+        .crisis-box {
+            max-width: 720px;
+            margin: 0 auto;
+            background: white;
+            border: 1px solid #B8A9C9;
+            border-radius: 16px;
+            padding: 2rem 2.2rem;
+        }
+
+        .crisis-label {
+            font-size: 0.72rem;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            color: #7E689B;
+            font-weight: 700;
+            margin: 0 0 0.7rem;
+        }
+
+        .crisis-lead {
+            margin: 0 0 1.3rem;
+            font-size: 1rem;
+            line-height: 1.6;
+            color: #2E3440;
+        }
+
+        .crisis-nums {
+            list-style: none;
+            margin: 0 0 1.2rem;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .crisis-nums li {
+            display: flex;
+            flex-direction: column;
+            gap: 0.15rem;
+        }
+
+        .crisis-nums a {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #7E689B;
+            text-decoration: none;
+            align-self: flex-start;
+            border-bottom: 1px solid transparent;
+        }
+
+        .crisis-nums a:hover,
+        .crisis-nums a:focus-visible {
+            border-bottom-color: #7E689B;
+        }
+
+        .crisis-who {
+            font-size: 0.9rem;
+            line-height: 1.4;
+            color: #5A6070;
+        }
+
+        .crisis-112 {
+            margin: 0;
+            padding-top: 1rem;
+            border-top: 1px solid rgba(184, 169, 201, 0.3);
+            font-size: 0.95rem;
+            color: #2E3440;
+        }
+
+        .crisis-112 a {
+            font-weight: 700;
+            font-size: 1.35rem;
+            color: #7E689B;
+            text-decoration: none;
+        }
+
+        .crisis-112 a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            .crisis {
+                padding: 3rem 1.5rem;
+            }
+
+            .crisis-box {
+                padding: 1.6rem 1.4rem;
+            }
+        }
+
         /* ==================== FAQ SECTION ==================== */
         .faq {
             background: #F4F2F6;
@@ -1196,9 +1348,8 @@
             </a>
             <ul class="nav-links">
                 <li><a href="#about" data-pl="O mnie" data-en="About">O mnie</a></li>
-                <li><a href="#services" data-pl="Oferta" data-en="Services">Oferta</a></li>
+                <li><a href="#services" data-pl="Oferta i cennik" data-en="Services & pricing">Oferta i cennik</a></li>
                 <li><a href="#qualifications" data-pl="Wykształcenie" data-en="Qualifications">Wykształcenie</a></li>
-                <li><a href="#pricing" data-pl="Cennik" data-en="Pricing">Cennik</a></li>
                 <li><a href="#faq" data-pl="FAQ" data-en="FAQ">FAQ</a></li>
                 <li><a href="#contact" data-pl="Kontakt" data-en="Contact">Kontakt</a></li>
                 <li><a href="#" class="nav-btn" data-cal-link="pracownia-psychoterapii-zofii-zmijewskiej" data-cal-namespace="booking" data-cal-config='{"layout":"month_view"}' data-pl="Umów wizytę" data-en="Book a session" onclick="event.preventDefault()">Umów wizytę</a></li>
@@ -1242,30 +1393,163 @@
     <!-- ==================== SERVICES SECTION ==================== -->
     <section class="services" id="services">
         <div class="services-container">
-            <p class="services-intro" data-pl="Powody, dla których ludzie szukają pomocy, bywają bardzo różne - w swoim gabinecie staram się tworzyć bezpieczną przestrzeń, w której możemy wspólnie przyglądać się temu, co za nimi stoi." data-en="The reasons people seek help vary greatly - in my practice, I strive to create a safe space where we can look together at what lies behind them.">Powody, dla których ludzie szukają pomocy, bywają bardzo różne - w swoim gabinecie staram się tworzyć bezpieczną przestrzeń, w której możemy wspólnie przyglądać się temu, co za nimi stoi.</p>
-            <div class="tags">
-                <span class="tag" data-pl="lęk" data-en="anxiety">lęk</span>
-                <span class="tag" data-pl="depresja" data-en="depression">depresja</span>
-                <span class="tag" data-pl="trauma" data-en="trauma">trauma</span>
-                <span class="tag" data-pl="konflikty w relacjach" data-en="relationship conflicts">konflikty w relacjach</span>
-                <span class="tag" data-pl="ADHD" data-en="ADHD">ADHD</span>
-                <span class="tag" data-pl="ataki paniki" data-en="panic attacks">ataki paniki</span>
-                <span class="tag" data-pl="problemy rodzinne" data-en="family issues">problemy rodzinne</span>
-                <span class="tag" data-pl="wypalenie" data-en="burnout">wypalenie</span>
-                <span class="tag" data-pl="PTSD" data-en="PTSD">PTSD</span>
-                <span class="tag" data-pl="trudność z bliskością" data-en="difficulty with closeness">trudność z bliskością</span>
-                <span class="tag" data-pl="poczucie utknięcia" data-en="feeling stuck">poczucie utknięcia</span>
-                <span class="tag" data-pl="autyzm" data-en="autism">autyzm</span>
-                <span class="tag" data-pl="żałoba i strata" data-en="grief & loss">żałoba i strata</span>
-                <span class="tag" data-pl="wybuchowość" data-en="emotional outbursts">wybuchowość</span>
-                <span class="tag" data-pl="trudności ze snem" data-en="sleep difficulties">trudności ze snem</span>
-                <span class="tag" data-pl="kryzysy życiowe" data-en="life crises">kryzysy życiowe</span>
-                <span class="tag" data-pl="problemy z zaufaniem" data-en="trust issues">problemy z zaufaniem</span>
-                <span class="tag" data-pl="wycofanie emocjonalne" data-en="emotional withdrawal">wycofanie emocjonalne</span>
-                <span class="tag" data-pl="przytłoczenie" data-en="feeling overwhelmed">przytłoczenie</span>
-                <span class="tag" data-pl="samotność" data-en="loneliness">samotność</span>
-                <span class="tag" data-pl="stres" data-en="stress">stres</span>
+            <h2 data-pl="Oferta" data-en="Services">Oferta</h2>
+            <div class="offer-grid">
+
+                <!-- ===== KARTA: DOROŚLI ===== -->
+                <div class="offer-card">
+                    <p class="offer-card-eyebrow" data-pl="Dla kogo" data-en="For whom">Dla kogo</p>
+                    <h3 data-pl="Dorośli" data-en="Adults">Dorośli</h3>
+                    <p class="offer-card-intro" data-pl="Spotkania dla osób dorosłych. Zaczynamy od konsultacji w gabinecie lub online, na której się poznajemy." data-en="Sessions for adults. We begin with a consultation, in person or online, where we get to know each other.">Spotkania dla osób dorosłych. Zaczynamy od konsultacji w gabinecie lub online, na której się poznajemy.</p>
+
+                    <div class="offer-services">
+
+                        <div class="svc">
+                            <button class="svc-head" onclick="toggleSvc(this)" aria-expanded="false">
+                                <span>
+                                    <span class="svc-name" data-pl="Konsultacja" data-en="Consultation">Konsultacja</span>
+                                    <span class="svc-meta" data-pl="Pierwsze spotkanie · 50 min · 250 zł" data-en="First meeting · 50 min · 300 PLN / 70 EUR">Pierwsze spotkanie · 50 min · 250 zł</span>
+                                </span>
+                                <svg class="svc-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            </button>
+                            <div class="svc-body">
+                                <p data-pl="Pierwsze spotkanie, na którym się poznajemy. Nie musisz mieć przygotowanej historii ani wiedzieć, czego dokładnie szukasz - wystarczy, że opowiesz, co Cię sprowadza. Na koniec wspólnie ustalamy, czy i w jakiej formie moglibyśmy pracować dalej. Czasem wystarczy jedno spotkanie, czasem potrzebne są dwa lub trzy." data-en="A first meeting where we get to know each other. You don't need a prepared story or to know exactly what you're looking for - it's enough to say what brings you here. At the end we decide together whether and in what form we might work further. Sometimes one meeting is enough, sometimes two or three are needed.">Pierwsze spotkanie, na którym się poznajemy. Nie musisz mieć przygotowanej historii ani wiedzieć, czego dokładnie szukasz - wystarczy, że opowiesz, co Cię sprowadza. Na koniec wspólnie ustalamy, czy i w jakiej formie moglibyśmy pracować dalej. Czasem wystarczy jedno spotkanie, czasem potrzebne są dwa lub trzy.</p>
+                            </div>
+                        </div>
+
+                        <div class="svc">
+                            <button class="svc-head" onclick="toggleSvc(this)" aria-expanded="false">
+                                <span>
+                                    <span class="svc-name" data-pl="Psychoterapia indywidualna" data-en="Individual psychotherapy">Psychoterapia indywidualna</span>
+                                    <span class="svc-meta" data-pl="Regularna praca · 50 min · 250 zł" data-en="Regular work · 50 min · 300 PLN / 70 EUR">Regularna praca · 50 min · 250 zł</span>
+                                </span>
+                                <svg class="svc-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            </button>
+                            <div class="svc-body">
+                                <p data-pl="Regularne spotkania, zwykle raz w tygodniu. Pracuję integracyjnie i systemowo - dobieram metody do Ciebie, ale patrzę też na kontekst, w którym żyjesz: Twoje relacje, rodzinę, sytuację życiową. Prowadzę terapię lęku, depresji, kryzysów życiowych, wypalenia i trudności w relacjach, a także pracę z traumą - w tym z PTSD i złożonym PTSD (cPTSD). To, jak długo potrwa terapia, omawiamy na bieżąco i dostosowujemy do Twoich potrzeb." data-en="Regular sessions, usually once a week. I work integratively and systemically - I choose methods that suit you, but I also look at the context you live in: your relationships, family, life situation. I provide therapy for anxiety, depression, life crises, burnout and difficulties in relationships, as well as work with trauma - including PTSD and complex PTSD (cPTSD). How long therapy lasts is something we discuss along the way and adjust to your needs.">Regularne spotkania, zwykle raz w tygodniu. Pracuję integracyjnie i systemowo - dobieram metody do Ciebie, ale patrzę też na kontekst, w którym żyjesz: Twoje relacje, rodzinę, sytuację życiową. Prowadzę terapię lęku, depresji, kryzysów życiowych, wypalenia i trudności w relacjach, a także pracę z traumą - w tym z PTSD i złożonym PTSD (cPTSD). To, jak długo potrwa terapia, omawiamy na bieżąco i dostosowujemy do Twoich potrzeb.</p>
+                            </div>
+                        </div>
+
+                        <div class="svc">
+                            <button class="svc-head" onclick="toggleSvc(this)" aria-expanded="false">
+                                <span>
+                                    <span class="svc-name" data-pl="Interwencja kryzysowa" data-en="Crisis intervention">Interwencja kryzysowa</span>
+                                    <span class="svc-meta" data-pl="Wsparcie w nagłym kryzysie · 300 zł za rozpoczętą godzinę" data-en="Support in an acute crisis · 350 PLN / 80 EUR per started hour">Wsparcie w nagłym kryzysie · 300 zł za rozpoczętą godzinę</span>
+                                </span>
+                                <svg class="svc-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            </button>
+                            <div class="svc-body">
+                                <p data-pl="Doraźne wsparcie w nagłym, trudnym momencie - po stracie, traumatycznym wydarzeniu lub w ostrym kryzysie emocjonalnym. Spotkanie bywa dłuższe niż zwykła sesja, dlatego rozliczam je za każdą rozpoczętą godzinę. Jeśli Twoje lub czyjeś życie jest w bezpośrednim zagrożeniu, zadzwoń pod 112 - interwencja w gabinecie nie zastępuje pomocy ratunkowej." data-en="Immediate support in a sudden, difficult moment - after a loss, a traumatic event, or in an acute emotional crisis. Such a meeting can be longer than a regular session, so it is billed per started hour. If your life or someone else's is in immediate danger, call 112 - an office intervention does not replace emergency help.">Doraźne wsparcie w nagłym, trudnym momencie - po stracie, traumatycznym wydarzeniu lub w ostrym kryzysie emocjonalnym. Spotkanie bywa dłuższe niż zwykła sesja, dlatego rozliczam je za każdą rozpoczętą godzinę. Jeśli Twoje lub czyjeś życie jest w bezpośrednim zagrożeniu, zadzwoń pod 112 - interwencja w gabinecie nie zastępuje pomocy ratunkowej.</p>
+                            </div>
+                        </div>
+
+                        <div class="svc">
+                            <button class="svc-head" onclick="toggleSvc(this)" aria-expanded="false">
+                                <span>
+                                    <span class="svc-name" data-pl="Psychoterapia grupowa" data-en="Group psychotherapy">Psychoterapia grupowa</span>
+                                    <span class="svc-meta" data-pl="Grupa · 90 min · 180 zł" data-en="Group · 90 min · 230 PLN / 55 EUR">Grupa · 90 min · 180 zł</span>
+                                </span>
+                                <svg class="svc-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            </button>
+                            <div class="svc-body">
+                                <p data-pl='Grupa terapeutyczna dla osób dorosłych, spotkania raz w tygodniu po 90 minut. W grupie pracuje się inaczej niż indywidualnie: to, co dzieje się między uczestnikami, samo staje się materiałem do pracy - dlatego grupa bywa szczególnie pomocna, gdy Twoje trudności dotyczą relacji z innymi ludźmi. Zanim dołączysz do grupy, spotykamy się indywidualnie na konsultacji: rozmawiamy o tym, czego szukasz, i wspólnie sprawdzamy, czy praca w grupie będzie dla Ciebie dobrą formą. Zgłoszenia przyjmuję mailowo, na adres <a href="mailto:kontakt@zofiazmijewska.pl">kontakt@zofiazmijewska.pl</a>.' data-en='A therapeutic group for adults, meeting once a week for 90 minutes. Group work is different from individual work: what happens between participants itself becomes material to work with - which is why a group can be especially helpful when your difficulties concern relationships with other people. Before you join the group, we meet individually for a consultation: we talk about what you are looking for and check together whether group work will be a good form for you. I accept enquiries by email, at <a href="mailto:kontakt@zofiazmijewska.pl">kontakt@zofiazmijewska.pl</a>.'>Grupa terapeutyczna dla osób dorosłych, spotkania raz w tygodniu po 90 minut. W grupie pracuje się inaczej niż indywidualnie: to, co dzieje się między uczestnikami, samo staje się materiałem do pracy - dlatego grupa bywa szczególnie pomocna, gdy Twoje trudności dotyczą relacji z innymi ludźmi. Zanim dołączysz do grupy, spotykamy się indywidualnie na konsultacji: rozmawiamy o tym, czego szukasz, i wspólnie sprawdzamy, czy praca w grupie będzie dla Ciebie dobrą formą. Zgłoszenia przyjmuję mailowo, na adres <a href="mailto:kontakt@zofiazmijewska.pl">kontakt@zofiazmijewska.pl</a>.</p>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <p class="offer-tags-label" data-pl="Przykładowe obszary pracy" data-en="Areas of work">Przykładowe obszary pracy</p>
+                    <div class="offer-tags">
+                        <span class="tag" data-pl="lęk" data-en="anxiety">lęk</span>
+                        <span class="tag" data-pl="depresja" data-en="depression">depresja</span>
+                        <span class="tag" data-pl="trauma i PTSD" data-en="trauma &amp; PTSD">trauma i PTSD</span>
+                        <span class="tag" data-pl="ADHD" data-en="ADHD">ADHD</span>
+                        <span class="tag" data-pl="spektrum autyzmu u kobiet" data-en="autism spectrum in women">spektrum autyzmu u kobiet</span>
+                        <span class="tag" data-pl="wypalenie" data-en="burnout">wypalenie</span>
+                        <span class="tag" data-pl="kryzysy życiowe" data-en="life crises">kryzysy życiowe</span>
+                        <span class="tag" data-pl="żałoba i strata" data-en="grief &amp; loss">żałoba i strata</span>
+                        <span class="tag" data-pl="trudności w relacjach" data-en="relationship difficulties">trudności w relacjach</span>
+                    </div>
+                </div>
+
+                <!-- ===== KARTA: MŁODZIEŻ I RODZINY ===== -->
+                <div class="offer-card">
+                    <p class="offer-card-eyebrow" data-pl="Dla kogo" data-en="For whom">Dla kogo</p>
+                    <h3 data-pl="Młodzież i Rodziny" data-en="Youth and Families">Młodzież i Rodziny</h3>
+                    <p class="offer-card-intro" data-pl="Wsparcie dla młodzieży od 15. roku życia, spotkania rodzinne oraz konsultacje dla samych rodziców." data-en="Support for young people from the age of 15, family sessions, and consultations for parents alone.">Wsparcie dla młodzieży od 15. roku życia, spotkania rodzinne oraz konsultacje dla samych rodziców.</p>
+
+                    <div class="offer-services">
+
+                        <div class="svc">
+                            <button class="svc-head" onclick="toggleSvc(this)" aria-expanded="false">
+                                <span>
+                                    <span class="svc-name" data-pl="Konsultacja" data-en="Consultation">Konsultacja</span>
+                                    <span class="svc-meta" data-pl="Pierwsze spotkanie · 50 min · 250 zł" data-en="First meeting · 50 min · 300 PLN / 70 EUR">Pierwsze spotkanie · 50 min · 250 zł</span>
+                                </span>
+                                <svg class="svc-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            </button>
+                            <div class="svc-body">
+                                <p data-pl="Pierwsze spotkanie, na którym się poznajemy i rozmawiamy o tym, co się dzieje. Jeśli sprawa dotyczy nastolatka, na konsultację mogą przyjść najpierw sami rodzice albo cała rodzina - ustalamy to wcześniej, przy umawianiu. Na koniec wspólnie decydujemy, jaka forma pomocy będzie najbardziej sensowna: terapia indywidualna, spotkania rodzinne czy konsultacje dla rodziców." data-en="A first meeting where we get to know each other and talk about what is going on. If the matter concerns a teenager, the parents alone or the whole family can come to the consultation first - we arrange this in advance, when booking. At the end we decide together which form of help makes the most sense: individual therapy, family sessions, or parent consultations.">Pierwsze spotkanie, na którym się poznajemy i rozmawiamy o tym, co się dzieje. Jeśli sprawa dotyczy nastolatka, na konsultację mogą przyjść najpierw sami rodzice albo cała rodzina - ustalamy to wcześniej, przy umawianiu. Na koniec wspólnie decydujemy, jaka forma pomocy będzie najbardziej sensowna: terapia indywidualna, spotkania rodzinne czy konsultacje dla rodziców.</p>
+                            </div>
+                        </div>
+
+                        <div class="svc">
+                            <button class="svc-head" onclick="toggleSvc(this)" aria-expanded="false">
+                                <span>
+                                    <span class="svc-name" data-pl="Psychoterapia młodzieży" data-en="Adolescent psychotherapy">Psychoterapia młodzieży</span>
+                                    <span class="svc-meta" data-pl="Od 15. roku życia · 50 min · 250 zł" data-en="From age 15 · 50 min · 300 PLN / 70 EUR">Od 15. roku życia · 50 min · 250 zł</span>
+                                </span>
+                                <svg class="svc-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            </button>
+                            <div class="svc-body">
+                                <p data-pl="Regularne, indywidualne spotkania z nastolatkiem, zwykle raz w tygodniu. Pracuję z lękiem, obniżonym nastrojem, trudnościami w relacjach - w domu i z rówieśnikami - a także z samookaleczeniami, zaburzeniami odżywiania i myślami samobójczymi. Terapia nastolatka wiąże się też z kontaktem z rodzicami: jego zakres oraz granice poufności ustalamy na początku, jawnie i wspólnie ze wszystkimi." data-en="Regular, individual sessions with a teenager, usually once a week. I work with anxiety, low mood, difficulties in relationships - at home and with peers - as well as with self-harm, eating disorders and suicidal thoughts. Therapy with a teenager also involves contact with the parents: its scope and the limits of confidentiality are set at the outset, openly and together with everyone.">Regularne, indywidualne spotkania z nastolatkiem, zwykle raz w tygodniu. Pracuję z lękiem, obniżonym nastrojem, trudnościami w relacjach - w domu i z rówieśnikami - a także z samookaleczeniami, zaburzeniami odżywiania i myślami samobójczymi. Terapia nastolatka wiąże się też z kontaktem z rodzicami: jego zakres oraz granice poufności ustalamy na początku, jawnie i wspólnie ze wszystkimi.</p>
+                            </div>
+                        </div>
+
+                        <div class="svc">
+                            <button class="svc-head" onclick="toggleSvc(this)" aria-expanded="false">
+                                <span>
+                                    <span class="svc-name" data-pl="Terapia rodzinna" data-en="Family therapy">Terapia rodzinna</span>
+                                    <span class="svc-meta" data-pl="Cała rodzina · 80 min · 360 zł" data-en="Whole family · 80 min · 410 PLN / 95 EUR">Cała rodzina · 80 min · 360 zł</span>
+                                </span>
+                                <svg class="svc-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            </button>
+                            <div class="svc-body">
+                                <p data-pl="Spotkania z całą rodziną, trwające 80 minut; częstotliwość ustalamy wspólnie. Pracujemy w tej formie wtedy, gdy trudność nie leży w jednej osobie, tylko w tym, co dzieje się pomiędzy wami - w powtarzających się konfliktach, napięciu, milczeniu, w kryzysie po stracie lub rozstaniu. W spotkaniach uczestniczą wszyscy wspólnie zamieszkujący członkowie rodziny." data-en="Sessions with the whole family, lasting 80 minutes; we agree on the frequency together. We work in this form when the difficulty does not lie in one person, but in what happens between you - in recurring conflicts, tension, silence, in a crisis after loss or separation. All family members living together take part in the sessions.">Spotkania z całą rodziną, trwające 80 minut; częstotliwość ustalamy wspólnie. Pracujemy w tej formie wtedy, gdy trudność nie leży w jednej osobie, tylko w tym, co dzieje się pomiędzy wami - w powtarzających się konfliktach, napięciu, milczeniu, w kryzysie po stracie lub rozstaniu. W spotkaniach uczestniczą wszyscy wspólnie zamieszkujący członkowie rodziny.</p>
+                            </div>
+                        </div>
+
+                        <div class="svc featured">
+                            <button class="svc-head" onclick="toggleSvc(this)" aria-expanded="false">
+                                <span>
+                                    <span class="svc-name" data-pl="Konsultacje rodzicielskie" data-en="Parent consultations">Konsultacje rodzicielskie</span>
+                                    <span class="svc-meta" data-pl="Dla rodziców, bez udziału dziecka · 50 min · 280 zł" data-en="For parents, without the child · 50 min · 330 PLN / 75 EUR">Dla rodziców, bez udziału dziecka · 50 min · 280 zł</span>
+                                </span>
+                                <svg class="svc-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            </button>
+                            <div class="svc-body">
+                                <p data-pl="Spotkania dla samych rodziców. Czasem najskuteczniejszą pomocą dla nastolatka jest wsparcie osób, które są z nim na co dzień. Rozmawiamy o tym, co dzieje się w domu, jak reagować, gdzie postawić granicę, a kiedy odpuścić - i jak zadbać o siebie, kiedy jest trudno. To często dobry pierwszy krok, jeśli Twoje dziecko nie chce jeszcze iść do terapeuty." data-en="Sessions for parents alone. Sometimes the most effective help for a teenager is support for the people who are with them every day. We talk about what is happening at home, how to respond, where to set a boundary and when to let go - and how to take care of yourself when things are hard. This is often a good first step if your child does not yet want to see a therapist.">Spotkania dla samych rodziców. Czasem najskuteczniejszą pomocą dla nastolatka jest wsparcie osób, które są z nim na co dzień. Rozmawiamy o tym, co dzieje się w domu, jak reagować, gdzie postawić granicę, a kiedy odpuścić - i jak zadbać o siebie, kiedy jest trudno. To często dobry pierwszy krok, jeśli Twoje dziecko nie chce jeszcze iść do terapeuty.</p>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <p class="offer-tags-label" data-pl="Przykładowe obszary pracy" data-en="Areas of work">Przykładowe obszary pracy</p>
+                    <div class="offer-tags">
+                        <span class="tag" data-pl="kryzys nastolatka" data-en="adolescent crisis">kryzys nastolatka</span>
+                        <span class="tag" data-pl="obniżony nastrój" data-en="low mood">obniżony nastrój</span>
+                        <span class="tag" data-pl="samookaleczenia" data-en="self-harm">samookaleczenia</span>
+                        <span class="tag" data-pl="zaburzenia odżywiania" data-en="eating disorders">zaburzenia odżywiania</span>
+                        <span class="tag" data-pl="relacje z rówieśnikami" data-en="peer relationships">relacje z rówieśnikami</span>
+                        <span class="tag" data-pl="konflikty w rodzinie" data-en="family conflict">konflikty w rodzinie</span>
+                        <span class="tag" data-pl="sportowcy" data-en="young athletes">sportowcy</span>
+                        <span class="tag" data-pl="lęk" data-en="anxiety">lęk</span>
+                    </div>
+                </div>
+
             </div>
+
+            <p class="offer-note" data-pl="" data-en="Prices in EUR are approximate and follow the current NBP exchange rate."></p>
         </div>
     </section>
 
@@ -1278,7 +1562,21 @@
                 <img src="images/about.jpg" alt="Zofia Żmijewska">
             </div>
             <div class="timeline">
-            <!-- Item 1: PTP Certification (in progress) -->
+            <!-- Ukończone: Studia -->
+            <div class="timeline-item">
+                <div class="timeline-year" data-pl="Studia" data-en="Studies">Studia</div>
+                <div class="timeline-title" data-pl="Magister psychologii klinicznej" data-en="Master's in Clinical Psychology">Magister psychologii klinicznej</div>
+                <div class="timeline-desc" data-pl="Uniwersytet SWPS w Warszawie." data-en="SWPS University in Warsaw.">Uniwersytet SWPS w Warszawie.</div>
+            </div>
+
+            <!-- Ukończone: Szkolenie psychoterapeutyczne -->
+            <div class="timeline-item">
+                <div class="timeline-year" data-pl="Szkolenie" data-en="Training">Szkolenie</div>
+                <div class="timeline-title" data-pl="Psychoterapeutka integracyjno-systemowa" data-en="Integrative-Systemic Psychotherapist">Psychoterapeutka integracyjno-systemowa</div>
+                <div class="timeline-desc" data-pl="Szkoła Psychoterapii Mabor/Dialog. Pełne 4-letnie szkolenie akredytowane przez Polskie Towarzystwo Psychologiczne oraz Polskie Towarzystwo Psychiatryczne." data-en="Mabor/Dialog School of Psychotherapy. Full 4-year training programme accredited by the Polish Psychological Association and the Polish Psychiatric Association.">Szkoła Psychoterapii Mabor/Dialog. Pełne 4-letnie szkolenie akredytowane przez Polskie Towarzystwo Psychologiczne oraz Polskie Towarzystwo Psychiatryczne.</div>
+            </div>
+
+            <!-- W trakcie: Certyfikacja PTP -->
             <div class="timeline-item">
                 <div class="timeline-year" data-pl="Certyfikacja" data-en="Certification">Certyfikacja</div>
                 <div class="timeline-title" data-pl="Certyfikacja psychoterapeutyczna" data-en="Psychotherapy Certification">Certyfikacja psychoterapeutyczna</div>
@@ -1286,67 +1584,37 @@
                 <div class="timeline-badge" data-pl="W trakcie" data-en="In progress">W trakcie</div>
             </div>
 
-            <!-- Item 2: ESTD Trauma Certification (in progress) -->
+            <!-- W trakcie: Certyfikacja ESTD (trauma) -->
             <div class="timeline-item">
                 <div class="timeline-year" data-pl="Certyfikacja" data-en="Certification">Certyfikacja</div>
                 <div class="timeline-title" data-pl="Certyfikacja w diagnostyce zaburzeń potraumatycznych" data-en="Post-Traumatic Disorder Diagnostics Certification">Certyfikacja w diagnostyce zaburzeń potraumatycznych</div>
                 <div class="timeline-desc" data-pl="ESTD (European Society for Trauma and Dissociation).<br>Centrum Badań nad Traumą i Dysocjacją w Katowicach." data-en="ESTD (European Society for Trauma and Dissociation).<br>Centre for Research on Trauma and Dissociation in Katowice.">ESTD (European Society for Trauma and Dissociation).<br>Centrum Badań nad Traumą i Dysocjacją w Katowicach.</div>
                 <div class="timeline-badge" data-pl="W trakcie" data-en="In progress">W trakcie</div>
             </div>
-
-
-            <!-- Item 4: Psychotherapy Training (completed) -->
-            <div class="timeline-item">
-                <div class="timeline-year" data-pl="Szkolenie" data-en="Training">Szkolenie</div>
-                <div class="timeline-title" data-pl="Psychoterapeutka integracyjno-systemowa" data-en="Integrative-Systemic Psychotherapist">Psychoterapeutka integracyjno-systemowa</div>
-                <div class="timeline-desc" data-pl="Szkoła Psychoterapii Mabor/Dialog. Pełne 4-letnie szkolenie akredytowane przez Polskie Towarzystwo Psychologiczne oraz Polskie Towarzystwo Psychiatryczne." data-en="Mabor/Dialog School of Psychotherapy. Full 4-year training programme accredited by the Polish Psychological Association and the Polish Psychiatric Association.">Szkoła Psychoterapii Mabor/Dialog. Pełne 4-letnie szkolenie akredytowane przez Polskie Towarzystwo Psychologiczne oraz Polskie Towarzystwo Psychiatryczne.</div>
-            </div>
-
-            <!-- Item 5: University (completed) -->
-            <div class="timeline-item">
-                <div class="timeline-year" data-pl="Studia" data-en="Studies">Studia</div>
-                <div class="timeline-title" data-pl="Magister psychologii klinicznej" data-en="Master's in Clinical Psychology">Magister psychologii klinicznej</div>
-                <div class="timeline-desc" data-pl="Uniwersytet SWPS w Warszawie." data-en="SWPS University in Warsaw.">Uniwersytet SWPS w Warszawie.</div>
-            </div>
         </div>
         </div>
     </section>
 
-    <!-- ==================== PRICING SECTION ==================== -->
-    <section class="pricing" id="pricing">
-        <div class="pricing-container">
-            <h2 data-pl="Cennik" data-en="Pricing">Cennik</h2>
-            <div class="pricing-grid">
-                <!-- Individual Session -->
-                <div class="pricing-card">
-                    <h3 data-pl="Sesja indywidualna" data-en="Individual Session">Sesja indywidualna</h3>
-                    <div class="pricing-price">250 zł</div>
-                    <div class="pricing-duration" data-pl="50 minut" data-en="50 minutes">50 minut</div>
-                    <p data-pl="Sesja psychoterapeutyczna dostosowana do Twoich indywidualnych potrzeb." data-en="A psychotherapy session tailored to your individual needs.">Sesja psychoterapeutyczna dostosowana do Twoich indywidualnych potrzeb.</p>
-                </div>
-
-                <!-- Family Therapy -->
-                <div class="pricing-card">
-                    <h3 data-pl="Psychoterapia rodzinna" data-en="Family Psychotherapy">Psychoterapia rodzinna</h3>
-                    <div class="pricing-price">360 zł</div>
-                    <div class="pricing-duration" data-pl="80 minut" data-en="80 minutes">80 minut</div>
-                    <p data-pl="Spotkanie z rodziną - uczestniczą wszyscy członkowie wspólnie zamieszkujący." data-en="A session with the family - all members living together take part.">Spotkanie z rodziną - uczestniczą wszyscy członkowie wspólnie zamieszkujący.</p>
-                </div>
-
-                <!-- Group Therapy -->
-                <div class="pricing-card">
-                    <h3 data-pl="Psychoterapia grupowa" data-en="Group Psychotherapy">Psychoterapia grupowa</h3>
-                    <div class="pricing-price">180 zł</div>
-                    <div class="pricing-duration" data-pl="90 minut" data-en="90 minutes">90 minut</div>
-                    <p data-pl="Sesja grupowa terapeutyczna z innymi uczestnikami w bezpiecznym środowisku." data-en="A group therapy session with other participants in a safe environment.">Sesja grupowa terapeutyczna z innymi uczestnikami w bezpiecznym środowisku.</p>
-                </div>
-            </div>
-            <div class="pricing-notes">
-                <p data-pl="Pracuję z dorosłymi i młodzieżą od 15. roku życia." data-en="I work with adults and adolescents from the age of 15.">Pracuję z dorosłymi i młodzieżą od 15. roku życia.</p>
-                <p data-pl="Przed rozpoczęciem psychoterapii zapraszam na konsultację (50 min / 250 zł)." data-en="Before starting psychotherapy, I invite you for a consultation (50 min / 250 zł).">Przed rozpoczęciem psychoterapii zapraszam na konsultację (50 min / 250 zł).</p>
-                <p data-pl="Sesje prowadzę również online." data-en="I also offer online sessions.">Sesje prowadzę również online.</p>
-                <p class="en-only" data-pl="" data-en="Prices in PLN (Polish zloty)."></p>
-            </div>
+    <!-- ==================== CRISIS / EMERGENCY LINES ==================== -->
+    <section class="crisis">
+        <div class="crisis-box">
+            <p class="crisis-label" data-pl="Zadzwoń" data-en="Call">Zadzwoń</p>
+            <p class="crisis-lead" data-pl="Nie czekaj na sesję. Zgłoś się po pomoc już teraz. Linie pomocowe działają całodobowo, 7 dni w tygodniu:" data-en="Don't wait for a session. Reach out for help right now. The helplines operate around the clock, 7 days a week (in Polish):">Nie czekaj na sesję. Zgłoś się po pomoc już teraz. Linie pomocowe działają całodobowo, 7 dni w tygodniu:</p>
+            <ul class="crisis-nums">
+                <li>
+                    <a href="tel:116111">116 111</a>
+                    <span class="crisis-who" data-pl="Telefon Zaufania dla Dzieci i Młodzieży" data-en="Helpline for children and teenagers">Telefon Zaufania dla Dzieci i Młodzieży</span>
+                </li>
+                <li>
+                    <a href="tel:116123">116 123</a>
+                    <span class="crisis-who" data-pl="Ogólnopolska Poradnia Telefoniczna dla Osób Dorosłych w Kryzysie Emocjonalnym" data-en="National helpline for adults in emotional crisis">Ogólnopolska Poradnia Telefoniczna dla Osób Dorosłych w Kryzysie Emocjonalnym</span>
+                </li>
+                <li>
+                    <a href="tel:800702222">800 70 22 22</a>
+                    <span class="crisis-who" data-pl="Centrum Wsparcia dla Osób Dorosłych w Kryzysie Psychicznym" data-en="Support Centre for adults in mental health crisis">Centrum Wsparcia dla Osób Dorosłych w Kryzysie Psychicznym</span>
+                </li>
+            </ul>
+            <p class="crisis-112" data-pl='Przy bezpośrednim zagrożeniu życia - <a href="tel:112">112</a>.' data-en='In case of immediate danger to life - <a href="tel:112">112</a>.'>Przy bezpośrednim zagrożeniu życia - <a href="tel:112">112</a>.</p>
         </div>
     </section>
 
@@ -1392,6 +1660,16 @@
                 </button>
                 <div class="faq-answer" role="region">
                     <div class="faq-answer-inner" data-pl="Tak. Prowadzę sesje zarówno stacjonarnie (ul. Puławska 26A/7, Warszawa), jak i online - przez wideo. Forma online sprawdza się dobrze dla osób, które mieszkają poza Warszawą, mają trudności z dojazdem lub po prostu czują się swobodniej we własnym domu." data-en="Yes. I offer sessions both in-person (ul. Puławska 26A/7, Warsaw) and online via video. Online sessions work well for people living outside Warsaw, those who have difficulty commuting, or those who simply feel more comfortable at home.">Tak. Prowadzę sesje zarówno stacjonarnie (ul. Puławska 26A/7, Warszawa), jak i online - przez wideo. Forma online sprawdza się dobrze dla osób, które mieszkają poza Warszawą, mają trudności z dojazdem lub po prostu czują się swobodniej we własnym domu.</div>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <button class="faq-question" aria-expanded="false">
+                    <span data-pl="W jakich językach prowadzisz sesje?" data-en="In what languages do you offer sessions?">W jakich językach prowadzisz sesje?</span>
+                    <span class="faq-icon">+</span>
+                </button>
+                <div class="faq-answer" role="region">
+                    <div class="faq-answer-inner" data-pl="Sesje prowadzę po polsku i po angielsku. Pracuję również z tłumaczami języków rzadkich, więc spotkanie może odbyć się w Twoim języku ojczystym. Do ceny sesji dolicza się wtedy wynagrodzenie tłumacza, około 150 zł." data-en="I offer sessions in Polish and English. I also work with interpreters of less common languages, so a session can take place in your mother tongue. In that case, the interpreter's fee of around 150 zł is added to the price of the session.">Sesje prowadzę po polsku i po angielsku. Pracuję również z tłumaczami języków rzadkich, więc spotkanie może odbyć się w Twoim języku ojczystym. Do ceny sesji dolicza się wtedy wynagrodzenie tłumacza, około 150 zł.</div>
                 </div>
             </div>
 
@@ -1633,6 +1911,13 @@
         document.querySelectorAll('.current-year').forEach(el => {
             el.textContent = new Date().getFullYear();
         });
+
+        // ==================== OFFER ACCORDION ====================
+        function toggleSvc(btn) {
+            const svc = btn.parentElement;
+            const open = svc.classList.toggle('open');
+            btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+        }
 
         // ==================== FAQ ACCORDION ====================
         document.querySelectorAll('.faq-question').forEach(btn => {

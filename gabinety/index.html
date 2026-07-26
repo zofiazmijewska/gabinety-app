@@ -859,7 +859,7 @@
             min-height: 100vh;
             background: #F9F8FA;
         }
-        /* Sticky top bar — logo + nav + zaloguj w jednej linii */
+        /* Sticky top bar - logo + nav + zaloguj w jednej linii */
         .landing-topbar {
             position: sticky;
             top: 0;
@@ -4207,7 +4207,7 @@ async function loadMyBookings() {
                 <td>${timeStr}</td>
                 <td>${escHtml(row.room_name)}</td>
                 <td><span class="badge badge-fixed">Stały blok</span></td>
-                <td><span class="text-xs text-gray">—</span></td>
+                <td><span class="text-xs text-gray">-</span></td>
                 <td class="text-xs text-gray">co tydzień</td>
             </tr>`;
         }
@@ -4394,7 +4394,7 @@ async function loadMyFixed() {
 
     // 1. Load fixed bookings (schedule + billing source)
     // Filtruj tylko bloki AKTUALNIE OBOWIĄZUJĄCE (nie pokazuj starych zakończonych
-    // ani jeszcze niezaczętych — te są w historii bloków po stronie admina)
+    // ani jeszcze niezaczętych - te są w historii bloków po stronie admina)
     const { data: bookingsAll } = await sb
         .from('fixed_bookings')
         .select('*, rooms(name)')
@@ -4629,7 +4629,7 @@ async function loadSummarySingle(tenantId, startDate, endDate) {
     const singleHours = singles ? singles.length : 0;
     const singleAmount = singleHours * tenantRate;
 
-    // Wynajem stały: policz dla konkretnego miesiąca — bierz tylko bloki
+    // Wynajem stały: policz dla konkretnego miesiąca - bierz tylko bloki
     // aktywne w tym miesiącu (valid_from <= ostatni dzień, end_date > pierwszy dzień)
     const { data: activeFixed } = await sb
         .from('fixed_bookings')

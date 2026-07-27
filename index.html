@@ -848,6 +848,59 @@
             display: none;
         }
 
+        .offer-cta {
+            text-align: center;
+            margin-top: 2.5rem;
+        }
+
+        .offer-contact-alt {
+            text-align: center;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            color: #7A8090;
+        }
+
+        .offer-contact-alt a {
+            color: #7E689B;
+            text-decoration: none;
+            font-weight: 600;
+            border-bottom: 1px solid rgba(184, 169, 201, 0.5);
+            white-space: nowrap;
+        }
+
+        .offer-contact-alt a:hover {
+            border-bottom-color: #7E689B;
+        }
+
+        /* Pływający przycisk zapisu na telefonie */
+        .mobile-cta {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .mobile-cta {
+                display: block;
+                position: fixed;
+                bottom: 1rem;
+                left: 50%;
+                transform: translateX(-50%) translateY(160%);
+                z-index: 900;
+                opacity: 0;
+                padding: 0.8rem 2.2rem;
+                font-size: 0.95rem;
+                white-space: nowrap;
+                text-align: center;
+                width: auto;
+                box-shadow: 0 6px 20px rgba(46, 52, 64, 0.28);
+                transition: transform 0.3s ease, opacity 0.3s ease;
+            }
+
+            .mobile-cta.visible {
+                transform: translateX(-50%) translateY(0);
+                opacity: 1;
+            }
+        }
+
         @media (max-width: 768px) {
             .services {
                 padding: 3rem 1.5rem;
@@ -1178,9 +1231,10 @@
 
         .crisis-112 a {
             font-weight: 700;
-            font-size: 1.35rem;
+            font-size: 1.2rem;
             color: #7E689B;
             text-decoration: none;
+            font-variant-numeric: tabular-nums;
         }
 
         .crisis-112 a:hover {
@@ -1385,8 +1439,8 @@
             <p data-pl="Pracuję integracyjnie, co znaczy, że łączę różne narzędzia i metody, dopasowując je do Twoich potrzeb. Bazuję przy tym na podejściu systemowym: interesuje mnie nie tylko Twoja indywidualna historia, ale też kontekst, w którym żyjesz - Twoje relacje, rodzina, środowisko. Często to, co przeżywamy jako osobisty problem: lęk, poczucie utknięcia, powtarzające się konflikty - okazuje się ściśle związane z tym, jak funkcjonujemy z innymi ludźmi i jakie wzorce się w nas zapisały." data-en="I work integratively, drawing on different tools and methods and adapting them to what you need. My foundation is a systemic approach: I'm interested not only in your individual history, but also in the context you live in - your relationships, your family, your environment. What we experience as a personal problem - anxiety, a sense of being stuck, conflicts that keep repeating - often turns out to be closely tied to how we function with other people, and to the patterns we've absorbed along the way.">Pracuję integracyjnie, co znaczy, że łączę różne narzędzia i metody, dopasowując je do Twoich potrzeb. Bazuję przy tym na podejściu systemowym: interesuje mnie nie tylko Twoja indywidualna historia, ale też kontekst, w którym żyjesz - Twoje relacje, rodzina, środowisko. Często to, co przeżywamy jako osobisty problem: lęk, poczucie utknięcia, powtarzające się konflikty - okazuje się ściśle związane z tym, jak funkcjonujemy z innymi ludźmi i jakie wzorce się w nas zapisały.</p>
             <p data-pl="Z osobami dorosłymi pracuję indywidualnie - nad lękiem, obniżonym nastrojem, wypaleniem, kryzysami życiowymi, żałobą i trudnościami w relacjach. Powody, dla których ludzie się zgłaszają, bywają bardzo różne - i nie musisz mieć „wystarczająco poważnego". Czasem przychodzi ktoś, kto z zewnątrz radzi sobie dobrze, a od środka czuje zmęczenie albo pustkę. Staram się, żeby mój gabinet był miejscem, w którym można się temu spokojnie przyjrzeć." data-en="With adults I work individually - on anxiety, low mood, burnout, life crises, grief and difficulties in relationships. People come for very different reasons, and yours doesn't have to be “serious enough”. Sometimes someone arrives who copes well on the outside but feels tired or empty on the inside. I try to make my practice a place where you can look at that calmly.">Z osobami dorosłymi pracuję indywidualnie - nad lękiem, obniżonym nastrojem, wypaleniem, kryzysami życiowymi, żałobą i trudnościami w relacjach. Powody, dla których ludzie się zgłaszają, bywają bardzo różne - i nie musisz mieć „wystarczająco poważnego". Czasem przychodzi ktoś, kto z zewnątrz radzi sobie dobrze, a od środka czuje zmęczenie albo pustkę. Staram się, żeby mój gabinet był miejscem, w którym można się temu spokojnie przyjrzeć.</p>
             <p data-pl="Pracuję też z młodzieżą i rodzinami. Prowadzę terapię rodzinną, psychoterapię nastolatków od 15. roku życia oraz konsultacje dla samych rodziców - bo czasem najskuteczniejszą pomocą dla dziecka jest wsparcie osób, które są z nim na co dzień. Z nastolatkami pracuję nad bardzo różnymi sprawami - od lęku i obniżonego nastroju po konflikty w domu i trudności z rówieśnikami - a także wtedy, gdy pojawiają się samookaleczenia, zaburzenia odżywiania czy myśli samobójcze. Należę do Sekcji Naukowej Terapii Rodzin Polskiego Towarzystwa Psychiatrycznego, a doświadczenie w pracy z dziećmi i rodzinami zbieram od ponad dziesięciu lat." data-en="I also work with adolescents and families. I offer family therapy, psychotherapy for adolescents from the age of 15, and consultations for parents on their own - because sometimes the most effective help for a child is support for the people who are with them every day. With teenagers I work on a wide range of difficulties, from anxiety and low mood to conflict at home and with peers, as well as self-harm, eating disorders and suicidal thoughts. I'm a member of the Family Therapy Section of the Polish Psychiatric Association, and I've been working with children and families for over ten years.">Pracuję też z młodzieżą i rodzinami. Prowadzę terapię rodzinną, psychoterapię nastolatków od 15. roku życia oraz konsultacje dla samych rodziców - bo czasem najskuteczniejszą pomocą dla dziecka jest wsparcie osób, które są z nim na co dzień. Z nastolatkami pracuję nad bardzo różnymi sprawami - od lęku i obniżonego nastroju po konflikty w domu i trudności z rówieśnikami - a także wtedy, gdy pojawiają się samookaleczenia, zaburzenia odżywiania czy myśli samobójcze. Należę do Sekcji Naukowej Terapii Rodzin Polskiego Towarzystwa Psychiatrycznego, a doświadczenie w pracy z dziećmi i rodzinami zbieram od ponad dziesięciu lat.</p>
-            <p data-pl="Drugim obszarem, w którym mam duże doświadczenie, jest praca z traumą. Diagnozuję zaburzenia potraumatyczne - PTSD i złożone PTSD (cPTSD) - i towarzyszę osobom po doświadczeniu przemocy, straty oraz przymusowej migracji. W tym obszarze współpracuję z Lekarzami bez Granic. Prowadzę też interwencję kryzysową i mam doświadczenie w pracy z pomocą tłumacza, także w rzadkich językach." data-en="The second area in which I have extensive experience is trauma. I diagnose post-traumatic disorders - PTSD and complex PTSD (cPTSD) - and work with people after experiences of violence, loss and forced migration. In this field I collaborate with Médecins Sans Frontières. I also provide crisis intervention, and I have experience working with interpreters, including in less common languages.">Drugim obszarem, w którym mam duże doświadczenie, jest praca z traumą. Diagnozuję zaburzenia potraumatyczne - PTSD i złożone PTSD (cPTSD) - i towarzyszę osobom po doświadczeniu przemocy, straty oraz przymusowej migracji. W tym obszarze współpracuję z Lekarzami bez Granic. Prowadzę też interwencję kryzysową i mam doświadczenie w pracy z pomocą tłumacza, także w rzadkich językach.</p>
-            <p data-pl="Swoją pracę stale poddaję superwizji." data-en="My work is under regular supervision.">Swoją pracę stale poddaję superwizji.</p>
+            <p data-pl="Drugim obszarem, w którym mam duże doświadczenie, jest praca z traumą. Diagnozuję zaburzenia potraumatyczne - PTSD i złożone PTSD (cPTSD) - i towarzyszę osobom po doświadczeniu przemocy, straty oraz przymusowej migracji. W tym obszarze współpracuję z Lekarzami bez Granic. Prowadzę też interwencję kryzysową i mam doświadczenie w pracy z pomocą tłumacza, także języków rzadkich." data-en="The second area in which I have extensive experience is trauma. I diagnose post-traumatic disorders - PTSD and complex PTSD (cPTSD) - and work with people after experiences of violence, loss and forced migration. In this field I collaborate with Médecins Sans Frontières. I also provide crisis intervention, and I have experience working with interpreters, including in less common languages.">Drugim obszarem, w którym mam duże doświadczenie, jest praca z traumą. Diagnozuję zaburzenia potraumatyczne - PTSD i złożone PTSD (cPTSD) - i towarzyszę osobom po doświadczeniu przemocy, straty oraz przymusowej migracji. W tym obszarze współpracuję z Lekarzami bez Granic. Prowadzę też interwencję kryzysową i mam doświadczenie w pracy z pomocą tłumacza, także języków rzadkich.</p>
+            <p data-pl="Swoją pracę poddaję regularnej superwizji indywidualnej i grupowej." data-en="My work is under regular individual and group supervision.">Swoją pracę poddaję regularnej superwizji indywidualnej i grupowej.</p>
             <p data-pl="" data-en="Sessions in English. I see clients in English as well as Polish. If you speak neither, write to me anyway - we will look for a solution together."></p>
         </div>
     </section>
@@ -1557,7 +1611,10 @@
 
             </div>
 
-            <p class="offer-note" data-pl="" data-en="Prices in EUR are approximate and follow the current NBP exchange rate."></p>
+            <div class="offer-cta">
+                <a href="#" class="btn" data-cal-link="pracownia-psychoterapii-zofii-zmijewskiej" data-cal-namespace="booking" data-cal-config='{"layout":"month_view"}' data-pl="Umów wizytę" data-en="Book a session" onclick="event.preventDefault()">Umów wizytę</a>
+            </div>
+            <p class="offer-contact-alt" data-pl='Wolisz napisać albo zadzwonić? <a href="mailto:kontakt@zofiazmijewska.pl">kontakt@zofiazmijewska.pl</a> · <a href="tel:+48514622225">514 622 225</a>' data-en='Prefer to write or call? <a href="mailto:kontakt@zofiazmijewska.pl">kontakt@zofiazmijewska.pl</a> · <a href="tel:+48514622225">+48 514 622 225</a>'>Wolisz napisać albo zadzwonić? <a href="mailto:kontakt@zofiazmijewska.pl">kontakt@zofiazmijewska.pl</a> · <a href="tel:+48514622225">514 622 225</a></p>
         </div>
     </section>
 
@@ -1622,7 +1679,7 @@
                     <span class="crisis-who" data-pl="Centrum Wsparcia dla Osób Dorosłych w Kryzysie Psychicznym" data-en="Support Centre for adults in mental health crisis">Centrum Wsparcia dla Osób Dorosłych w Kryzysie Psychicznym</span>
                 </li>
             </ul>
-            <p class="crisis-112" data-pl='Przy bezpośrednim zagrożeniu życia - <a href="tel:112">112</a>.' data-en='In case of immediate danger to life - <a href="tel:112">112</a>.'>Przy bezpośrednim zagrożeniu życia - <a href="tel:112">112</a>.</p>
+            <p class="crisis-112" data-pl='Przy bezpośrednim zagrożeniu życia - <a href="tel:112">112</a>' data-en='In case of immediate danger to life - <a href="tel:112">112</a>'>Przy bezpośrednim zagrożeniu życia - <a href="tel:112">112</a></p>
         </div>
     </section>
 
@@ -1771,6 +1828,9 @@
         </div>
     </footer>
 
+    <!-- Pływający przycisk zapisu (tylko telefon) -->
+    <a href="#" class="btn mobile-cta" id="mobileCta" data-cal-link="pracownia-psychoterapii-zofii-zmijewskiej" data-cal-namespace="booking" data-cal-config='{"layout":"month_view"}' data-pl="Umów wizytę" data-en="Book a session" onclick="event.preventDefault()">Umów wizytę</a>
+
     <script>
         // ==================== LANGUAGE SWITCHING ====================
         const langBtns = document.querySelectorAll('.lang-btn');
@@ -1813,6 +1873,18 @@
                 btn.classList.remove('active');
             });
             document.querySelector(`[data-lang="${currentLang}"]`).classList.add('active');
+        }
+
+        // ==================== FLOATING MOBILE CTA ====================
+        const mobileCta = document.getElementById('mobileCta');
+        if (mobileCta) {
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 500) {
+                    mobileCta.classList.add('visible');
+                } else {
+                    mobileCta.classList.remove('visible');
+                }
+            }, { passive: true });
         }
 
         // ==================== MOBILE MENU TOGGLE ====================

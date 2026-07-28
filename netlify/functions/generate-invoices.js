@@ -69,7 +69,13 @@ exports.handler = async (event) => {
   }
 
   // ── Daty ──
-  const issueDate = billing_month.substring(0, 10); // YYYY-MM-DD (1. dzień miesiąca)
+  // issue_date = wcześniejsza z (dziś, 1. dzień billing_month).
+  // KSeF blokuje daty przyszłe, a przy zawieszeniu działalności w danym miesiącu
+  // faktura wystawiona pod koniec poprzedniego miesiąca za następny miesiąc
+  // musi mieć datę wystawienia w miesiącu bieżącym (nie w miesiącu billing_month).
+  const monthStart = billing_month.substring(0, 10);
+  const today = new Date().toISOString().split('T')[0];
+  const issueDate = today < monthStart ? today : monthStart;
   const paymentDate = addDays(issueDate, PAYMENT_DAYS);
 
   const results = [];

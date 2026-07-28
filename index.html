@@ -764,6 +764,8 @@
             font-size: 0.85rem;
             color: #7A8090;
             margin: 0;
+            /* gdy karty stoja obok siebie, zawiniety podpis rozjechalby wiersze */
+            white-space: nowrap;
         }
 
         .svc.featured .svc-meta {
@@ -908,6 +910,11 @@
 
             .offer-grid {
                 grid-template-columns: 1fr;
+            }
+
+            /* na telefonie karty sa jedna pod druga, wiec zawijanie nie szkodzi */
+            .svc-meta {
+                white-space: normal;
             }
         }
 
@@ -1472,7 +1479,7 @@
                             <button class="svc-head" onclick="toggleSvc(this)" aria-expanded="false">
                                 <span>
                                     <span class="svc-name" data-pl="Konsultacja" data-en="Consultation">Konsultacja</span>
-                                    <span class="svc-meta" data-pl="Pierwsze spotkanie · 50 min · 250 zł" data-en="First meeting · 50 min · 300 PLN / 70 EUR">Pierwsze spotkanie · 50 min · 250 zł</span>
+                                    <span class="svc-meta" data-pl="Pierwsze spotkanie · 50 min · 250 zł" data-en="50 min · 300 PLN / 70 EUR">Pierwsze spotkanie · 50 min · 250 zł</span>
                                 </span>
                                 <svg class="svc-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg>
                             </button>
@@ -1485,7 +1492,7 @@
                             <button class="svc-head" onclick="toggleSvc(this)" aria-expanded="false">
                                 <span>
                                     <span class="svc-name" data-pl="Psychoterapia indywidualna" data-en="Individual psychotherapy">Psychoterapia indywidualna</span>
-                                    <span class="svc-meta" data-pl="Regularna praca · 50 min · 250 zł" data-en="Regular work · 50 min · 300 PLN / 70 EUR">Regularna praca · 50 min · 250 zł</span>
+                                    <span class="svc-meta" data-pl="Regularna praca · 50 min · 250 zł" data-en="50 min · 300 PLN / 70 EUR">Regularna praca · 50 min · 250 zł</span>
                                 </span>
                                 <svg class="svc-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg>
                             </button>
@@ -1511,7 +1518,7 @@
                             <button class="svc-head" onclick="toggleSvc(this)" aria-expanded="false">
                                 <span>
                                     <span class="svc-name" data-pl="Psychoterapia grupowa" data-en="Group psychotherapy">Psychoterapia grupowa</span>
-                                    <span class="svc-meta" data-pl="Grupa · 90 min · 180 zł" data-en="Group · 90 min · 230 PLN / 55 EUR">Grupa · 90 min · 180 zł</span>
+                                    <span class="svc-meta" data-pl="Grupa · 90 min · 180 zł" data-en="90 min · 230 PLN / 55 EUR">Grupa · 90 min · 180 zł</span>
                                 </span>
                                 <svg class="svc-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg>
                             </button>
@@ -1548,7 +1555,7 @@
                             <button class="svc-head" onclick="toggleSvc(this)" aria-expanded="false">
                                 <span>
                                     <span class="svc-name" data-pl="Konsultacja" data-en="Consultation">Konsultacja</span>
-                                    <span class="svc-meta" data-pl="Pierwsze spotkanie · 50 min · 250 zł" data-en="First meeting · 50 min · 300 PLN / 70 EUR">Pierwsze spotkanie · 50 min · 250 zł</span>
+                                    <span class="svc-meta" data-pl="Pierwsze spotkanie · 50 min · 250 zł" data-en="50 min · 300 PLN / 70 EUR">Pierwsze spotkanie · 50 min · 250 zł</span>
                                 </span>
                                 <svg class="svc-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg>
                             </button>
@@ -1561,7 +1568,7 @@
                             <button class="svc-head" onclick="toggleSvc(this)" aria-expanded="false">
                                 <span>
                                     <span class="svc-name" data-pl="Psychoterapia młodzieży" data-en="Adolescent psychotherapy">Psychoterapia młodzieży</span>
-                                    <span class="svc-meta" data-pl="Od 15. roku życia · 50 min · 250 zł" data-en="From age 15 · 50 min · 300 PLN / 70 EUR">Od 15. roku życia · 50 min · 250 zł</span>
+                                    <span class="svc-meta" data-pl="Od 15. roku życia · 50 min · 250 zł" data-en="Ages 15+ · 50 min · 300 PLN / 70 EUR">Od 15. roku życia · 50 min · 250 zł</span>
                                 </span>
                                 <svg class="svc-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg>
                             </button>
@@ -1574,7 +1581,7 @@
                             <button class="svc-head" onclick="toggleSvc(this)" aria-expanded="false">
                                 <span>
                                     <span class="svc-name" data-pl="Terapia rodzinna" data-en="Family therapy">Terapia rodzinna</span>
-                                    <span class="svc-meta" data-pl="Cała rodzina · 80 min · 360 zł" data-en="Whole family · 80 min · 410 PLN / 95 EUR">Cała rodzina · 80 min · 360 zł</span>
+                                    <span class="svc-meta" data-pl="Cała rodzina · 80 min · 360 zł" data-en="80 min · 410 PLN / 95 EUR">Cała rodzina · 80 min · 360 zł</span>
                                 </span>
                                 <svg class="svc-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg>
                             </button>
@@ -1587,7 +1594,7 @@
                             <button class="svc-head" onclick="toggleSvc(this)" aria-expanded="false">
                                 <span>
                                     <span class="svc-name" data-pl="Konsultacje rodzicielskie" data-en="Parent consultations">Konsultacje rodzicielskie</span>
-                                    <span class="svc-meta" data-pl="Dla rodziców, bez udziału dziecka · 50 min · 280 zł" data-en="For parents, without the child · 50 min · 330 PLN / 75 EUR">Dla rodziców, bez udziału dziecka · 50 min · 280 zł</span>
+                                    <span class="svc-meta" data-pl="Bez udziału dziecka · 50 min · 280 zł" data-en="50 min · 330 PLN / 75 EUR">Bez udziału dziecka · 50 min · 280 zł</span>
                                 </span>
                                 <svg class="svc-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg>
                             </button>

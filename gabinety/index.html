@@ -5924,8 +5924,23 @@ async function generateInvoices() {
 
     // Build invoice specs for Fakturownia
     const invoiceSpecs = [];
+    let skippedAlreadyInvoiced = 0;
     for (const tenant of tenants) {
         if (!tenant.fakturownia_client_id) continue; // skip if no Fakturownia ID
+
+        // Pomiń jeśli faktura dla tego najemcy w tym billing_month już poszła
+        // do Fakturowni (ma fakturownia_url). Chroni przed duplikatami przy
+        // powtórnym kliknięciu "Generuj faktury".
+        const { data: alreadyInvoiced } = await sb
+            .from('invoices')
+            .select('fakturownia_url')
+            .eq('tenant_id', tenant.id)
+            .eq('billing_month', startDate)
+            .maybeSingle();
+        if (alreadyInvoiced && alreadyInvoiced.fakturownia_url) {
+            skippedAlreadyInvoiced++;
+            continue;
+        }
 
         const { data: singles } = await sb
             .from('single_bookings')
@@ -6006,14 +6021,17 @@ async function generateInvoices() {
                 }
             }
             const errors = (result.results || []).filter(r => r.error);
+            const skipInfo = skippedAlreadyInvoiced > 0 ? ` (pominięto ${skippedAlreadyInvoiced} już wystawionych)` : '';
             if (result.created > 0 && errors.length === 0) {
-                toast(`Faktury wysłane do Fakturownia: ${result.created}`, 'success');
+                toast(`Faktury wysłane do Fakturownia: ${result.created}${skipInfo}`, 'success');
             } else if (result.created > 0 && errors.length > 0) {
-                toast(`Wysłano ${result.created} faktur, ${errors.length} błędów - sprawdź szczegóły w konsoli`, 'warning');
+                toast(`Wysłano ${result.created} faktur, ${errors.length} błędów${skipInfo} - sprawdź szczegóły w konsoli`, 'warning');
                 console.warn('Fakturownia errors:', errors);
             } else if (errors.length > 0) {
-                toast(`Błąd Fakturownia dla ${errors.length} faktur - sprawdź konsolę`, 'error');
+                toast(`Błąd Fakturownia dla ${errors.length} faktur${skipInfo} - sprawdź konsolę`, 'error');
                 console.error('Fakturownia errors:', errors);
+            } else if (skippedAlreadyInvoiced > 0) {
+                toast(`Brak nowych faktur do wysłania. Pominięto ${skippedAlreadyInvoiced} już wystawionych.`, 'info');
             } else {
                 toast(`Dane faktur zapisane (${generated}). Brak faktur do wysłania do Fakturowni (sprawdź ID klientów).`, 'info');
             }

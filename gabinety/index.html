@@ -1850,11 +1850,15 @@
             Zaloguj się
         </button>
         <div style="margin-top:0.75rem;">
-            <button class="btn btn-secondary" style="width:100%;justify-content:center;" onclick="handleLogin()">
-                Wyślij magic link na email
+            <button class="btn btn-secondary" id="magicBtn" style="width:100%;justify-content:center;" onclick="handleLogin()">
+                Nie pamiętam hasła
             </button>
         </div>
         <div id="loginMessage" class="login-message" style="display:none;"></div>
+
+        <p style="margin-top:1.5rem;margin-bottom:0;font-size:0.82rem;color:var(--gray-light);line-height:1.5;">
+            Panel jest przeznaczony wyłącznie dla osób współpracujących z Pracownią Psychoterapii. Nie masz jeszcze konta? Skontaktuj się z nami: <a href="mailto:gabinety@zofiazmijewska.pl" style="color:var(--primary);">gabinety@zofiazmijewska.pl</a> lub <a href="tel:+48514622225" style="color:var(--primary);">514 622 225</a>.
+        </p>
     </div>
 </div>
 
@@ -2480,23 +2484,24 @@ async function handleLogin() {
     const email = document.getElementById('loginEmail').value.trim();
     if (!email) { showLoginMessage('Podaj adres email', 'error'); return; }
 
-    const btn = document.getElementById('loginBtn');
+    const btn = document.getElementById('magicBtn');
     btn.disabled = true;
     btn.textContent = 'Wysyłam...';
 
     const { error } = await sb.auth.signInWithOtp({
         email,
-        options: { emailRedirectTo: window.location.origin + window.location.pathname }
+        options: {
+            shouldCreateUser: false, // link tylko dla istniejących kont - nie tworzymy nowych
+            emailRedirectTo: window.location.origin + window.location.pathname
+        }
     });
 
     btn.disabled = false;
-    btn.textContent = 'Wyślij link logowania';
+    btn.textContent = 'Nie pamiętam hasła';
 
-    if (error) {
-        showLoginMessage('Błąd: ' + error.message, 'error');
-    } else {
-        showLoginMessage('Link logowania został wysłany na ' + email + '. Sprawdź skrzynkę.', 'success');
-    }
+    // Neutralny komunikat niezależnie od wyniku - nie zdradzamy, czy dany email ma konto
+    showLoginMessage('Jeśli ten email ma konto w systemie, wysłaliśmy na niego link do logowania. Sprawdź skrzynkę.', 'success');
+    if (error) console.warn('Magic link:', error.message);
 }
 
 async function handlePasswordLogin() {

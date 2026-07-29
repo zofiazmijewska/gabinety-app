@@ -678,6 +678,21 @@
             opacity: 0.5;
             cursor: not-allowed;
         }
+        .consent-logout {
+            display: block;
+            width: 100%;
+            margin-top: 1rem;
+            text-align: center;
+            background: none;
+            border: none;
+            padding: 0.4rem;
+            font-size: 0.9rem;
+            font-family: 'DM Sans', sans-serif;
+            color: var(--gray);
+            text-decoration: underline;
+            cursor: pointer;
+        }
+        .consent-logout:hover { color: var(--text); }
 
         /* ==================== MODAL ==================== */
         .modal-overlay {
@@ -1863,6 +1878,10 @@
 
         <button class="consent-btn" id="consentBtn" disabled onclick="handleConsent()">
             Akceptuję i przechodzę do panelu
+        </button>
+
+        <button type="button" class="consent-logout" onclick="handleLogout()">
+            Nie teraz - wyloguj się
         </button>
     </div>
 </div>

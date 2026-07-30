@@ -188,9 +188,9 @@
 
         /* ==================== COLORS ==================== */
         :root {
-            --primary: #B8A9C9;
-            --primary-hover: #A496B8;
-            --primary-light: #E8E0F0;
+            --primary: #7A8CA8;
+            --primary-hover: #596B84;
+            --primary-light: #E4EAF5;
             --bg-light: #F4F2F6;
             --bg-lighter: #EFEAF4;
             --dark: #2E3440;
@@ -2505,7 +2505,11 @@ async function init() {
         if (session) {
             currentUser = session.user;
             const ok = await loadTenantProfile();
-            if (ok) showApp(); else showLanding();
+            if (ok) {
+                // Po odświeżeniu wróć tam, gdzie użytkownik był: strona startowa albo panel
+                if (sessionStorage.getItem('gabView') === 'landing') showLanding();
+                else showApp();
+            } else showLanding();
         } else {
             showLanding();
         }
@@ -2648,6 +2652,7 @@ async function handleLogout() {
     currentUser = null;
     currentTenant = null;
     isAdmin = false;
+    sessionStorage.removeItem('gabView');
     showLanding();
 }
 
@@ -2818,6 +2823,10 @@ function showLanding() {
     hideAllViews();
     document.getElementById('landingView').style.display = '';
 
+    // Zapamiętaj wybór, aby odświeżenie strony zostawiło zalogowanego
+    // użytkownika na stronie startowej, a nie przerzucało do panelu.
+    if (currentTenant) sessionStorage.setItem('gabView', 'landing');
+
     // Gdy ktoś jest zalogowany i wraca na stronę startową, przyciski CTA
     // maja go wpuscic z powrotem do panelu (a nie na ekran logowania).
     const loggedIn = !!currentTenant;
@@ -2846,6 +2855,9 @@ function showConsent() {
 }
 
 function showApp() {
+    // Wejście do panelu = domyślny widok po odświeżeniu
+    sessionStorage.removeItem('gabView');
+
     // Check if tenant accepted terms
     if (currentTenant && !currentTenant.accepted_terms_at && !currentTenant.is_admin) {
         showConsent();

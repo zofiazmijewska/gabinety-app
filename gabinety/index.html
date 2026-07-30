@@ -930,8 +930,8 @@
             gap: 0.1rem;
             overflow-x: auto;
             scrollbar-width: none;
-            flex: 1;
-            justify-content: center;
+            justify-content: flex-start;
+            margin-left: 1.5rem;
         }
         .landing-nav-tabs::-webkit-scrollbar { display: none; }
         .landing-topbar .btn-login {
@@ -939,6 +939,7 @@
             font-size: 0.9rem !important;
             white-space: nowrap;
             flex-shrink: 0;
+            margin-left: auto;
         }
         @media (max-width: 900px) {
             .landing-topbar-inner {
@@ -2505,11 +2506,7 @@ async function init() {
         if (session) {
             currentUser = session.user;
             const ok = await loadTenantProfile();
-            if (ok) {
-                // Po odświeżeniu wróć tam, gdzie użytkownik był: strona startowa albo panel
-                if (sessionStorage.getItem('gabView') === 'landing') showLanding();
-                else showApp();
-            } else showLanding();
+            if (ok) routeAfterAuth(); else showLanding();
         } else {
             showLanding();
         }
@@ -2525,7 +2522,7 @@ async function init() {
             if (!currentTenant) {
                 // Only re-init if not already loaded (e.g. magic link callback)
                 const ok = await loadTenantProfile();
-                if (ok) showApp(); else showLogin();
+                if (ok) routeAfterAuth(); else showLogin();
             }
         } else if (event === 'TOKEN_REFRESHED' && session) {
             // Token refreshed silently - just update user, don't re-render
@@ -2550,7 +2547,7 @@ async function init() {
         if (session && !currentTenant) {
             currentUser = session.user;
             const ok = await loadTenantProfile();
-            if (ok) showApp(); else showLanding();
+            if (ok) routeAfterAuth(); else showLanding();
         }
     });
 }
@@ -2817,6 +2814,14 @@ function hideAllViews() {
     document.getElementById('loginView').style.display = 'none';
     document.getElementById('consentView').style.display = 'none';
     document.getElementById('appView').style.display = 'none';
+}
+
+// Wspólny router po uwierzytelnieniu: respektuje zapamiętany widok,
+// żeby żadne zdarzenie auth (init / SIGNED_IN / powrót do karty) nie
+// nadpisywało strony startowej panelem.
+function routeAfterAuth() {
+    if (sessionStorage.getItem('gabView') === 'landing') showLanding();
+    else showApp();
 }
 
 function showLanding() {

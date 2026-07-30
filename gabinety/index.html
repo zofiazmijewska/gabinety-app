@@ -1010,8 +1010,64 @@
         .landing-hero-sub {
             text-align: center;
             color: var(--gray);
-            margin-bottom: 2rem;
+            margin-bottom: 1.25rem;
             font-size: 0.95rem;
+        }
+
+        /* Hero quick links - klawisze prowadzące do sekcji form wynajmu */
+        .hero-quick-links {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.75rem;
+            margin-bottom: 2rem;
+        }
+        @media (max-width: 520px) {
+            .hero-quick-links { grid-template-columns: 1fr; }
+        }
+        .hero-quick-link {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            padding: 0.85rem 1rem;
+            border-radius: 12px;
+            border-top: 5px solid var(--primary);
+            background: white;
+            text-decoration: none;
+            color: var(--dark);
+            box-shadow: 0 2px 12px rgba(58, 63, 74, 0.06);
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+        }
+        .hero-quick-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(58, 63, 74, 0.1);
+        }
+        .hero-quick-link-block  { border-top-color: #7B9A7B; }
+        .hero-quick-link-single { border-top-color: #A4AECC; }
+        .hero-quick-link-tag {
+            font-size: 0.72rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 0.25rem 0.55rem;
+            border-radius: 4px;
+            flex-shrink: 0;
+        }
+        .hero-quick-link-block .hero-quick-link-tag  { background: #E1EBE1; color: #3E5A3E; }
+        .hero-quick-link-single .hero-quick-link-tag { background: #E4EAF5; color: #4A5878; }
+        .hero-quick-link-name {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.05rem;
+            font-weight: 500;
+            flex: 1;
+        }
+        .hero-quick-link-arrow {
+            font-size: 1.1rem;
+            color: var(--gray-light);
+            transition: transform 0.15s ease;
+        }
+        .hero-quick-link:hover .hero-quick-link-arrow {
+            transform: translateX(3px);
+            color: var(--primary-hover);
         }
 
         /* Gabinet Cards */
@@ -1534,6 +1590,19 @@
         <h1 class="landing-hero-title">Wynajem Gabinetów</h1>
         <p class="landing-hero-sub">ul. Puławska 26A, Warszawa - dostępne na godziny i stałe bloki</p>
 
+        <div class="hero-quick-links">
+            <a href="#sec-wynajem" class="hero-quick-link hero-quick-link-block">
+                <span class="hero-quick-link-tag">Stały</span>
+                <span class="hero-quick-link-name">Wynajem stały (bloki)</span>
+                <span class="hero-quick-link-arrow" aria-hidden="true">→</span>
+            </a>
+            <a href="#sec-wynajem" class="hero-quick-link hero-quick-link-single">
+                <span class="hero-quick-link-tag">Elastyczny</span>
+                <span class="hero-quick-link-name">Wynajem pojedynczy</span>
+                <span class="hero-quick-link-arrow" aria-hidden="true">→</span>
+            </a>
+        </div>
+
         <div id="sec-gabinety" class="landing-section"></div>
         <!-- GABINET 1 -->
         <div class="gabinet-card">
@@ -1667,11 +1736,11 @@
                 <h3>Wynajem stały (blok)</h3>
                 <div class="rental-card-price">
                     <span class="amount">35 zł</span>
-                    <span class="unit">/ godzina · 1 - 3 h</span>
+                    <span class="unit">/ godzina · blok 1-3 godz.</span>
                 </div>
                 <div class="rental-card-price" style="margin-top:-0.1rem;">
                     <span class="amount">30 zł</span>
-                    <span class="unit">/ godzina · 4 h+</span>
+                    <span class="unit">/ godzina · blok od 4 godz.</span>
                 </div>
                 <p class="rental-card-lead" style="margin-top:0.6rem;">Rezerwujesz ten sam dzień i godziny co tydzień, na czas nieokreślony. Twój termin - do Twojej wyłącznej dyspozycji.</p>
                 <ul class="rental-features">

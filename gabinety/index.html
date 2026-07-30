@@ -1567,7 +1567,7 @@
 <div id="landingView" class="landing-page">
     <header class="landing-topbar" id="landingNav">
         <div class="landing-topbar-inner">
-            <a href="../" class="landing-logo" aria-label="Pracownia Psychoterapii Zofii Żmijewskiej - powrót na stronę główną">
+            <a href="#" class="landing-logo" onclick="event.preventDefault();window.scrollTo({top:0,behavior:'smooth'});" aria-label="Pracownia Psychoterapii Zofii Żmijewskiej - strona startowa gabinetów">
                 <span class="landing-logo-prefix">Pracownia Psychoterapii</span>
                 <span class="landing-logo-circle"></span>
                 <span class="landing-logo-text">Zofii Żmijewskiej</span>
@@ -1580,7 +1580,7 @@
                 <a href="#sec-regulamin" data-target="sec-regulamin">Regulamin</a>
                 <a href="#sec-kontakt" data-target="sec-kontakt">Kontakt</a>
             </nav>
-            <button class="btn-login" onclick="showLoginFromLanding()" style="background:var(--primary);color:white;border:none;border-radius:7px;font-family:'DM Sans',sans-serif;cursor:pointer;">
+            <button class="btn-login" id="landingCtaTop" onclick="showLoginFromLanding()" style="background:var(--primary);color:white;border:none;border-radius:7px;font-family:'DM Sans',sans-serif;cursor:pointer;">
                 Zaloguj się
             </button>
         </div>
@@ -1591,14 +1591,14 @@
         <p class="landing-hero-sub">ul. Puławska 26A, Warszawa - dostępne na godziny i stałe bloki</p>
 
         <div class="hero-quick-links">
-            <a href="#sec-wynajem" class="hero-quick-link hero-quick-link-block">
-                <span class="hero-quick-link-tag">Stały</span>
-                <span class="hero-quick-link-name">Wynajem stały (bloki)</span>
-                <span class="hero-quick-link-arrow" aria-hidden="true">→</span>
-            </a>
             <a href="#sec-wynajem" class="hero-quick-link hero-quick-link-single">
                 <span class="hero-quick-link-tag">Elastyczny</span>
                 <span class="hero-quick-link-name">Wynajem pojedynczy</span>
+                <span class="hero-quick-link-arrow" aria-hidden="true">→</span>
+            </a>
+            <a href="#sec-wynajem" class="hero-quick-link hero-quick-link-block">
+                <span class="hero-quick-link-tag">Stały</span>
+                <span class="hero-quick-link-name">Wynajem stały (bloki)</span>
                 <span class="hero-quick-link-arrow" aria-hidden="true">→</span>
             </a>
         </div>
@@ -1898,7 +1898,7 @@
 
         <!-- CTA -->
         <div class="landing-cta">
-            <button class="btn-login" onclick="showLoginFromLanding()">Zaloguj się do panelu</button>
+            <button class="btn-login" id="landingCtaBottom" onclick="showLoginFromLanding()">Zaloguj się do panelu</button>
             <p>Dostęp wyłącznie dla najemców gabinetów</p>
         </div>
     </div>
@@ -1977,7 +1977,7 @@
         <div class="topbar-user">
             <span id="userName"></span>
             <div class="topbar-avatar" id="userAvatar"></div>
-            <a class="btn btn-sm btn-secondary" href="../" style="text-decoration:none;">Strona główna</a>
+            <button class="btn btn-sm btn-secondary" onclick="showLanding()">Strona główna</button>
             <button class="btn btn-sm btn-secondary" onclick="showChangePasswordModal()">Zmień hasło</button>
             <button class="btn btn-sm btn-secondary" onclick="handleLogout()">Wyloguj</button>
         </div>
@@ -2817,13 +2817,26 @@ function hideAllViews() {
 function showLanding() {
     hideAllViews();
     document.getElementById('landingView').style.display = '';
+
+    // Gdy ktoś jest zalogowany i wraca na stronę startową, przyciski CTA
+    // maja go wpuscic z powrotem do panelu (a nie na ekran logowania).
+    const loggedIn = !!currentTenant;
+    const topBtn = document.getElementById('landingCtaTop');
+    const bottomBtn = document.getElementById('landingCtaBottom');
+    if (topBtn) topBtn.textContent = loggedIn ? 'Wróć do panelu' : 'Zaloguj się';
+    if (bottomBtn) bottomBtn.textContent = loggedIn ? 'Wróć do panelu' : 'Zaloguj się do panelu';
 }
 
 function showLogin() {
     hideAllViews();
     document.getElementById('loginView').style.display = '';
 }
-const showLoginFromLanding = showLogin; // alias - wywoływany z landing page
+
+// Klik CTA na stronie startowej: zalogowany -> panel, niezalogowany -> logowanie
+function showLoginFromLanding() {
+    if (currentTenant) { showApp(); return; }
+    showLogin();
+}
 
 function showConsent() {
     hideAllViews();

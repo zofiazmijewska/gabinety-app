@@ -1571,7 +1571,6 @@
             <a href="#" class="landing-logo" onclick="event.preventDefault();window.scrollTo({top:0,behavior:'smooth'});" aria-label="Pracownia Psychoterapii Zofii Żmijewskiej - strona startowa gabinetów">
                 <span class="landing-logo-prefix">Pracownia Psychoterapii</span>
                 <span class="landing-logo-circle"></span>
-                <span class="landing-logo-text">Zofii Żmijewskiej</span>
             </a>
             <nav class="landing-nav-tabs">
                 <a href="#sec-gabinety" data-target="sec-gabinety">Gabinety</a>
@@ -6107,8 +6106,13 @@ async function generateInvoices() {
 
         // Data sprzedaży: dla faktur "tylko pojedyncze godziny" - ostatni dzień
         // poprzedniego miesiąca (kiedy faktycznie wykonano usługi). Dla faktur
-        // ze stałym blokiem - pierwszy dzień billing_month (start okresu wynajmu).
-        const sellDate = fixedAmount > 0 ? startDate : prevEndDate;
+        // ze stałym blokiem - pierwszy dzień billing_month (start okresu wynajmu),
+        // ale nie w przyszłość względem dziś (np. wystawianie z wyprzedzeniem
+        // przed rozpoczęciem miesiąca fakturowanego — jak przy zawieszeniu działalności).
+        const todayStr = new Date().toISOString().split('T')[0];
+        const sellDate = fixedAmount > 0
+            ? (todayStr < startDate ? todayStr : startDate)
+            : prevEndDate;
 
         invoiceSpecs.push({
             tenant_id: tenant.id,

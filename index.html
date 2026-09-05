@@ -1443,7 +1443,7 @@
                 <li><a href="#qualifications" data-pl="Wykształcenie" data-en="Qualifications">Wykształcenie</a></li>
                 <li><a href="#faq" data-pl="FAQ" data-en="FAQ">FAQ</a></li>
                 <li><a href="#contact" data-pl="Kontakt" data-en="Contact">Kontakt</a></li>
-                <li><a href="#" class="nav-btn" data-cal-link="pracownia-psychoterapii-zofii-zmijewskiej" data-cal-namespace="booking" data-cal-config='{"layout":"month_view"}' data-pl="Umów wizytę" data-en="Book a session" onclick="event.preventDefault()">Umów wizytę</a></li>
+                <li><a href="https://www.sumupbookings.com/pracownia-psychoterapii-zofii-zmijewskiej" class="nav-btn" target="_blank" rel="noopener" data-pl="Umów wizytę" data-en="Book a session">Umów wizytę</a></li>
             </ul>
             <div class="language-toggle">
                 <button class="lang-btn active" data-lang="pl" aria-label="Polski">PL</button>
@@ -1461,7 +1461,7 @@
     <section class="hero" id="home">
         <div class="hero-content">
             <img src="images/logo.svg" alt="Pracownia Psychoterapii Zofia Żmijewska" class="hero-logo" id="hero-logo" data-logo-pl="images/logo.svg" data-logo-en="images/logo-en.svg">
-            <a href="#" class="btn" data-cal-link="pracownia-psychoterapii-zofii-zmijewskiej" data-cal-namespace="booking" data-cal-config='{"layout":"month_view"}' data-pl="Umów wizytę" data-en="Book a session" onclick="event.preventDefault()">Umów wizytę</a>
+            <a href="https://www.sumupbookings.com/pracownia-psychoterapii-zofii-zmijewskiej" class="btn" target="_blank" rel="noopener" data-pl="Umów wizytę" data-en="Book a session">Umów wizytę</a>
         </div>
     </section>
 
@@ -1646,7 +1646,7 @@
             </div>
 
             <div class="offer-cta">
-                <a href="#" class="btn" data-cal-link="pracownia-psychoterapii-zofii-zmijewskiej" data-cal-namespace="booking" data-cal-config='{"layout":"month_view"}' data-pl="Umów wizytę" data-en="Book a&nbsp;session" onclick="event.preventDefault()">Umów wizytę</a>
+                <a href="https://www.sumupbookings.com/pracownia-psychoterapii-zofii-zmijewskiej" class="btn" target="_blank" rel="noopener" data-pl="Umów wizytę" data-en="Book a&nbsp;session">Umów wizytę</a>
             </div>
             <p class="offer-contact-alt" data-pl='Wolisz napisać albo zadzwonić? <a href="mailto:kontakt@zofiazmijewska.pl">kontakt@zofiazmijewska.pl</a> · <a href="tel:+48514622225">514 622 225</a>' data-en='Prefer to write or call? <a href="mailto:kontakt@zofiazmijewska.pl">kontakt@zofiazmijewska.pl</a> · <a href="tel:+48514622225">+48 514 622 225</a>'>Wolisz napisać albo zadzwonić? <a href="mailto:kontakt@zofiazmijewska.pl">kontakt@zofiazmijewska.pl</a> · <a href="tel:+48514622225">514 622 225</a></p>
         </div>
@@ -1863,7 +1863,7 @@
     </footer>
 
     <!-- Pływający przycisk zapisu (tylko telefon) -->
-    <a href="#" class="btn mobile-cta" id="mobileCta" data-cal-link="pracownia-psychoterapii-zofii-zmijewskiej" data-cal-namespace="booking" data-cal-config='{"layout":"month_view"}' data-pl="Umów wizytę" data-en="Book a session" onclick="event.preventDefault()">Umów wizytę</a>
+    <a href="https://www.sumupbookings.com/pracownia-psychoterapii-zofii-zmijewskiej" class="btn mobile-cta" id="mobileCta" target="_blank" rel="noopener" data-pl="Umów wizytę" data-en="Book a session">Umów wizytę</a>
 
     <script>
         // ==================== LANGUAGE SWITCHING ====================
@@ -2102,41 +2102,7 @@
         }
     </script>
 
-    <!-- Cal.com Embed Script -->
-    <script type="text/javascript">
-    (function (C, A, L) {
-        let p = function (a, ar) { a.q.push(ar); };
-        let d = C.document;
-        C.Cal = C.Cal || function () {
-            let cal = C.Cal;
-            let ar = arguments;
-            if (!cal.loaded) {
-                cal.ns = {};
-                cal.q = cal.q || [];
-                d.head.appendChild(d.createElement("script")).src = A;
-                cal.loaded = true;
-            }
-            if (ar[0] === L) {
-                const api = function () { p(api, arguments); };
-                const namespace = ar[1];
-                api.q = api.q || [];
-                if (typeof namespace === "string") {
-                    cal.ns[namespace] = cal.ns[namespace] || api;
-                    p(cal.ns[namespace], ar);
-                    p(cal, ["initNamespace", namespace]);
-                } else p(cal, ar);
-                return;
-            }
-            p(cal, ar);
-        };
-    })(window, "https://app.cal.eu/embed/embed.js", "init");
-
-    Cal("init", "booking", { origin: "https://cal.eu" });
-    Cal.ns.booking("ui", {
-        styles: { branding: { brandColor: "#B8A9C9" } },
-        hideEventTypeDetails: false,
-        layout: "month_view"
-    });
-    </script>
+    <!-- Rezerwacje: SumUp Bookings - przyciski "Umów wizytę" prowadzą do strony rezerwacji -->
+    <!-- https://www.sumupbookings.com/pracownia-psychoterapii-zofii-zmijewskiej -->
 </body>
 </html>

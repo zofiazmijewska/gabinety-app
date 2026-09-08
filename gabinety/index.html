@@ -3437,19 +3437,19 @@ async function showBookingModal(start, end, resourceId) {
                         ${roomOptions}
                     </select>
                 </div>
-                <p class="text-sm" id="bookCostInfo">Koszt: <strong>${hours * (currentTenant.single_hourly_rate || PRICE_PER_HOUR)} zł</strong> (${hours} × ${currentTenant.single_hourly_rate || PRICE_PER_HOUR} zł)</p>
+                <p class="text-sm" id="bookCostInfo">Koszt: <strong>${hours * (currentTenant.single_hourly_rate ?? PRICE_PER_HOUR)} zł</strong> (${hours} × ${currentTenant.single_hourly_rate ?? PRICE_PER_HOUR} zł)</p>
                 <p class="text-sm text-gray mt-1">Bezpłatne odwołanie do ${CANCEL_DAYS} dni przed terminem.</p>
                 <hr style="margin:0.75rem 0;border-color:var(--border)">
                 <div class="form-group">
                     <label style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;">
-                        <input type="checkbox" id="bookRepeatCheck" onchange="toggleRepeatOptions(${hours}, ${currentTenant.single_hourly_rate || PRICE_PER_HOUR})">
+                        <input type="checkbox" id="bookRepeatCheck" onchange="toggleRepeatOptions(${hours}, ${currentTenant.single_hourly_rate ?? PRICE_PER_HOUR})">
                         <span class="text-sm">Powtarzaj co tydzień</span>
                     </label>
                 </div>
                 <div id="bookRepeatOptions" style="display:none;margin-top:0.5rem;">
                     <div class="form-group">
                         <label class="form-label">Ile tygodni (łącznie z tym)</label>
-                        <select class="form-select" id="bookRepeatWeeks" onchange="updateRepeatCost(${hours}, ${currentTenant.single_hourly_rate || PRICE_PER_HOUR})">
+                        <select class="form-select" id="bookRepeatWeeks" onchange="updateRepeatCost(${hours}, ${currentTenant.single_hourly_rate ?? PRICE_PER_HOUR})">
                             ${[2,3,4,5,6,7,8,10,12].map(n => `<option value="${n}">${n} tygodni</option>`).join('')}
                         </select>
                     </div>
@@ -3589,7 +3589,7 @@ async function confirmBooking(dateStr, startH, endH) {
                 booking_date: bDate,
                 start_time: String(h).padStart(2, '0') + ':00:00',
                 end_time: String(h + 1).padStart(2, '0') + ':00:00',
-                price_per_hour: currentTenant.single_hourly_rate || PRICE_PER_HOUR,
+                price_per_hour: currentTenant.single_hourly_rate ?? PRICE_PER_HOUR,
                 status: 'confirmed',
                 created_by: currentTenant.id,
                 series_id: seriesId
@@ -3670,7 +3670,7 @@ function showBookingDetailModal(props) {
                 <p><strong>${props.roomName}</strong></p>
                 <p>${datePretty}</p>
                 <p>${props.startTime.substring(0,5)} - ${props.endTime.substring(0,5)}</p>
-                <p class="text-sm text-gray mt-1">${currentTenant.single_hourly_rate || PRICE_PER_HOUR} zł</p>
+                <p class="text-sm text-gray mt-1">${currentTenant.single_hourly_rate ?? PRICE_PER_HOUR} zł</p>
                 ${createdInfo}
                 ${isAdmin && daysUntil < CANCEL_DAYS ?
                     `<p class="text-sm mt-1" style="color:var(--warning)">Odwołanie poza limitem (admin)</p>` :
@@ -4515,8 +4515,8 @@ async function loadMyFixed() {
         const { data } = await sb.from('tenants').select('*').eq('id', tenantId).single();
         if (data) viewTenant = data;
     }
-    const singleRate = viewTenant.single_hourly_rate || PRICE_PER_HOUR;
-    const hourlyRate = viewTenant.hourly_rate || PRICE_PER_HOUR;
+    const singleRate = viewTenant.single_hourly_rate ?? PRICE_PER_HOUR;
+    const hourlyRate = viewTenant.hourly_rate ?? PRICE_PER_HOUR;
     const monthlyAmount = viewTenant.monthly_fixed_amount || 0;
 
     // 1. Load fixed bookings (schedule + billing source)
@@ -4697,7 +4697,7 @@ async function loadSummaryAll(startDate, endDate) {
     if (tenants) {
         tenants.forEach(t => {
             const fixedAmt = t.monthly_fixed_amount || 0;
-            const rate = t.single_hourly_rate || PRICE_PER_HOUR;
+            const rate = t.single_hourly_rate ?? PRICE_PER_HOUR;
             const bookings = singlesByTenant[t.id] || [];
             const hours = bookings.length;
             const singleAmt = hours * rate;
@@ -4752,7 +4752,7 @@ async function loadSummarySingle(tenantId, startDate, endDate) {
         .order('booking_date')
         .order('start_time');
 
-    const tenantRate = tenant.single_hourly_rate || PRICE_PER_HOUR;
+    const tenantRate = tenant.single_hourly_rate ?? PRICE_PER_HOUR;
     const singleHours = singles ? singles.length : 0;
     const singleAmount = singleHours * tenantRate;
 
@@ -4773,7 +4773,7 @@ async function loadSummarySingle(tenantId, startDate, endDate) {
             monthlyWeeklyHours += parseInt(f.end_time.split(':')[0]) - parseInt(f.start_time.split(':')[0]);
         });
     }
-    const hourlyRate = tenant.hourly_rate || 35;
+    const hourlyRate = tenant.hourly_rate ?? 35;
     const calculatedFixed = parseFloat((monthlyWeeklyHours * hourlyRate * 4.26).toFixed(2));
 
     // Preferuj kalkulację z aktywnych bloków dla tego miesiąca.
@@ -4919,7 +4919,7 @@ async function showEditTenantModal(tenantId) {
         const end = parseInt(fb.end_time.substring(0,2));
         return sum + (end - start);
     }, 0);
-    const rate = parseFloat(t.hourly_rate) || 35;
+    const rate = Number.isFinite(parseFloat(t.hourly_rate)) ? parseFloat(t.hourly_rate) : 35;
     const calcAmount = (totalWeeklyHours * rate * 4.26).toFixed(2);
 
     const fixedBlocksRows = (fixedBlocks || []).map(fb => {
@@ -4970,11 +4970,11 @@ async function showEditTenantModal(tenantId) {
                 <div class="grid-2">
                     <div class="form-group">
                         <label class="form-label">Stawka za godzinę (zł)</label>
-                        <input class="form-input" id="tenantHourlyRate" type="number" step="1" min="1" value="${t.hourly_rate || 35}" style="width:100px;" oninput="updateCalcDisplay()">
+                        <input class="form-input" id="tenantHourlyRate" type="number" step="1" min="0" value="${t.hourly_rate ?? 35}" style="width:100px;" oninput="updateCalcDisplay()">
                     </div>
                     <div class="form-group">
                         <label class="form-label">Stawka jednorazowa (zł/h)</label>
-                        <input class="form-input" id="tenantSingleRate" type="number" step="1" min="1" value="${t.single_hourly_rate || 35}" style="width:100px;">
+                        <input class="form-input" id="tenantSingleRate" type="number" step="1" min="0" value="${t.single_hourly_rate ?? 35}" style="width:100px;">
                     </div>
                 </div>
 
@@ -5069,8 +5069,8 @@ async function saveTenant(existingId) {
             company_name: (companyEl && companyEl.value.trim()) || null,
             address: (addressEl && addressEl.value.trim()) || null,
             monthly_fixed_amount: fixedEl ? (parseFloat(fixedEl.value.replace(',', '.')) || 0) : 0,
-            hourly_rate: hourlyRateEl ? (parseFloat(hourlyRateEl.value) || 35) : 35,
-            single_hourly_rate: singleRateEl ? (parseFloat(singleRateEl.value) || 35) : 35,
+            hourly_rate: (hourlyRateEl && Number.isFinite(parseFloat(hourlyRateEl.value))) ? parseFloat(hourlyRateEl.value) : 35,
+            single_hourly_rate: (singleRateEl && Number.isFinite(parseFloat(singleRateEl.value))) ? parseFloat(singleRateEl.value) : 35,
             wants_invoice: wantsInvoiceEl ? wantsInvoiceEl.checked : false,
             fakturownia_client_id: fakturowniaIdEl && fakturowniaIdEl.value ? parseInt(fakturowniaIdEl.value) : null,
             accepted_terms_v2_at: acceptedV2Val
@@ -5138,7 +5138,7 @@ async function autoRecalcMonthly(tenantId) {
     // Uwzględnia valid_from i end_date - pomija bloki zakończone lub jeszcze
     // niezaczęte (żeby nie liczyć starych wersji po podzieleniu bloku).
     const { data: tenant } = await sb.from('tenants').select('hourly_rate').eq('id', tenantId).single();
-    const rate = (tenant && tenant.hourly_rate) || 35;
+    const rate = (tenant && tenant.hourly_rate != null) ? tenant.hourly_rate : 35;
 
     const { data: bookings } = await sb
         .from('fixed_bookings')
@@ -6009,7 +6009,7 @@ async function generateInvoices() {
             .lte('booking_date', prevEndDate);
 
         const singleHours = singles ? singles.length : 0;
-        const tenantRate = tenant.single_hourly_rate || PRICE_PER_HOUR;
+        const tenantRate = tenant.single_hourly_rate ?? PRICE_PER_HOUR;
         const singleAmount = singleHours * tenantRate;
         const fixedAmount = tenant.monthly_fixed_amount || 0;
         const total = fixedAmount + singleAmount;
@@ -6078,7 +6078,7 @@ async function generateInvoices() {
             .lte('booking_date', prevEndDate);
 
         const singleHours = singles ? singles.length : 0;
-        const tenantRate2 = tenant.single_hourly_rate || PRICE_PER_HOUR;
+        const tenantRate2 = tenant.single_hourly_rate ?? PRICE_PER_HOUR;
         const singleAmount = singleHours * tenantRate2;
         const fixedAmount = tenant.monthly_fixed_amount || 0;
         const total = fixedAmount + singleAmount;

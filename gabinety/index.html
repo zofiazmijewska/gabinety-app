@@ -3792,6 +3792,9 @@ async function saveEditBooking(bookingId) {
     const { data: oldBooking } = await sb.from('single_bookings').select('*').eq('id', bookingId).single();
 
     // Sprawdź konflikty (pomijając edytowaną rezerwację)
+    // Rezerwacje sąsiadujące (np. 16-17 i 17-18) NIE są konfliktem - end_time jest exclusive.
+    const newStart = String(newStartH).padStart(2,'0') + ':00:00';
+    const newEnd   = String(newEndH).padStart(2,'0') + ':00:00';
     const { data: conflicts } = await sb
         .from('single_bookings')
         .select('id')
@@ -3799,8 +3802,8 @@ async function saveEditBooking(bookingId) {
         .eq('booking_date', newDate)
         .eq('status', 'confirmed')
         .neq('id', bookingId)
-        .gte('end_time', String(newStartH).padStart(2,'0') + ':00:00')
-        .lte('start_time', String(newEndH - 1).padStart(2,'0') + ':00:00');
+        .gt('end_time', newStart)
+        .lt('start_time', newEnd);
 
     if (conflicts && conflicts.length > 0) {
         toast('Konflikt z istniejącą rezerwacją w tym terminie', 'error');

@@ -4806,11 +4806,11 @@ async function loadSummaryAll(startDate, endDate) {
             const rate = t.single_hourly_rate ?? PRICE_PER_HOUR;
             const hourlyRate = t.hourly_rate ?? 35;
             const weeklyHours = fixedHoursByTenant[t.id] || 0;
-            // Wynajem staly liczony z aktywnych blokow dla tego miesiaca (weekly * rate * 4,26)
-            // Fallback do stored monthly_fixed_amount tylko gdy nie ma blokow (dla najemcow bez bloków ale z faktura co miesiac)
+            // Wynajem staly liczony z blokow AKTYWNYCH w tym miesiacu (weekly * rate * 4,26).
+            // Brak blokow w danym miesiacu => 0 zl (bloki z valid_from/end_date pilnuja zakresu).
             const fixedAmt = weeklyHours > 0
                 ? parseFloat((weeklyHours * hourlyRate * 4.26).toFixed(2))
-                : (t.monthly_fixed_amount || 0);
+                : 0;
             const bookings = singlesByTenant[t.id] || [];
             const hours = bookings.length;
             const singleAmt = hours * rate;
@@ -4889,9 +4889,10 @@ async function loadSummarySingle(tenantId, startDate, endDate) {
     const hourlyRate = tenant.hourly_rate ?? 35;
     const calculatedFixed = parseFloat((monthlyWeeklyHours * hourlyRate * 4.26).toFixed(2));
 
-    // Preferuj kalkulację z aktywnych bloków dla tego miesiąca.
-    // Fallback do stored monthly_fixed_amount tylko gdy nie ma żadnych bloków.
-    const fixedAmount = monthlyWeeklyHours > 0 ? calculatedFixed : (tenant.monthly_fixed_amount || 0);
+    // Kalkulacja z blokow aktywnych w tym miesiacu (weekly * rate * 4,26).
+    // Brak blokow w miesiacu => 0 zl (nie robimy fallbacku do stored monthly_fixed_amount,
+    // bo bloki z valid_from/end_date poprawnie odzwierciedlaja co jest waznego kiedy).
+    const fixedAmount = monthlyWeeklyHours > 0 ? calculatedFixed : 0;
     const total = fixedAmount + singleAmount;
 
     document.getElementById('summaryFixedAmount').textContent = fixedAmount.toFixed(0) + ' zł';

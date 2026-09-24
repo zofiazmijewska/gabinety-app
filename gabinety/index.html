@@ -4701,12 +4701,25 @@ function initSummaryMonths() {
     if (!select || select.options.length > 0) return;
 
     const now = new Date();
-    for (let i = 0; i < 6; i++) {
+    const currentVal = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2,'0')}-01`;
+    // 6 miesięcy w przyszłość (od najdalszego), bieżący, 12 miesięcy w przeszłość (od najnowszego)
+    const options = [];
+    for (let i = 6; i >= 1; i--) {
+        const d = new Date(now.getFullYear(), now.getMonth() + i, 1);
+        options.push({ d, tag: 'podgląd' });
+    }
+    options.push({ d: new Date(now.getFullYear(), now.getMonth(), 1), tag: 'bieżący' });
+    for (let i = 1; i <= 12; i++) {
         const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+        options.push({ d, tag: 'archiwum' });
+    }
+
+    options.forEach(({ d, tag }) => {
         const val = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2,'0')}-01`;
         const label = d.toLocaleDateString('pl-PL', { month: 'long', year: 'numeric' });
-        select.innerHTML += `<option value="${val}">${label}</option>`;
-    }
+        const suffix = tag === 'bieżący' ? '' : ` (${tag})`;
+        select.innerHTML += `<option value="${val}" ${val === currentVal ? 'selected' : ''}>${label}${suffix}</option>`;
+    });
 
     // Admin: pokaż dropdown najemców
     if (currentTenant && currentTenant.is_admin) {
@@ -4758,6 +4771,11 @@ async function loadSummaryAll(startDate, endDate) {
         .eq('status', 'confirmed')
         .gte('booking_date', startDate)
         .lte('booking_date', endDate);
+    // Pobierz wszystkie aktywne stałe bloki - potem filtrujemy po valid_from/end_date
+    const { data: allFixed } = await sb
+        .from('fixed_bookings')
+        .select('tenant_id, start_time, end_time, valid_from, end_date')
+        .eq('is_active', true);
 
     const singlesByTenant = {};
     if (singles) {
@@ -4767,14 +4785,32 @@ async function loadSummaryAll(startDate, endDate) {
         });
     }
 
+    // Godziny stałe w miesiącu per najemca (bloki obowiązujące w tym okresie)
+    const fixedHoursByTenant = {};
+    if (allFixed) {
+        allFixed.forEach(f => {
+            const validFromOk = !f.valid_from || f.valid_from <= endDate;
+            const endDateOk = !f.end_date || f.end_date > startDate;
+            if (!validFromOk || !endDateOk) return;
+            const hours = parseInt(f.end_time.split(':')[0]) - parseInt(f.start_time.split(':')[0]);
+            fixedHoursByTenant[f.tenant_id] = (fixedHoursByTenant[f.tenant_id] || 0) + hours;
+        });
+    }
+
     let grandFixed = 0, grandSingleHours = 0, grandSingleAmount = 0, grandTotal = 0;
     const tbody = document.getElementById('summaryAllTenantsTable');
     let rows = '';
 
     if (tenants) {
         tenants.forEach(t => {
-            const fixedAmt = t.monthly_fixed_amount || 0;
             const rate = t.single_hourly_rate ?? PRICE_PER_HOUR;
+            const hourlyRate = t.hourly_rate ?? 35;
+            const weeklyHours = fixedHoursByTenant[t.id] || 0;
+            // Wynajem staly liczony z aktywnych blokow dla tego miesiaca (weekly * rate * 4,26)
+            // Fallback do stored monthly_fixed_amount tylko gdy nie ma blokow (dla najemcow bez bloków ale z faktura co miesiac)
+            const fixedAmt = weeklyHours > 0
+                ? parseFloat((weeklyHours * hourlyRate * 4.26).toFixed(2))
+                : (t.monthly_fixed_amount || 0);
             const bookings = singlesByTenant[t.id] || [];
             const hours = bookings.length;
             const singleAmt = hours * rate;
@@ -4789,7 +4825,7 @@ async function loadSummaryAll(startDate, endDate) {
 
             rows += `<tr>
                 <td><strong>${escHtml(t.name)}</strong></td>
-                <td>${fixedAmt.toFixed(0)} zł</td>
+                <td>${fixedAmt.toFixed(0)} zł${weeklyHours > 0 ? ` <span class="text-xs text-gray">(${weeklyHours}h/tydz)</span>` : ''}</td>
                 <td>${hours > 0 ? hours + ' h' : '-'}</td>
                 <td>${hours > 0 ? singleAmt.toFixed(0) + ' zł' : '-'}</td>
                 <td><strong>${total.toFixed(0)} zł</strong></td>

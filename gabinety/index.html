@@ -6109,6 +6109,23 @@ async function generateInvoices() {
         return;
     }
 
+    // Pobierz aktywne bloki wszystkich najemcow, zbuduj map tenant_id -> godziny_tygodniowo
+    // dla BILLING_MONTH (nie dla dzisiaj) - zeby prognozy i archiwum liczyly poprawnie.
+    const { data: allActiveFixed } = await sb
+        .from('fixed_bookings')
+        .select('tenant_id, start_time, end_time, valid_from, end_date')
+        .eq('is_active', true);
+    const weeklyHoursByTenant = {};
+    if (allActiveFixed) {
+        allActiveFixed.forEach(f => {
+            const validFromOk = !f.valid_from || f.valid_from <= endDate;
+            const endDateOk = !f.end_date || f.end_date > startDate;
+            if (!validFromOk || !endDateOk) return;
+            const hours = parseInt(f.end_time.split(':')[0]) - parseInt(f.start_time.split(':')[0]);
+            weeklyHoursByTenant[f.tenant_id] = (weeklyHoursByTenant[f.tenant_id] || 0) + hours;
+        });
+    }
+
     let generated = 0;
     let errors = 0;
 
@@ -6125,7 +6142,12 @@ async function generateInvoices() {
         const singleHours = singles ? singles.length : 0;
         const tenantRate = tenant.single_hourly_rate ?? PRICE_PER_HOUR;
         const singleAmount = singleHours * tenantRate;
-        const fixedAmount = tenant.monthly_fixed_amount || 0;
+        // Wynajem staly liczony z blokow AKTYWNYCH w billing_month (nie ze zapisanego cache)
+        const weeklyHours = weeklyHoursByTenant[tenant.id] || 0;
+        const hourlyRate = tenant.hourly_rate ?? 35;
+        const fixedAmount = weeklyHours > 0
+            ? parseFloat((weeklyHours * hourlyRate * 4.26).toFixed(2))
+            : 0;
         const total = fixedAmount + singleAmount;
 
         if (total === 0) continue; // Skip if nothing to invoice
@@ -6194,7 +6216,12 @@ async function generateInvoices() {
         const singleHours = singles ? singles.length : 0;
         const tenantRate2 = tenant.single_hourly_rate ?? PRICE_PER_HOUR;
         const singleAmount = singleHours * tenantRate2;
-        const fixedAmount = tenant.monthly_fixed_amount || 0;
+        // Wynajem staly liczony z blokow AKTYWNYCH w billing_month (nie ze zapisanego cache)
+        const weeklyHours = weeklyHoursByTenant[tenant.id] || 0;
+        const hourlyRate = tenant.hourly_rate ?? 35;
+        const fixedAmount = weeklyHours > 0
+            ? parseFloat((weeklyHours * hourlyRate * 4.26).toFixed(2))
+            : 0;
         const total = fixedAmount + singleAmount;
         if (total === 0) continue;
 

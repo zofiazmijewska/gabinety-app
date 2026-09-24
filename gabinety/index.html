@@ -3547,6 +3547,69 @@ async function confirmBooking(dateStr, startH, endH) {
     const tenantSelect = document.getElementById('bookTenantSelect');
     const bookingTenantId = (tenantSelect && currentTenant.is_admin) ? tenantSelect.value : currentTenant.id;
 
+    // Zapobiegaj podwojnej rezerwacji tego samego najemcy w tym samym czasie w innym gabinecie.
+    // Wyjatek: admin i osoby z zerowa stawka (np. Zuzia sprzatajaca) - moga mieciec kilka gabinetow naraz.
+    const { data: bookingTenant } = await sb.from('tenants').select('is_admin, hourly_rate, single_hourly_rate, name').eq('id', bookingTenantId).single();
+    const isFreeTenant = bookingTenant && (bookingTenant.is_admin || (Number(bookingTenant.hourly_rate) === 0 && Number(bookingTenant.single_hourly_rate) === 0));
+    if (!isFreeTenant) {
+        // Zbierz wszystkie daty (uwzgledniajac ewentualne powtorki tygodniowe)
+        const weeks = (function() {
+            const rc = document.getElementById('bookRepeatCheck');
+            return rc && rc.checked ? parseInt(document.getElementById('bookRepeatWeeks').value) : 1;
+        })();
+        const datesToCheck = [];
+        for (let w = 0; w < weeks; w++) {
+            const d = parseLocalDate(dateStr);
+            d.setDate(d.getDate() + w * 7);
+            datesToCheck.push(toLocalDateStr(d));
+        }
+
+        // 1. Sprawdz single_bookings tego najemcy w tych dniach na te godziny w INNYM gabinecie
+        const { data: sameTimeSingles } = await sb
+            .from('single_bookings')
+            .select('booking_date, start_time, room_id, rooms(name)')
+            .eq('tenant_id', bookingTenantId)
+            .eq('status', 'confirmed')
+            .in('booking_date', datesToCheck)
+            .neq('room_id', roomId);
+
+        const conflictSingle = (sameTimeSingles || []).find(b => {
+            const bh = parseInt(b.start_time.substring(0, 2));
+            return bh >= startH && bh < endH;
+        });
+        if (conflictSingle) {
+            toast(`${bookingTenant.name} ma już rezerwację w ${conflictSingle.rooms?.name || 'innym gabinecie'} tego dnia o ${conflictSingle.start_time.substring(0,5)}`, 'error');
+            btn.disabled = false; btn.textContent = 'Rezerwuję'; return;
+        }
+
+        // 2. Sprawdz staly blok tego najemcy nakladajacy sie z tym slotem w INNYM gabinecie
+        const { data: sameTimeFixed } = await sb
+            .from('fixed_bookings')
+            .select('day_of_week, start_time, end_time, room_id, rooms(name), valid_from, end_date')
+            .eq('tenant_id', bookingTenantId)
+            .eq('is_active', true)
+            .neq('room_id', roomId);
+
+        const conflictFixed = (sameTimeFixed || []).find(f => {
+            const startBlock = parseInt(f.start_time.substring(0, 2));
+            const endBlock = parseInt(f.end_time.substring(0, 2));
+            if (startBlock >= endH || endBlock <= startH) return false; // nie zachodzi na siebie
+            // czy jakis z targetDates trafia na day_of_week i miesci sie w valid_from/end_date
+            return datesToCheck.some(ds => {
+                const targetD = parseLocalDate(ds);
+                const dow = (targetD.getDay() + 6) % 7;
+                if (dow !== f.day_of_week) return false;
+                if (f.valid_from && f.valid_from > ds) return false;
+                if (f.end_date && f.end_date <= ds) return false;
+                return true;
+            });
+        });
+        if (conflictFixed) {
+            toast(`${bookingTenant.name} ma staly blok w ${conflictFixed.rooms?.name || 'innym gabinecie'} w tych godzinach`, 'error');
+            btn.disabled = false; btn.textContent = 'Rezerwuję'; return;
+        }
+    }
+
     // Repeat settings
     const repeatCheck = document.getElementById('bookRepeatCheck');
     const repeatWeeks = repeatCheck && repeatCheck.checked ? parseInt(document.getElementById('bookRepeatWeeks').value) : 1;

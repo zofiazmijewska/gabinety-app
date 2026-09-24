@@ -2463,6 +2463,7 @@ const SUPABASE_URL = 'https://clzfuvicdxewtovniriv.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNsemZ1dmljZHhld3Rvdm5pcml2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE0MjQ2NDgsImV4cCI6MjA4NzAwMDY0OH0.g-sxdV_hfuiJBhskZ9vLXShCvRcaWytdgybmInawsEs';
 const PRICE_PER_HOUR = 35;
 const CANCEL_DAYS = 7;
+const GRACE_MINUTES = 10; // po utworzeniu najemca może sam edytować/odwołać własną rezerwację
 const DAYS_PL = ['Poniedziałek', 'Wtorek', 'Środa', 'Czwartek', 'Piątek', 'Sobota', 'Niedziela'];
 const HOURS_START = 7;
 const HOURS_END = 21;
@@ -3648,8 +3649,18 @@ function showBookingDetailModal(props) {
     const todayLocal = new Date(now.getFullYear(), now.getMonth(), now.getDate());
     const daysUntil = Math.floor((bookingDate - todayLocal) / (1000 * 60 * 60 * 24));
     const isAdmin = currentTenant && currentTenant.is_admin;
-    const canCancel = isAdmin || daysUntil >= CANCEL_DAYS;
     const isOwn = props.tenantId === currentTenant.id;
+
+    // Grace period: własna świeża rezerwacja (< 10 min od utworzenia) - najemca może sam edytować/odwołać
+    let graceMinutesLeft = 0;
+    if (isOwn && !isAdmin && props.createdAt) {
+        const ageMs = Date.now() - new Date(props.createdAt).getTime();
+        graceMinutesLeft = Math.max(0, Math.ceil((GRACE_MINUTES * 60 * 1000 - ageMs) / 60000));
+    }
+    const inGrace = graceMinutesLeft > 0;
+
+    const canCancel = isAdmin || daysUntil >= CANCEL_DAYS || inGrace;
+    const canEdit = isAdmin || inGrace;
 
     const cancelLabel = isAdmin && !isOwn ? 'Odwołaj (admin)' : 'Odwołaj rezerwację';
     const hasSeries = !!props.seriesId;
@@ -3662,6 +3673,11 @@ function showBookingDetailModal(props) {
         createdInfo = `<p class="text-xs text-gray" style="margin-top:0.5rem">Utworzona: ${cdStr}${props.createdByName ? ' · ' + props.createdByName : ''}</p>`;
     }
 
+    // Info o grace period dla własnej świeżej rezerwacji
+    const graceInfo = inGrace && !isAdmin
+        ? `<p class="text-sm mt-1" style="color:var(--primary)">Możesz jeszcze edytować lub odwołać przez ${graceMinutesLeft} min (do ${GRACE_MINUTES} min od utworzenia)</p>`
+        : '';
+
     const modal = `
         <div class="modal-overlay" onclick="if(event.target===this)closeModal()">
             <div class="modal">
@@ -3672,16 +3688,18 @@ function showBookingDetailModal(props) {
                 <p>${props.startTime.substring(0,5)} - ${props.endTime.substring(0,5)}</p>
                 <p class="text-sm text-gray mt-1">${currentTenant.single_hourly_rate ?? PRICE_PER_HOUR} zł</p>
                 ${createdInfo}
+                ${graceInfo}
                 ${isAdmin && daysUntil < CANCEL_DAYS ?
                     `<p class="text-sm mt-1" style="color:var(--warning)">Odwołanie poza limitem (admin)</p>` :
-                    canCancel ?
+                    (daysUntil >= CANCEL_DAYS) ?
                         `<p class="text-sm mt-1" style="color:var(--success)">Możesz bezpłatnie odwołać (${daysUntil} dni do terminu)</p>` :
-                        `<p class="text-sm mt-1" style="color:var(--danger)">Odwołanie niemożliwe (mniej niż ${CANCEL_DAYS} dni do terminu)</p>`
+                        (inGrace ? '' :
+                            `<p class="text-sm mt-1" style="color:var(--danger)">Odwołanie niemożliwe (mniej niż ${CANCEL_DAYS} dni do terminu)</p>`)
                 }
                 ${hasSeries ? `<p class="text-sm text-gray mt-1">🔁 Część cyklicznej rezerwacji</p>` : ''}
                 <div class="modal-actions" style="flex-wrap:wrap;gap:0.5rem;">
                     <button class="btn btn-secondary" onclick="closeModal()">Zamknij</button>
-                    ${isAdmin ? `<button class="btn btn-primary" onclick="showEditBookingModal('${props.bookingId}', '${props.roomId}', '${props.bookingDate}', '${props.startTime}', '${props.endTime}', '${props.tenantId}')">Edytuj</button>` : ''}
+                    ${canEdit ? `<button class="btn btn-primary" onclick="showEditBookingModal('${props.bookingId}', '${props.roomId}', '${props.bookingDate}', '${props.startTime}', '${props.endTime}', '${props.tenantId}')">Edytuj</button>` : ''}
                     ${canCancel ? `<button class="btn btn-danger" onclick="cancelBooking('${props.bookingId}')">${hasSeries ? 'Odwołaj tę jedną' : cancelLabel}</button>` : ''}
                     ${canCancel && hasSeries ? `<button class="btn btn-danger" style="background:#9B3030;" onclick="cancelSeriesFuture('${props.seriesId}', '${props.bookingDate}')">Odwołaj tę i kolejne</button>` : ''}
                 </div>
@@ -3698,6 +3716,18 @@ function openBookingDetail(bookingId) {
     const datePretty = new Date(b.booking_date).toLocaleDateString('pl-PL', { weekday: 'long', day: 'numeric', month: 'long' });
     const time = b.start_time.substring(0,5) + ' - ' + b.end_time.substring(0,5);
     const admin = currentTenant && currentTenant.is_admin;
+    const isOwn = b.tenant_id === currentTenant.id;
+
+    // Grace period: własna świeża rezerwacja - najemca może edytować
+    let graceMinutesLeft = 0;
+    if (isOwn && !admin && b.created_at) {
+        const ageMs = Date.now() - new Date(b.created_at).getTime();
+        graceMinutesLeft = Math.max(0, Math.ceil((GRACE_MINUTES * 60 * 1000 - ageMs) / 60000));
+    }
+    const canEdit = admin || graceMinutesLeft > 0;
+    const graceInfo = graceMinutesLeft > 0
+        ? `<p class="text-sm mt-1" style="color:var(--primary)">Możesz jeszcze edytować przez ${graceMinutesLeft} min (do ${GRACE_MINUTES} min od utworzenia)</p>`
+        : '';
 
     const modal = `
         <div class="modal-overlay" onclick="if(event.target===this)closeModal()">
@@ -3706,10 +3736,11 @@ function openBookingDetail(bookingId) {
                 <p><strong>${roomName}</strong></p>
                 <p>${datePretty}</p>
                 <p>${time}</p>
+                ${graceInfo}
                 <hr style="margin:0.75rem 0;border-color:var(--border)">
                 <div class="modal-actions" style="flex-wrap:wrap;gap:0.5rem;">
                     <button class="btn btn-secondary" onclick="closeModal()">Zamknij</button>
-                    ${admin ? `<button class="btn btn-primary" onclick="showEditBookingModal('${b.id}', '${b.room_id}', '${b.booking_date}', '${b.start_time}', '${b.end_time}', '${b.tenant_id}')">Zmień termin</button>` : ''}
+                    ${canEdit ? `<button class="btn btn-primary" onclick="showEditBookingModal('${b.id}', '${b.room_id}', '${b.booking_date}', '${b.start_time}', '${b.end_time}', '${b.tenant_id}')">Zmień termin</button>` : ''}
                     <button class="btn btn-danger" onclick="cancelBooking('${b.id}')">Odwołaj tę sesję</button>
                     ${b.series_id ? `<button class="btn btn-danger" style="background:#9B3030;" onclick="cancelSeriesFuture('${b.series_id}', '${b.booking_date}')">Odwołaj tę i przyszłe</button>` : ''}
                 </div>
@@ -3719,6 +3750,7 @@ function openBookingDetail(bookingId) {
 }
 
 async function showEditBookingModal(bookingId, currentRoomId, currentDate, currentStart, currentEnd, tenantId) {
+    const isAdmin = currentTenant && currentTenant.is_admin;
     const roomOptions = rooms.map(r =>
         `<option value="${r.id}" ${r.id === currentRoomId ? 'selected' : ''}>${r.name}</option>`
     ).join('');
@@ -3731,19 +3763,25 @@ async function showEditBookingModal(bookingId, currentRoomId, currentDate, curre
         hourOptions += `<option value="${h}">${String(h).padStart(2,'0')}:00</option>`;
     }
 
-    const { data: tenants } = await sb.from('tenants').select('id, name').eq('is_active', true).order('name');
-    const tenantOptions = (tenants || []).map(t =>
-        `<option value="${t.id}" ${t.id === tenantId ? 'selected' : ''}>${t.name}</option>`
-    ).join('');
+    // Pole "Najemca" (z listą wszystkich) tylko dla admina; najemca nie może zmienić na kogo jest rezerwacja
+    let tenantFieldHtml = '';
+    if (isAdmin) {
+        const { data: tenants } = await sb.from('tenants').select('id, name').eq('is_active', true).order('name');
+        const tenantOptions = (tenants || []).map(t =>
+            `<option value="${t.id}" ${t.id === tenantId ? 'selected' : ''}>${t.name}</option>`
+        ).join('');
+        tenantFieldHtml = `
+                <div class="form-group">
+                    <label class="form-label">Najemca</label>
+                    <select class="form-select" id="editTenantSelect">${tenantOptions}</select>
+                </div>`;
+    }
 
     const modal = `
         <div class="modal-overlay" onclick="if(event.target===this)closeModal()">
             <div class="modal">
                 <h2>Edytuj rezerwację</h2>
-                <div class="form-group">
-                    <label class="form-label">Najemca</label>
-                    <select class="form-select" id="editTenantSelect">${tenantOptions}</select>
-                </div>
+                ${tenantFieldHtml}
                 <div class="form-group">
                     <label class="form-label">Gabinet</label>
                     <select class="form-select" id="editRoomSelect">${roomOptions}</select>
@@ -3780,7 +3818,8 @@ async function saveEditBooking(bookingId) {
     const newDate = document.getElementById('editDateInput').value;
     const newStartH = parseInt(document.getElementById('editStartSelect').value);
     const newEndH = parseInt(document.getElementById('editEndSelect').value);
-    const newTenantId = document.getElementById('editTenantSelect').value;
+    const editTenantEl = document.getElementById('editTenantSelect');
+    const newTenantId = editTenantEl ? editTenantEl.value : null;
 
     if (newStartH >= newEndH) {
         toast('Godzina końca musi być późniejsza niż początku', 'error');
@@ -3790,6 +3829,24 @@ async function saveEditBooking(bookingId) {
     }
 
     const { data: oldBooking } = await sb.from('single_bookings').select('*').eq('id', bookingId).single();
+
+    // Zabezpieczenie: nie-admin może edytować tylko własną świeżą rezerwację (< GRACE_MINUTES od utworzenia)
+    if (!currentTenant.is_admin) {
+        if (!oldBooking || oldBooking.tenant_id !== currentTenant.id) {
+            toast('Nie możesz edytować cudzej rezerwacji', 'error');
+            btn.disabled = false; btn.textContent = 'Zapisz'; return;
+        }
+        const ageMin = (Date.now() - new Date(oldBooking.created_at).getTime()) / 60000;
+        if (ageMin > GRACE_MINUTES) {
+            toast(`Edycja możliwa tylko przez ${GRACE_MINUTES} min od utworzenia rezerwacji`, 'error');
+            btn.disabled = false; btn.textContent = 'Zapisz'; return;
+        }
+        // Najemca nie może zmienić dla kogo jest rezerwacja
+        if (newTenantId && newTenantId !== oldBooking.tenant_id) {
+            toast('Nie możesz zmienić najemcy rezerwacji', 'error');
+            btn.disabled = false; btn.textContent = 'Zapisz'; return;
+        }
+    }
 
     // Sprawdź konflikty (pomijając edytowaną rezerwację)
     // Rezerwacje sąsiadujące (np. 16-17 i 17-18) NIE są konfliktem - end_time jest exclusive.
@@ -3842,6 +3899,23 @@ async function saveEditBooking(bookingId) {
 
 async function cancelBooking(bookingId) {
     const { data: oldBooking } = await sb.from('single_bookings').select('*, tenants(name), rooms(name)').eq('id', bookingId).single();
+
+    // Zabezpieczenie dla nie-admina: własna rezerwacja + (>= CANCEL_DAYS do terminu ALBO w grace period od utworzenia)
+    if (!currentTenant.is_admin && oldBooking) {
+        if (oldBooking.tenant_id !== currentTenant.id) {
+            toast('Nie możesz odwołać cudzej rezerwacji', 'error');
+            return;
+        }
+        const [bY, bM, bD] = oldBooking.booking_date.split('-').map(Number);
+        const now = new Date();
+        const todayLocal = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        const daysUntil = Math.floor((new Date(bY, bM - 1, bD) - todayLocal) / (1000 * 60 * 60 * 24));
+        const ageMin = (Date.now() - new Date(oldBooking.created_at).getTime()) / 60000;
+        if (daysUntil < CANCEL_DAYS && ageMin > GRACE_MINUTES) {
+            toast(`Odwołanie niemożliwe - mniej niż ${CANCEL_DAYS} dni do terminu i minęło ponad ${GRACE_MINUTES} min od utworzenia`, 'error');
+            return;
+        }
+    }
 
     let query = sb
         .from('single_bookings')
@@ -4706,7 +4780,7 @@ async function loadSummaryAll(startDate, endDate) {
             const singleAmt = hours * rate;
             const total = fixedAmt + singleAmt;
 
-            if (fixedAmt === 0 && hours === 0) return; // pomiń nieaktywnych
+            if (fixedAmt === 0 && hours === 0 && !t.is_admin) return; // pomiń nieaktywnych (admin zawsze widoczny)
 
             grandFixed += fixedAmt;
             grandSingleHours += hours;
@@ -4715,7 +4789,7 @@ async function loadSummaryAll(startDate, endDate) {
 
             rows += `<tr>
                 <td><strong>${escHtml(t.name)}</strong></td>
-                <td>${fixedAmt > 0 ? fixedAmt.toFixed(0) + ' zł' : '-'}</td>
+                <td>${fixedAmt.toFixed(0)} zł</td>
                 <td>${hours > 0 ? hours + ' h' : '-'}</td>
                 <td>${hours > 0 ? singleAmt.toFixed(0) + ' zł' : '-'}</td>
                 <td><strong>${total.toFixed(0)} zł</strong></td>

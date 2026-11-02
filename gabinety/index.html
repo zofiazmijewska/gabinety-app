@@ -3771,9 +3771,19 @@ function showBookingDetailModal(props) {
     document.getElementById('modalContainer').innerHTML = modal;
 }
 
-function openBookingDetail(bookingId) {
-    const b = window._bookingsCache && window._bookingsCache[bookingId];
-    if (!b) { toast('Nie znaleziono rezerwacji', 'error'); return; }
+async function openBookingDetail(bookingId) {
+    let b = window._bookingsCache && window._bookingsCache[bookingId];
+    // Fallback: cache nie zawiera (np. rezerwacja z przeszlosci) - dociagnij z bazy
+    if (!b) {
+        const { data } = await sb.from('single_bookings')
+            .select('*, rooms(name)')
+            .eq('id', bookingId)
+            .maybeSingle();
+        if (!data) { toast('Nie znaleziono rezerwacji', 'error'); return; }
+        b = data;
+        if (!window._bookingsCache) window._bookingsCache = {};
+        window._bookingsCache[bookingId] = b;
+    }
 
     const roomName = b.rooms?.name || '-';
     const datePretty = new Date(b.booking_date).toLocaleDateString('pl-PL', { weekday: 'long', day: 'numeric', month: 'long' });

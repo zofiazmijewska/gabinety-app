@@ -3501,6 +3501,19 @@ async function confirmBooking(dateStr, startH, endH) {
         return;
     }
 
+    // Limit "wyprzedzenia" dla najemcow budzetowych (max_booking_lead_hours)
+    // Dotyczy TYLKO rezerwacji dla samego siebie, nie admina ustawiajacego komus
+    if (!(currentTenant && currentTenant.is_admin) && currentTenant.max_booking_lead_hours != null) {
+        const maxH = currentTenant.max_booking_lead_hours;
+        const limit = new Date(Date.now() + maxH * 60 * 60 * 1000);
+        if (bookingStart > limit) {
+            toast(`Mozesz rezerwowac maksymalnie ${maxH} godz. w przod. Wejdz blizej terminu.`, 'error');
+            btn.disabled = false;
+            btn.textContent = 'Rezerwuję';
+            return;
+        }
+    }
+
     // Sprawdź kolizje ze stałymi blokami (pomijaj wyjątki na ten dzień)
     const dow = (bookingStart.getDay() + 6) % 7; // 0=Pon
     const { data: fixedAll } = await sb

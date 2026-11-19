@@ -3984,7 +3984,12 @@ async function saveEditBooking(bookingId) {
 }
 
 async function cancelBooking(bookingId) {
-    const { data: oldBooking } = await sb.from('single_bookings').select('*, tenants(name), rooms(name)').eq('id', bookingId).single();
+    // UWAGA: tenants(name) musi byc jawnie z FK bo single_bookings ma trzy relacje do tenants
+    // (tenant_id, created_by, cancelled_by). Bez tego PostgREST zwraca blad PGRST201
+    // i oldBooking jest null - przez to logAudit nie byl wywolywany od dawna.
+    const { data: oldBooking } = await sb.from('single_bookings')
+        .select('*, tenants!tenant_id(name), rooms(name)')
+        .eq('id', bookingId).single();
 
     // Zabezpieczenie dla nie-admina: własna rezerwacja + (>= CANCEL_DAYS do terminu ALBO w grace period od utworzenia)
     if (!currentTenant.is_admin && oldBooking) {
@@ -4036,6 +4041,15 @@ async function cancelBooking(bookingId) {
 async function cancelSeriesFuture(seriesId, fromDate) {
     if (!confirm('Odwołać tę rezerwację i wszystkie kolejne w tej serii?')) return;
 
+    // Pobierz odwolywane rezerwacje do audytu
+    let preQuery = sb.from('single_bookings')
+        .select('id, booking_date, start_time, end_time, tenant_id, tenants!tenant_id(name), rooms(name)')
+        .eq('series_id', seriesId)
+        .gte('booking_date', fromDate)
+        .eq('status', 'confirmed');
+    if (!currentTenant.is_admin) preQuery = preQuery.eq('tenant_id', currentTenant.id);
+    const { data: toCancel } = await preQuery;
+
     let query = sb
         .from('single_bookings')
         .update({ status: 'cancelled', cancelled_at: new Date().toISOString(), cancelled_by: currentTenant.id })
@@ -4052,6 +4066,19 @@ async function cancelSeriesFuture(seriesId, fromDate) {
     if (error) {
         toast('Błąd odwołania: ' + error.message, 'error');
         return;
+    }
+
+    // Wpis audytowy: jedna linia opisujaca cala serie
+    if (toCancel && toCancel.length > 0) {
+        const first = toCancel[0];
+        const tenantName = first.tenants?.name || '';
+        const roomName = first.rooms?.name || '';
+        const timeStr = first.start_time.substring(0,5) + '-' + first.end_time.substring(0,5);
+        const lastDate = toCancel[toCancel.length - 1].booking_date;
+        await logAudit('single_bookings', seriesId, 'cancel',
+            { series_id: seriesId, count: toCancel.length, from: fromDate, to: lastDate }, null,
+            `Odwołano serię ${toCancel.length} rezerwacji: ${tenantName} - ${fromDate}..${lastDate} ${timeStr} ${roomName}`,
+            first.tenant_id);
     }
 
     // Wyłącz też auto-przedłużanie tej serii (jeśli istnieje w booking_series)
